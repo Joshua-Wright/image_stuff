@@ -305,9 +305,9 @@ namespace image_utils {
         int dy = out_double.y() / 2;
         rose_dist func(n);
         for (int x = 0; x < out_double.x(); x++) {
-            func.x = 2.0L * (1.0L * x - dx) / out_double.x();
+            func.x = 1.1L * 2.0L * (1.0L * x - dx) / out_double.x();
             for (int y = 0; y < out_double.y(); y++) {
-                func.y = 2.0L * (1.0L * y - dy) / out_double.y();
+                func.y = 1.1L * 2.0L * (1.0L * y - dy) / out_double.y();
                 out_double(x, y) = sqrt(function_min(&func, a, b, (const int) (b - a), 9));
             }
             if (x % (out_double.x() / 100) == 0) {
@@ -317,7 +317,7 @@ namespace image_utils {
     }
 
 
-    void image_sanity_check(const matrix<long double> &doubles) {
+    void image_sanity_check(const matrix<long double> &doubles, bool print_minmax) {
         auto min_max_tuple = std::minmax_element(doubles.begin(), doubles.end());
         long double min = *min_max_tuple.first;
         long double max = *min_max_tuple.second;
@@ -325,7 +325,9 @@ namespace image_utils {
             std::isnan(max)) {
             std::cout << "infinity detected" << std::endl;
         }
-        std::cout << min << " " << max << std::endl;
+        if (print_minmax) {
+            std::cout << min << " " << max << std::endl;
+        }
         if (min == 0 && max == 0) {
             std::cout << "everything is 0" << std::endl;
         } else if (min == max) {

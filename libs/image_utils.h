@@ -83,7 +83,7 @@ namespace image_utils {
 
     void image_fill_rose_ripples(matrix<long double> &out_double, long double n, long double a, long double b);
 
-    void image_sanity_check(const matrix<long double> &doubles);
+    void image_sanity_check(const matrix<long double> &doubles, bool print_minmax = false);
 
     void color_write_image(matrix<long double> &doubles, colormap_f colormap, std::string output_filename);
 

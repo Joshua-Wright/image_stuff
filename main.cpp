@@ -19,22 +19,25 @@ int main() {
     srand((unsigned int) time(0));
 
 //    unsigned z = 100;
+//    unsigned z = 200;
+//    unsigned z = 250;
+//    unsigned z = 300;
     unsigned z = 500;
 //    unsigned z = 1000;
 //    unsigned z = 2560;
 //    unsigned z = 4096;
     matrix<long double> doubles(z, z);
-    long double scale_factor = 0.5*z;
-    long double diag(point_dist(point(0, 0), point(z, z)));
 
-
+    long double scale_const = 2;
 
 //    image_fill_rose_ripples(doubles, 3.0L / 2.0L, 0, 4 * pi);
-    image_fill_rose_ripples(doubles, 6.0L / 7.0L, 0, 16 * pi);
+    image_fill_rose_ripples(doubles, 3.0L / 5.0L, 0, 5 * pi);
+//    image_fill_rose_ripples(doubles, 6.0L / 7.0L, 0, 16 * pi);
 
+    /* scale the image so it's */
+    scale_doubles(doubles);
     for (auto &d : doubles) {
-//        d = std::sin(z * d / scale_factor);
-        d = std::sin(diag * d / 8);
+        d = std::cos(d * 2 * pi * scale_const);
     }
 
 

@@ -233,7 +233,6 @@ namespace image_utils {
     }
 
 
-
     struct rose_dist : functor_class<long double> {
         long double n;
         long double x;
@@ -241,49 +240,107 @@ namespace image_utils {
 
         rose_dist(long double _n, long double _x, long double _y) : n(_n), x(_x), y(_y) { };
 
+        rose_dist(long double _n) : n(_n), x(0.0L), y(0.0L) { };
+
         virtual long double operator()(const long double &t) {
-            return (cos(n * t) * cos(t) - x) * (cos(n * t) * cos(t) - x) +
-                   (cos(n * t) * sin(t) - y) * (cos(n * t) * sin(t) - y);
+//            return (cos(n * t) * cos(t) - x) * (cos(n * t) * cos(t) - x) +
+//                   (cos(n * t) * sin(t) - y) * (cos(n * t) * sin(t) - y);
+            return pow(cos(n * t) * cos(t) - x, 2) +
+                   pow(cos(n * t) * sin(t) - y, 2);
+        }
+
+        virtual long double diff(const long double &t) {
+//            return -2 * (n * cos(t) * sin(n * t) + cos(n * t) * sin(t)) * (cos(n * t) * cos(t) - x) -
+//                   2 * (n * sin(n * t) * sin(t) - cos(n * t) * cos(t)) * (cos(n * t) * sin(t) - y);
+//            return - 2 * n * cos(n * t) * cos(t) * cos(t) * sin(n * t)
+//                   - 2 * n * cos(n * t) * sin(n * t) * sin(t) * sin(t)
+//                   + 2 * n * x * cos(t) * sin(n * t)
+//                   + 2 * n * y * sin(n * t) * sin(t)
+//                   - 2 * y * cos(n * t) * cos(t)
+//                   + 2 * x * cos(n * t) * sin(t);
+            long double cos_t = cos(t);
+            long double sin_t = sin(t);
+            long double cos_nt = cos(n * t);
+            long double sin_nt = sin(n * t);
+            return -2 * n * cos_nt * cos_t * cos_t * sin_nt
+                   - 2 * n * cos_nt * sin_nt * sin_t * sin_t
+                   + 2 * n * x * cos_t * sin_nt
+                   + 2 * n * y * sin_nt * sin_t
+                   - 2 * y * cos_nt * cos_t
+                   + 2 * x * cos_nt * sin_t;
         }
     };
 
     long double function_min(functor_class<long double> *func, const long double a, const long double b,
                              const int steps = 100, const int rounds = 999) {
-        if (b - a < sqrt(std::numeric_limits<long double>::epsilon())) {
+        if ((b - a) < sqrt(std::numeric_limits<long double>::epsilon()) || rounds <= 0) {
             return (*func)((a + b) / 2);
         }
-        long double min = INFINITY;
-        long double min_t = 0;
         long double step = (b - a) / steps;
-        long double val;
-        for (long double t = a; t < b; t += step) {
-            val = (*func)(t);
-            if (val < min) {
-                min = val;
-                min_t = t;
+        long double l_t = a;
+        long double r_t = a + step;
+        long double l_diff = func->diff(l_t);
+        long double r_diff = func->diff(r_t);
+//        long double current_min = (*func)((a + b) / 2);
+//        long double current_min = std::numeric_limits<long double>::max();
+        long double current_min = (*func)(b);
+        long double current_val;
+        while (l_t < b) {
+            if (l_diff < 0 && r_diff > 0) {
+                current_val = function_min(func, l_t, r_t, steps, rounds - 1);
+                if (current_val < current_min) {
+                    current_min = current_val;
+                }
             }
+            l_t = r_t;
+            l_diff = r_diff;
+            r_t += step;
+            r_diff = func->diff(r_t);
         }
-        if (rounds <= 1) {
-            return min;
-        } else {
-            return function_min(func, min_t - step, min_t + step, steps, rounds - 1);
-        }
+        return current_min;
     }
 
     void image_fill_rose_ripples(matrix<long double> &out_double, long double n, long double a, long double b) {
         int dx = out_double.x() / 2;
         int dy = out_double.y() / 2;
+        rose_dist func(n);
         for (int x = 0; x < out_double.x(); x++) {
+            func.x = 2.0L * (1.0L * x - dx) / out_double.x();
             for (int y = 0; y < out_double.y(); y++) {
-                rose_dist func(n,
-                               std::fabs(2.0L * (x - dx) / out_double.x()),
-                               std::fabs(2.0L * (y - dy) / out_double.y())
-                );
-                out_double(x, y) = sqrt(function_min(&func, a, b, 600, 5));
+                func.y = 2.0L * (1.0L * y - dy) / out_double.y();
+                out_double(x, y) = sqrt(function_min(&func, a, b, (const int) (b - a), 9));
             }
             if (x % (out_double.x() / 100) == 0) {
                 std::cout << x << std::endl;
             }
         }
     }
+
+
+    void image_sanity_check(const matrix<long double> &doubles) {
+        auto min_max_tuple = std::minmax_element(doubles.begin(), doubles.end());
+        long double min = *min_max_tuple.first;
+        long double max = *min_max_tuple.second;
+        if (min == INFINITY || min == -INFINITY || max == INFINITY || max == -INFINITY || std::isnan(min) ||
+            std::isnan(max)) {
+            std::cout << "infinity detected" << std::endl;
+        }
+        std::cout << min << " " << max << std::endl;
+        if (min == 0 && max == 0) {
+            std::cout << "everything is 0" << std::endl;
+        } else if (min == max) {
+            std::cout << "everything is equal" << std::endl;
+        }
+    }
+
+    void color_write_image(matrix<long double> &doubles, colormap_f colormap, std::string output_filename) {
+        /* modifies argument! */
+        scale_doubles(doubles);
+        image_RGB color_image(doubles.x(), doubles.y());
+        grayscale_to_rgb(doubles, color_image, colormap);
+        std::cout << "saving image" << std::endl;
+        write_image(color_image, output_filename);
+
+    }
+
 }

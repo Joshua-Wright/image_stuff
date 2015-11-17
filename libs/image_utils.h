@@ -9,7 +9,7 @@
 #include <set>
 #include <cmath>
 #include <stdexcept>
-#include <singular/structs.h>
+//#include <singular/structs.h>
 #include "../external_libs/lodepng.h"
 #include "matrix.h"
 #include "vctr.h"
@@ -83,12 +83,9 @@ namespace image_utils {
 
     void image_fill_rose_ripples(matrix<long double> &out_double, long double n, long double a, long double b);
 
+    void image_sanity_check(const matrix<long double> &doubles);
 
-
-//    long double rose_dist(long double n, long double t, long double x, long double y);
-
-//    long double function_min(long double (*func)(long double), const long double a, const long double b,
-//                             const int steps = 100, const int rounds = 999);
+    void color_write_image(matrix<long double> &doubles, colormap_f colormap, std::string output_filename);
 
 }
 #endif //IMAGE_STUFF_MATRIX_H

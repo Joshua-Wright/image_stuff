@@ -8,6 +8,7 @@ namespace image_utils {
     using std::sqrt;
     using std::sin;
     using std::cos;
+    using std::pow;
 
     const long double PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482L;
     const long double Pi = PI;
@@ -49,7 +50,9 @@ namespace image_utils {
 
     template<typename T>
     struct functor_class {
+        bool has_derivative;
         virtual T operator()(const T&) {}
+        virtual T diff(const T&) {}
     };
 
 }

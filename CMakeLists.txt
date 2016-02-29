@@ -30,3 +30,5 @@ add_executable(polar_grid
         src/renders/polar_grid.cpp
         ${LIB_FILES}
         )
+
+add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)

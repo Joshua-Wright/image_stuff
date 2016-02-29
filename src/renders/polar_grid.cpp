@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <functional>
 #include "../libs/colormaps.h"
 #include "../libs/generators.h"
 #include "../libs/io.h"
@@ -41,7 +42,14 @@ int main(int argc, char const *argv[]) {
 
     /*fill the grid*/
     /*TODO: command-line option for wave type*/
+//    image_fill_circle_grid(grid, mul_theta, mul_dist);
+
+//    wave *w = new wave_triangle();
+//    wave *w = new wave_fourier_square(3);
+//    image_fill_circle_grid(grid, mul_theta, mul_dist, w);
     image_fill_circle_grid(grid, mul_theta, mul_dist);
+
+
     /*write the image*/
     color_write_image(grid, &colormap_basic_hot, output);
 }

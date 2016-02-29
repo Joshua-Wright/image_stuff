@@ -4,11 +4,18 @@
 
 namespace image_utils {
 
-    long double fourier_square_wave(long double x, size_t n) {
-        /*
-         * period of wave is fixed
-         * n: number of iterations of wave
-         */
+
+    long double wave_triangle::operator()(const long double &x) const {
+        /*fix out-of-range values*/
+        long double x2 = std::fabs(std::fmod(x, 1.0L));
+        if (x2 < 0.5) {
+            return 2.0L * x2;
+        } else {
+            return 2.0L - 2.0L * x2;
+        }
+    }
+
+    long double wave_fourier_square::operator()(const long double &x) const {
         long double result = 0.0L;
         for (size_t i = 1; i < n; i++) {
             result +=
@@ -17,37 +24,25 @@ namespace image_utils {
         return result * (4.0L / PI);
     }
 
-    long double square_wave(void *, long double x) {
-        x = std::fabs(std::fmod(x, 1.0L));
-        if (x < 0.5L) {
+    long double wave_sine::operator()(const long double &x) const {
+        return 1.0L + std::sin(2.0L * PI * x) / 2.0L;
+    }
+
+    long double wave_square::operator()(const long double &x) const {
+        if (std::fabs(std::fmod(x, 1.0L)) < 0.5L) {
             return 0L;
         } else {
             return 1.0L;
         }
     }
 
-    long double sine_wave(void *, long double x) {
-        return 1.0L + std::sin(2.0L * PI * x) / 2.0L;
-    }
-
-    long double triangle_wave(void *, long double x) {
-        /*fix out-of-range values*/
-        x = std::fabs(std::fmod(x, 1.0L));
-        if (x < 0.5) {
-            return 2.0L * x;
-        } else {
-            return 2.0L - 2.0L * x;
-        }
-    }
 
     void image_fill_circle_grid(matrix<long double> &grid,
                                 long double theta_mul, long double dist_mul,
-                                wave_function func,
-                                void *wave_param) {
-        /*
-         * theta_mul: larger => more angular ripples (each ripple is smaller)
-         * dist_mult: larger => more radial ripples (each ripple is smaller)
-         */
+                                wave *wave_func){
+        if (wave_func == nullptr) {
+            wave_func = new wave_sine();
+        }
         vctr<long double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
         long double diagonal_dist = mid.mag() / 2.0L;
         long double theta, d;
@@ -56,7 +51,7 @@ namespace image_utils {
                 d = mid.dist(x, y) * dist_mul / diagonal_dist;
                 theta = std::atan2(y - mid.y, x - mid.x) / (2.0L * PI) *
                         theta_mul;
-                grid(x, y) = func(wave_param, theta) + func(wave_param, d);
+                grid(x, y) = (*wave_func)(theta) + (*wave_func)(d);
             }
         }
     }

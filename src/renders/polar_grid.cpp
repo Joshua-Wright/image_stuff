@@ -46,9 +46,14 @@ int main(int argc, char const *argv[]) {
 
 //    wave *w = new wave_triangle();
 //    wave *w = new wave_fourier_square(3);
-//    image_fill_circle_grid(grid, mul_theta, mul_dist, w);
-    image_fill_circle_grid(grid, mul_theta, mul_dist);
+    wave *w1 = new wave_fourier_square(3);
+    wave *w2 = new wave_triangle();
+    image_fill_circle_grid(grid, mul_theta, mul_dist, w1, w2);
+//    image_fill_circle_grid(grid, mul_theta, mul_dist);
 
+
+//    image_fill_concentric_waves(grid, mul_dist, w);
+//    image_fill_pointing_out(grid, mul_theta, w);
 
     /*write the image*/
     color_write_image(grid, &colormap_basic_hot, output);

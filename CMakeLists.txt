@@ -32,3 +32,4 @@ add_executable(polar_grid
         )
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
+add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)

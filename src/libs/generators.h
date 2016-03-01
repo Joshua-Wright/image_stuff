@@ -27,6 +27,10 @@ namespace image_utils {
     public:
         virtual long double operator()(const long double &x) const;
     };
+    class wave_sawtooth : public wave {
+    public:
+        virtual long double operator()(const long double &x) const;
+    };
     class wave_fourier_square : public wave {
         size_t n;
     public:
@@ -38,14 +42,24 @@ namespace image_utils {
     /////////////
     // fillers //
     /////////////
+    void image_fill_concentric_waves(matrix<long double> &grid,
+                                     const long double &mul,
+                                     wave *wave_func);
+
+    void image_fill_pointing_out(matrix<long double> &grid,
+                                     const long double &mul,
+                                     wave *wave_func);
+
 
     /*
      * theta_mul: larger => more angular ripples (each ripple is smaller)
      * dist_mult: larger => more radial ripples (each ripple is smaller)
      */
     void image_fill_circle_grid(matrix<long double> &grid,
-                                long double theta_mul, long double dist_mul,
-                                wave *wave_func = nullptr);
+                                const long double &theta_mul,
+                                const long double &dist_mul,
+                                wave *w1 = nullptr,
+                                wave *w2 = nullptr);
 
 
 }

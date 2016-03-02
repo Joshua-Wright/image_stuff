@@ -13,12 +13,12 @@ int main(int argc, char const *argv[]) {
     using namespace image_utils;
 
     std::string output("/home/j0sh/Dropbox/code/Cpp/image_stuff/build/out.png");
-    rose_dist rose_dist1(3.0L, 7.0L, std::pow(2,20), 12 * PI);
+    rose_dist rose_dist1(3, 11, std::pow(2,20), 0);
 //    rose_dist rose_dist1(3.0L / 7.0L, 4194304, 12 * PI);
 //    size_t z = 1000;
     size_t z = 500;
     matrix<long double> grid(z, z);
     image_fill_2d_wave(grid, &rose_dist1);
-    color_write_image(grid, &colormap_basic_hot, output);
+    color_write_image(grid, &colormap_grayscale, output);
     return 0;
 }

@@ -1,6 +1,7 @@
 // (c) Copyright 2015 Josh Wright
 
 #include "generators.h"
+//#include "cpp_containers/lib/debug.h"
 
 namespace image_utils {
 
@@ -87,13 +88,36 @@ namespace image_utils {
         }
     }
 
+    rose_dist::rose_dist(const long double n, const long double d,
+                         const size_t table_size,
+                         const long double _max_t) {
+
+        lookup_table.reserve(table_size);
+
+        /*rho=1 if n*d is odd, rho=2 if n*d is even*/
+        /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
+        int rho = (int(n * d) % 2) ? 1 : 2;
+        max_t = PI * d * rho;
+        std::cout << "max_t=" << max_t << std::endl;
+
+        /*TODO: pre-allocate this vector*/
+        for (long double t = 0; t < max_t; t += max_t / table_size) {
+            lookup_table.emplace_back(n / d, t);
+        }
+
+        /*determine interval size*/
+        wid = (size_t) (table_size * PI / (3*max_t));
+        std::cout << "wid=" << wid << std::endl;
+
+        /*TODO: wave function parameter*/
+//        w = new wave_fourier_square(3);
+//        w = new wave_triangle();
+        w = new wave_sawtooth();
+    }
+
     long double rose_dist::operator()(const long double &x,
                                       const long double &y) const {
-        /*TODO: realistic value for the min*/
-        long double min = 99999;
-        /*TODO: test wid to find the right value in terms of t*/
-        size_t wid = (size_t) (lookup_table.size() /
-                               (3 * max_t / PI));
+        long double min = INFINITY;
         /*TODO: allow this loop to be more easily vectorized*/
         for (size_t i = wid; /*interval width*/
              i < lookup_table.size(); i += wid) {
@@ -105,28 +129,7 @@ namespace image_utils {
                 }
             }
         }
-        return (*w)(min * 5);
-    }
-
-    rose_dist::rose_dist(const long double n, const long double d,
-                         const size_t table_size,
-                         const long double _max_t) : max_t(_max_t) {
-
-        lookup_table.reserve(table_size);
-
-        /*TODO: auto-determine max t*/
-        /*rho=1 if n*d is odd, rho=2 if n*d is even*/
-        /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
-        int rho = (int(n*d) % 2) ? 2 : 1;
-        max_t = PI * d * rho;
-//        max_t *= 0.5;
-
-        /*TODO: pre-allocate this vector*/
-        for (long double t = 0; t < max_t; t += max_t / table_size) {
-            lookup_table.emplace_back(n / d, t);
-        }
-        /*TODO: wave function parameter*/
-        w = new wave_fourier_square(3);
+        return (*w)(min * 10);
     }
 
     long double rose_dist::_find_min(size_t left, size_t right,

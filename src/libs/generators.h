@@ -58,50 +58,51 @@ namespace image_utils {
         struct cached_value {
 
             /*constants needed in general*/
-            long double n;
-            long double t;
+            const long double t;
 
             /*constants needed for distance*/
-            long double C1_0;
-            long double C1_x1;
-            long double C1_y1;
-            long double C1_x2;
-            long double C1_y2;
+            const long double C1_0;
+            const long double C1_x1;
+            const long double C1_y1;
 
             /*constants needed for derivative of distance*/
-            long double C2_0;
-            long double C2_x1;
-            long double C2_y1;
+            const long double C2_0;
+            const long double C2_x1;
+            const long double C2_y1;
 
-            cached_value(const long double _n, const long double _t) : n(_n),
-                                                                       t(_t) {
-                using std::cos;
-                using std::sin;
-                using std::pow;
-                /*distance*/
-                C1_0 = pow(cos(n * t), 2) * pow(cos(t), 2) +
-                       pow(cos(n * t), 2) * pow(sin(t), 2);
-                C1_x1 = -2 * cos(n * t) * cos(t);
-                C1_y1 = -2 * cos(n * t) * sin(t);
-                C1_x2 = 1;
-                C1_y2 = 1;
-                /*derivative*/
-                C2_0 = -2 * n * cos(n * t) * pow(cos(t), 2) * sin(n * t) -
-                       2 * n * cos(n * t) * sin(n * t) * pow(sin(t), 2);
-                C2_x1 = 2 * n * cos(t) * sin(n * t) + 2 * cos(n * t) * sin(t);
-                C2_y1 = 2 * n * sin(n * t) * sin(t) - 2 * cos(n * t) * cos(t);
-            }
+            cached_value(const long double n,
+                         const long double _t) : t(_t),
+                                                 C1_0(pow(cos(n * t), 2) *
+                                                      pow(cos(t), 2) +
+                                                      pow(cos(n * t), 2) *
+                                                      pow(sin(t), 2)),
+                                                 C1_x1(-2 * cos(n * t) *
+                                                       cos(t)),
+                                                 C1_y1(-2 * cos(n * t) *
+                                                       sin(t)),
+                                                 C2_0(-2 * n * cos(n * t) *
+                                                      pow(cos(t), 2) *
+                                                      sin(n * t) -
+                                                      2 * n * cos(n * t) *
+                                                      sin(n * t) *
+                                                      pow(sin(t), 2)),
+                                                 C2_x1(2 * n * cos(t) *
+                                                       sin(n * t) +
+                                                       2 * cos(n * t) * sin(t)),
+                                                 C2_y1(2 * n * sin(n * t) *
+                                                       sin(t) - 2 * cos(n * t) *
+                                                                cos(t)) { }
 
             long double dist2(const long double x, const long double y) const {
                 return C1_0
-                       + C1_x1 * x + C1_x2 * x * x
-                       + C1_y1 * y + C1_y2 * y * y;
+                       + C1_x1 * x + x * x
+                       + C1_y1 * y + y * y;
             }
 
             long double dist(const long double x, const long double y) const {
                 return std::sqrt(C1_0
-                                 + C1_x1 * x + C1_x2 * x * x
-                                 + C1_y1 * y + C1_y2 * y * y);
+                                 + C1_x1 * x + x * x
+                                 + C1_y1 * y + y * y);
             }
 
             long double diff(const long double x,
@@ -112,6 +113,7 @@ namespace image_utils {
 
         std::vector<cached_value> lookup_table;
         long double max_t;
+        size_t wid;
         wave *w;
 
         long double _find_min(size_t left, size_t right,

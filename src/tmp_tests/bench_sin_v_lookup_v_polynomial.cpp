@@ -24,13 +24,11 @@ struct optimized_sin {
     }
 
     unsigned long long theta_to_idx(const long double &theta) {
-        /* TODO: fix values not in 0 <= theta <= 2*pi*/
         return (unsigned long long int) (theta / (2 * PI) * size);
     }
 
     long double &operator()(const long double theta) {
         /* actual optimized sin function*/
-        /* TODO: average 2 values for thetas that aren't exact matches */
         return values[theta_to_idx(theta)];
     }
 

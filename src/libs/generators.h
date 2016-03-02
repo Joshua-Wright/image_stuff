@@ -115,7 +115,7 @@ namespace image_utils {
         size_t wid;
         wave *w;
 
-        long double _find_min(size_t left, size_t right,
+        size_t _find_min(size_t left, size_t right,
                               const long double &x,
                               const long double &y) const;
 

@@ -1,5 +1,6 @@
 // (c) Copyright 2015 Josh Wright
 
+#include <cstring>
 #include "generators.h"
 //#include "cpp_containers/lib/debug.h"
 
@@ -30,6 +31,11 @@ namespace image_utils {
         } else {
             return 1.0L;
         }
+    }
+
+    wave_fourier_square::wave_fourier_square(const std::string &spec) {
+        constexpr size_t spec_begin_length = std::strlen("fourier_square:");
+        n = std::stoull(spec.substr(spec_begin_length));
     }
 
     long double wave_fourier_square::operator()(const long double &x) const {
@@ -88,39 +94,36 @@ namespace image_utils {
         }
     }
 
-    rose_dist::rose_dist(const long double n, const long double d,
-                         const size_t table_size,
-                         const long double _max_t) {
+    rose_dist::rose_dist(wave *_w, const long double n, const long double d,
+                         const size_t table_size, const long double wave_size)
+            : wave_size(wave_size), w(_w) {
 
         lookup_table.reserve(table_size);
 
         /*rho=1 if n*d is odd, rho=2 if n*d is even*/
         /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
-        int rho = (int(n * d) % 2) ? 1 : 2;
+        long double rho = (int(n * d) % 2) ? 1.0L : 2.0L;
         max_t = PI * d * rho;
-        std::cout << "max_t=" << max_t << std::endl;
+        std::cout << "max_t=" << max_t << std::endl; /*debug*/
 
-        /*TODO: pre-allocate this vector*/
         for (long double t = 0; t < max_t; t += max_t / table_size) {
             lookup_table.emplace_back(n / d, t);
         }
 
-        /*determine interval size*/
-        wid = (size_t) (table_size * PI / (3*max_t));
-        std::cout << "wid=" << wid << std::endl;
+        /*determine interval width*/
+        /*PI/(3*max_t) determined by experimentation*/
+        wid = (size_t) (table_size * PI / (3 * max_t));
+        std::cout << "wid=" << wid << std::endl; /*debug*/
 
-        /*TODO: wave function parameter*/
-//        w = new wave_fourier_square(3);
-//        w = new wave_triangle();
-        w = new wave_sawtooth();
+        if (w == nullptr) {
+            w = new wave_sawtooth();
+        }
     }
 
     long double rose_dist::operator()(const long double &x,
                                       const long double &y) const {
         long double min = INFINITY;
-        /*TODO: allow this loop to be more easily vectorized*/
-        for (size_t i = wid; /*interval width*/
-             i < lookup_table.size(); i += wid) {
+        for (size_t i = wid; i < lookup_table.size(); i += wid) {
             if (lookup_table[i - wid].diff(x, y) < 0 &&
                 lookup_table[i].diff(x, y) > 0) {
                 long double new_min = _find_min(i - wid, i, x, y);
@@ -129,7 +132,7 @@ namespace image_utils {
                 }
             }
         }
-        return (*w)(min * 10);
+        return (*w)(100 * min / wave_size);
     }
 
     long double rose_dist::_find_min(size_t left, size_t right,
@@ -151,7 +154,6 @@ namespace image_utils {
     void image_fill_2d_wave(matrix<long double> &grid, wave_2d *w_2d) {
         vctr<long double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
         long double mag = grid.x() / 2;
-//        mid *= 2;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 /*current point*/

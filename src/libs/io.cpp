@@ -1,5 +1,7 @@
 // (c) Copyright 2015 Josh Wright
 #include <iostream>
+#include <string>
+#include <cstring>
 #include "io.h"
 #include "../external_libs/lodepng.h"
 
@@ -59,4 +61,29 @@ namespace image_utils {
         doubles /= (max - min);
     }
 
+    bool startswith(const std::string &substring, const std::string &parent) {
+        auto it1 = substring.begin();
+        auto it2 = parent.begin();
+        while (it1 != substring.end()) {
+            if (it2 == parent.end() || *it1 != *it2) {
+                return false;
+            }
+            ++it1;
+            ++it2;
+        }
+        return true;
+    }
+
+    wave *parse_wave_spec(const std::string &spec) {
+        if (startswith("sine", spec)) {
+            return new wave_sine();
+        } else if (startswith("sawtooth", spec)) {
+            return new wave_sawtooth();
+        } else if (startswith("triangle", spec)) {
+            return new wave_triangle();
+        } else if (startswith("fourier_square:", spec)) {
+            return new wave_fourier_square(spec);
+        }
+        return nullptr;
+    }
 }

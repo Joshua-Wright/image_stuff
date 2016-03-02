@@ -4,6 +4,7 @@
 #include <string>
 #include "types.h"
 #include "colormaps.h"
+#include "generators.h"
 
 namespace image_utils {
 
@@ -16,5 +17,7 @@ namespace image_utils {
                            const std::string &output_filename);
 
     void scale_grid(matrix<long double> &doubles);
+
+    wave *parse_wave_spec(const std::string &spec);
 
 }

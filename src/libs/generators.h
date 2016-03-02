@@ -42,6 +42,7 @@ namespace image_utils {
         size_t n;
     public:
         wave_fourier_square(size_t _n) : n(_n) { }
+        wave_fourier_square(const std::string &spec);
 
         virtual long double operator()(const long double &x) const;
     };
@@ -53,8 +54,7 @@ namespace image_utils {
     };
 
     class rose_dist : public wave_2d {
-        /*for debugging*/
-//    public:
+
         struct cached_value {
 
             /*constants needed in general*/
@@ -100,9 +100,7 @@ namespace image_utils {
             }
 
             long double dist(const long double x, const long double y) const {
-                return std::sqrt(C1_0
-                                 + C1_x1 * x + x * x
-                                 + C1_y1 * y + y * y);
+                return std::sqrt(dist2(x,y));
             }
 
             long double diff(const long double x,
@@ -113,6 +111,7 @@ namespace image_utils {
 
         std::vector<cached_value> lookup_table;
         long double max_t;
+        long double wave_size;
         size_t wid;
         wave *w;
 
@@ -121,9 +120,8 @@ namespace image_utils {
                               const long double &y) const;
 
     public:
-        /*TODO: wave size*/
-        rose_dist(const long double n, const long double d,
-                  const size_t table_size, const long double _max_t);
+        rose_dist(wave* w, const long double n, const long double d,
+                  const size_t table_size, const long double wave_size);
 
         virtual long double operator()(const long double &x,
                                        const long double &y) const;;

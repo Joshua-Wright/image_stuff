@@ -42,6 +42,7 @@ int main(int argc, char const *argv[]) {
         std::cout << ";" << std::endl;
     }
     std::cout << "];" << std::endl;
+
     std::cout << "plot(" << std::endl;
     for (int i=0; i<labels.size()-1; i++) {
         std::cout << "x, waves(" << i+1 << ",:)," << std::endl;

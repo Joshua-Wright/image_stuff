@@ -9,11 +9,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lboost_timer -lboost_system")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgsl -lcblas") #[[ needed to link to gsl]]
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/local/include -L/usr/local/lib")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lginac -lcln") # for ginac
@@ -33,3 +33,4 @@ add_executable(polar_grid
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
+add_executable(rose_dist ${LIB_FILES} src/renders/rose_dist.cpp)

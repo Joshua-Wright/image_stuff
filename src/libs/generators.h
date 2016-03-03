@@ -16,6 +16,7 @@ namespace image_utils {
     class wave {
     public:
         virtual long double operator()(const long double &x) const = 0;
+        virtual ~wave() {};
     };
 
     class wave_triangle : public wave {
@@ -51,6 +52,7 @@ namespace image_utils {
     public:
         virtual long double operator()(const long double &x,
                                        const long double &y) const = 0;
+        virtual ~wave_2d() { };
     };
 
     class rose_dist : public wave_2d {
@@ -124,7 +126,9 @@ namespace image_utils {
                   const size_t table_size, const long double wave_size);
 
         virtual long double operator()(const long double &x,
-                                       const long double &y) const;;
+                                       const long double &y) const;
+
+        virtual ~rose_dist();
     };
 
 

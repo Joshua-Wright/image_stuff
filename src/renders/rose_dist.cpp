@@ -21,8 +21,8 @@ int main(int argc, char const *argv[]) {
         /*3*/ std::cout << " <image y>";
         /*4*/ std::cout << " <n>";
         /*5*/ std::cout << " <d>";
-        /*6*/ std::cout << " [wave size]"; /*TODO with default*/
-        /*7*/ std::cout << " [wave type]"; /*TODO with default*/
+        /*6*/ std::cout << " [wave size]";
+        /*7*/ std::cout << " [wave type]";
         /*8*/ std::cout << " [lookup table size]"; /*TODO with default*/
         /*9*/ /*TODO: colormap*/
         std::cout << std::endl;
@@ -45,7 +45,7 @@ int main(int argc, char const *argv[]) {
         w = new wave_sawtooth();
     }
 
-    rose_dist *rose_dist1 = new rose_dist(w, n, d, std::pow(2, 23),
+    rose_dist *rose_dist1 = new rose_dist(w, n, d, std::pow(2, 21),
                                           distance_multiplier);
 
 #else
@@ -56,7 +56,12 @@ int main(int argc, char const *argv[]) {
     matrix<long double> grid(z, z);
 
 #endif
+
     image_fill_2d_wave(grid, rose_dist1);
-    color_write_image(grid, new colormap_grayscale(), output);1
+
+    delete w;
+    delete rose_dist1;
+
+    color_write_image(grid, new colormap_grayscale(), output);
     return 0;
 }

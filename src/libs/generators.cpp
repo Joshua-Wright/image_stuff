@@ -54,13 +54,12 @@ namespace image_utils {
             : wave_size(wave_size), w(_w) {
 
         lookup_table.reserve(table_size);
+        std::cout << "n:" << n << "d:" << d << std::endl;
 
         /*rho=1 if n*d is odd, rho=2 if n*d is even*/
         /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
         long double rho = ((n * d) % 2) ? 1.0L : 2.0L;
-        max_t = PI * d * rho + 0.1L;
-        /*TODO: this min doesn't work when n > d*/
-//        std::cout << "max_t=" << max_t << std::endl; /*debug*/
+        max_t = PI * d * rho;
 
         const long double k = (long double) (n) / (long double) (d);
         for (long double t = 0; t <= max_t; t += max_t / table_size) {
@@ -69,8 +68,11 @@ namespace image_utils {
 
         /*determine interval width*/
         /*PI/(3*max_t) determined by experimentation*/
-        wid = (size_t) (table_size * PI / (3 * max_t));
-//        std::cout << "wid=" << wid << std::endl; /*debug*/
+        if (n < d) {
+            wid = (size_t) (table_size * PI / (3 * max_t));
+        } else {
+            wid = (size_t) (table_size * PI / (6 * rho * max_t));
+        }
 
         if (w == nullptr) {
             w = new wave_sawtooth();
@@ -125,6 +127,11 @@ namespace image_utils {
         }
         return (*w)(100 * std::sqrt(min_dist) / wave_size);
     }
+
+    rose_dist::~rose_dist() {
+
+    }
+
 
 
     /*fillers*/

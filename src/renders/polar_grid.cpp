@@ -52,6 +52,9 @@ int main(int argc, char const *argv[]) {
     /*fill the grid*/
     image_fill_circle_grid(grid, mul_theta, mul_dist, w1, w2);
 
+    delete w1;
+    delete w2;
+
     /*write the image*/
     color_write_image(grid, new colormap_basic_hot(), output);
 }

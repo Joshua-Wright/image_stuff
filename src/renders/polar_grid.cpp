@@ -53,5 +53,5 @@ int main(int argc, char const *argv[]) {
     image_fill_circle_grid(grid, mul_theta, mul_dist, w1, w2);
 
     /*write the image*/
-    color_write_image(grid, &colormap_basic_hot, output);
+    color_write_image(grid, new colormap_basic_hot(), output);
 }

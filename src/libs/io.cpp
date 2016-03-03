@@ -42,12 +42,12 @@ namespace image_utils {
         }
     }
 
-    void color_write_image(matrix<long double> &grid, colormap_f colormap,
+    void color_write_image(matrix<long double> &grid, colormap *cmap,
                            const std::string &output_filename) {
         /* modifies argument! */
         scale_grid(grid);
         image_RGB color_image(grid.x(), grid.y());
-        grayscale_to_rgb(grid, color_image, colormap);
+        grayscale_to_rgb(grid, color_image, cmap);
         std::cout << "saving image" << std::endl;
         write_image(color_image, output_filename);
 

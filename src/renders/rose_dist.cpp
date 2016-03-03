@@ -57,6 +57,6 @@ int main(int argc, char const *argv[]) {
 
 #endif
     image_fill_2d_wave(grid, rose_dist1);
-    color_write_image(grid, &colormap_basic_hot, output);
+    color_write_image(grid, new colormap_grayscale(), output);1
     return 0;
 }

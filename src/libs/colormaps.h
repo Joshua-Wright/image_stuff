@@ -5,16 +5,28 @@
 
 namespace image_utils {
 
-    /*TODO: ADT-based colormaps, similar to wave setup*/
+    //////////////////
+    // colormap ADT //
+    //////////////////
+    /*colormaps expect 0 <= x <= 1 */
+    class colormap {
+    public:
+        virtual RGB get_rgb(const long double x) const = 0;
+    };
+    class colormap_basic_hot : public colormap {
+    public:
+        virtual RGB get_rgb(const long double d) const;
+    };
+    class colormap_grayscale : public colormap {
 
-    typedef RGB (*colormap_f)(long double);
-
-    RGB colormap_basic_hot(long double x);
-
-    RGB colormap_grayscale(long double x);
+    public:
+        virtual RGB get_rgb(const long double x) const;
+    };
 
 
-    void grayscale_to_rgb(matrix<long double> &in_double, image_RGB &out_rgb,
-                          colormap_f fun);
+
+    void grayscale_to_rgb(const matrix<long double> &in_double, image_RGB &out_rgb,
+                          colormap *fun);
+
 
 }

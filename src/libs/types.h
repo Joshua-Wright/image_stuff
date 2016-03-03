@@ -150,16 +150,6 @@ namespace image_utils {
     typedef matrix<RGBd> image_RGBd;
     typedef matrix<RGBAd> image_RGBAd;
     typedef matrix<grayscaled> image_gsd;
-    typedef RGB colormap[256];
-
-    template<typename T>
-    struct functor_class {
-        bool has_derivative;
-
-        virtual T operator()(const T &) { }
-
-        virtual T diff(const T &) { }
-    };
 
 }
 #endif //IMAGE_STUFF_TYPES_H

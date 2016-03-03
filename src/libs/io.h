@@ -13,7 +13,7 @@ namespace image_utils {
     void image_sanity_check(const matrix<long double> &doubles,
                             bool print_minmax = false);
 
-    void color_write_image(matrix<long double> &grid, colormap_f colormap,
+    void color_write_image(matrix<long double> &grid, colormap *cmap,
                            const std::string &output_filename);
 
     void scale_grid(matrix<long double> &doubles);

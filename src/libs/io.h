@@ -18,6 +18,4 @@ namespace image_utils {
 
     void scale_grid(matrix<long double> &doubles);
 
-    wave *parse_wave_spec(const std::string &spec);
-
 }

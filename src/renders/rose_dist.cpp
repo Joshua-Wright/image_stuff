@@ -26,7 +26,8 @@ int main(int argc, char const *argv[]) {
         /*8*/ std::cout << " [lookup table size]"; /*TODO with default*/
         /*9*/ /*TODO: colormap*/
         std::cout << std::endl;
-        std::cout << "wave size: default 16" << std::endl;
+        std::cout << "wave size:         default 16" << std::endl;
+        std::cout << "lookup table size: 2^x, default 21" << std::endl;
         return 1;
     }
     std::string output(argv[1]);
@@ -45,6 +46,7 @@ int main(int argc, char const *argv[]) {
         w = new wave_sawtooth();
     }
 
+    std::cout << "filling lookup table" << std::endl;
     rose_dist *rose_dist1 = new rose_dist(w, n, d, std::pow(2, 21),
                                           distance_multiplier);
 
@@ -57,6 +59,7 @@ int main(int argc, char const *argv[]) {
 
 #endif
 
+    std::cout << "rendering image" << std::endl;
     image_fill_2d_wave(grid, rose_dist1);
 
     delete w;

@@ -16,7 +16,8 @@ namespace image_utils {
     class wave {
     public:
         virtual long double operator()(const long double &x) const = 0;
-        virtual ~wave() {};
+
+        virtual ~wave() { };
     };
 
     class wave_triangle : public wave {
@@ -43,15 +44,24 @@ namespace image_utils {
         size_t n;
     public:
         wave_fourier_square(size_t _n) : n(_n) { }
+
         wave_fourier_square(const std::string &spec);
 
         virtual long double operator()(const long double &x) const;
     };
 
+    class wave_noop : public wave {
+        virtual long double operator()(
+                const long double &x) const { return x; };
+    };
+
+    wave *parse_wave_spec(const std::string &spec);
+
     class wave_2d {
     public:
         virtual long double operator()(const long double &x,
                                        const long double &y) const = 0;
+
         virtual ~wave_2d() { };
     };
 
@@ -102,7 +112,7 @@ namespace image_utils {
             }
 
             long double dist(const long double x, const long double y) const {
-                return std::sqrt(dist2(x,y));
+                return std::sqrt(dist2(x, y));
             }
 
             long double diff(const long double x,
@@ -114,21 +124,25 @@ namespace image_utils {
         std::vector<cached_value> lookup_table;
         long double max_t;
         long double wave_size;
+        long double offset;
         size_t wid;
         wave *w;
 
         size_t _find_min(size_t left, size_t right,
-                              const long double &x,
-                              const long double &y) const;
+                         const long double &x,
+                         const long double &y) const;
 
     public:
-        rose_dist(wave* w, const int n, const int d,
+        rose_dist(wave *w, const int n, const int d,
                   const size_t table_size, const long double wave_size);
+
+        void set_offset(const long double x);
 
         virtual long double operator()(const long double &x,
                                        const long double &y) const;
 
         virtual ~rose_dist();
+
     };
 
 
@@ -143,7 +157,6 @@ namespace image_utils {
                                  const long double &mul,
                                  wave *wave_func);
 
-
     /*
      * theta_mul: larger => more angular ripples (each ripple is smaller)
      * dist_mult: larger => more radial ripples (each ripple is smaller)
@@ -153,6 +166,10 @@ namespace image_utils {
                                 const long double &dist_mul,
                                 wave *w1 = nullptr,
                                 wave *w2 = nullptr);
+
+    void image_fill_apply_range_to_dist(const matrix<long double> &in,
+                                        matrix<long double> &out, wave *w,
+                                        const long double offset);
 
     void image_fill_2d_wave(matrix<long double> &grid, wave_2d *w_2d);
 

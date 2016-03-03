@@ -7,6 +7,19 @@
 namespace image_utils {
 
 
+    bool startswith(const std::string &substring, const std::string &parent) {
+        auto it1 = substring.begin();
+        auto it2 = parent.begin();
+        while (it1 != substring.end()) {
+            if (it2 == parent.end() || *it1 != *it2) {
+                return false;
+            }
+            ++it1;
+            ++it2;
+        }
+        return true;
+    }
+
     /*wave functions*/
     long double wave_triangle::operator()(const long double &x) const {
         /*fix out-of-range values*/
@@ -48,18 +61,33 @@ namespace image_utils {
         return 0.5 + result * (2.0L / PI);
     }
 
+    wave *parse_wave_spec(const std::string &spec) {
+        if (startswith("sine", spec)) {
+            return new wave_sine();
+        } else if (startswith("sawtooth", spec)) {
+            return new wave_sawtooth();
+        } else if (startswith("triangle", spec)) {
+            return new wave_triangle();
+        } else if (startswith("fourier_square:", spec)) {
+            return new wave_fourier_square(spec);
+        } else if (startswith("noop", spec)) {
+            return new wave_noop();
+        }
+        return nullptr;
+    }
 
     rose_dist::rose_dist(wave *_w, const int n, const int d,
                          const size_t table_size, const long double wave_size)
-            : wave_size(wave_size), w(_w) {
+            : wave_size(wave_size),
+              w(_w) {
 
         lookup_table.reserve(table_size);
-        std::cout << "n:" << n << "d:" << d << std::endl;
 
         /*rho=1 if n*d is odd, rho=2 if n*d is even*/
         /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
         long double rho = ((n * d) % 2) ? 1.0L : 2.0L;
-        max_t = PI * d * rho;
+        max_t = PI * d * rho *
+                1.01; /*1.01 to account for rounding errors on teh max value*/
 
         const long double k = (long double) (n) / (long double) (d);
         for (long double t = 0; t <= max_t; t += max_t / table_size) {
@@ -84,9 +112,15 @@ namespace image_utils {
                                 const long double &y) const {
         /*simply binary-search the lookup table, using the derivative at the
          * midpoint of the interval*/
-        while (left != right) {
+        constexpr long double threshold = std::sqrt(
+                std::numeric_limits<long double>::epsilon());
+        while (left != right && right - left > 1) {
+            /*overflow-safe average*/
             size_t mid = left / 2 + right / 2 + (left & right & 1);
-            if (lookup_table[mid].diff(x, y) > 0) {
+            long double mid_diff = lookup_table[mid].diff(x, y);
+            if (std::fabs(mid_diff) < threshold) {
+                return mid;
+            } else if (mid_diff > 0) {
                 right = mid;
             } else {
                 left = mid + 1;
@@ -98,7 +132,6 @@ namespace image_utils {
     long double rose_dist::operator()(const long double &x,
                                       const long double &y) const {
         long double min_dist = INFINITY;
-        size_t min_idx = 0;
         size_t i = wid;
         for (; i < lookup_table.size(); i += wid) {
             if (lookup_table[i - wid].diff(x, y) < 0 &&
@@ -107,7 +140,6 @@ namespace image_utils {
                 long double new_min_dst = lookup_table[new_min_idx].dist2(x, y);
                 if (new_min_dst < min_dist) {
                     min_dist = new_min_dst;
-                    min_idx = new_min_idx;
                 }
             }
         }
@@ -121,17 +153,17 @@ namespace image_utils {
                 long double new_min_dst = lookup_table[new_min_idx].dist2(x, y);
                 if (new_min_dst < min_dist) {
                     min_dist = new_min_dst;
-                    min_idx = new_min_idx;
                 }
             }
         }
-        return (*w)(100 * std::sqrt(min_dist) / wave_size);
+        return (*w)(100 * std::sqrt(min_dist) / wave_size + offset);
     }
 
-    rose_dist::~rose_dist() {
-
+    void rose_dist::set_offset(const long double x) {
+        offset = std::fabs(std::fmod(x, 1.0L));
     }
 
+    rose_dist::~rose_dist() { }
 
 
     /*fillers*/
@@ -172,7 +204,6 @@ namespace image_utils {
     void image_fill_pointing_out(matrix<long double> &grid,
                                  const long double &mul, wave *wave_func) {
         vctr<long double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
-        long double diagonal_dist = mid.mag() / 2.0L;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 grid(x, y) = (*wave_func)(
@@ -195,5 +226,16 @@ namespace image_utils {
                 grid(x, y) = (*w_2d)(current.x, current.y);
             }
         }
+    }
+
+    void image_fill_apply_range_to_dist(const matrix<long double> &in,
+                                        matrix<long double> &out, wave *w,
+                                        const long double offset) {
+        for (size_t x = 0; x < in.x(); x++) {
+            for (size_t y = 0; y < out.y(); y++) {
+                out(x, y) = (*w)(in(x, y) + offset);
+            }
+        }
+
     }
 }

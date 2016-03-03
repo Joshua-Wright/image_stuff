@@ -5,6 +5,8 @@
 
 namespace image_utils {
 
+    /*TODO: ADT-based colormaps, similar to wave setup*/
+
     typedef RGB (*colormap_f)(long double);
 
     RGB colormap_basic_hot(long double x);

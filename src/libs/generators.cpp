@@ -7,7 +7,6 @@
 namespace image_utils {
 
 
-
     /*wave functions*/
     long double wave_triangle::operator()(const long double &x) const {
         /*fix out-of-range values*/
@@ -50,7 +49,7 @@ namespace image_utils {
     }
 
 
-    rose_dist::rose_dist(wave *_w, const long double n, const long double d,
+    rose_dist::rose_dist(wave *_w, const int n, const int d,
                          const size_t table_size, const long double wave_size)
             : wave_size(wave_size), w(_w) {
 
@@ -58,19 +57,20 @@ namespace image_utils {
 
         /*rho=1 if n*d is odd, rho=2 if n*d is even*/
         /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
-        long double rho = (int(n * d) % 2) ? 1.0L : 2.0L;
-        max_t = PI * d * rho;
+        long double rho = ((n * d) % 2) ? 1.0L : 2.0L;
+        max_t = PI * d * rho + 0.1L;
         /*TODO: this min doesn't work when n > d*/
-        std::cout << "max_t=" << max_t << std::endl; /*debug*/
+//        std::cout << "max_t=" << max_t << std::endl; /*debug*/
 
-        for (long double t = 0; t < max_t; t += max_t / table_size) {
-            lookup_table.emplace_back(n / d, t);
+        const long double k = (long double) (n) / (long double) (d);
+        for (long double t = 0; t <= max_t; t += max_t / table_size) {
+            lookup_table.emplace_back(k, t);
         }
 
         /*determine interval width*/
         /*PI/(3*max_t) determined by experimentation*/
         wid = (size_t) (table_size * PI / (3 * max_t));
-        std::cout << "wid=" << wid << std::endl; /*debug*/
+//        std::cout << "wid=" << wid << std::endl; /*debug*/
 
         if (w == nullptr) {
             w = new wave_sawtooth();
@@ -78,8 +78,8 @@ namespace image_utils {
     }
 
     size_t rose_dist::_find_min(size_t left, size_t right,
-                                     const long double &x,
-                                     const long double &y) const {
+                                const long double &x,
+                                const long double &y) const {
         /*simply binary-search the lookup table, using the derivative at the
          * midpoint of the interval*/
         while (left != right) {
@@ -97,21 +97,34 @@ namespace image_utils {
                                       const long double &y) const {
         long double min_dist = INFINITY;
         size_t min_idx = 0;
-        for (size_t i = wid; i < lookup_table.size(); i += wid) {
+        size_t i = wid;
+        for (; i < lookup_table.size(); i += wid) {
             if (lookup_table[i - wid].diff(x, y) < 0 &&
                 lookup_table[i].diff(x, y) > 0) {
                 size_t new_min_idx = _find_min(i - wid, i, x, y);
-                long double new_min_dist = lookup_table[new_min_idx].dist2(x,y);
-                if (new_min_dist < min_dist) {
-                    min_dist = new_min_dist;
+                long double new_min_dst = lookup_table[new_min_idx].dist2(x, y);
+                if (new_min_dst < min_dist) {
+                    min_dist = new_min_dst;
+                    min_idx = new_min_idx;
+                }
+            }
+        }
+        /*check if the last part didn't divide evenly*/
+        size_t left = i - wid;
+        size_t right = lookup_table.size() - 1;
+        if (right - left > 0) {
+            if (lookup_table[left].diff(x, y) < 0 &&
+                lookup_table[right].diff(x, y) > 0) {
+                size_t new_min_idx = _find_min(left, right, x, y);
+                long double new_min_dst = lookup_table[new_min_idx].dist2(x, y);
+                if (new_min_dst < min_dist) {
+                    min_dist = new_min_dst;
                     min_idx = new_min_idx;
                 }
             }
         }
         return (*w)(100 * std::sqrt(min_dist) / wave_size);
     }
-
-
 
 
     /*fillers*/
@@ -164,7 +177,7 @@ namespace image_utils {
 
     void image_fill_2d_wave(matrix<long double> &grid, wave_2d *w_2d) {
         vctr<long double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
-        long double mag = grid.x() / 2;
+        long double mag = std::min(grid.x(), grid.y()) / 2;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 /*current point*/

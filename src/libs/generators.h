@@ -120,7 +120,7 @@ namespace image_utils {
                               const long double &y) const;
 
     public:
-        rose_dist(wave* w, const long double n, const long double d,
+        rose_dist(wave* w, const int n, const int d,
                   const size_t table_size, const long double wave_size);
 
         virtual long double operator()(const long double &x,

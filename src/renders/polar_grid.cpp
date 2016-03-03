@@ -8,14 +8,15 @@
 #include "../libs/io.h"
 
 /*easy pre-defined parameters for consistent debugging*/
+#define DEBUG 0
 //#define DEBUG 1
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
     using image_utils::matrix;
 
-#ifndef DEBUG
-    if (argc < 4) {
+#if !DEBUG
+    if (argc < 6) {
         /*if not run with enough arguments, pring usage*/
         std::cout << argv[0];
         std::cout << " <output filename>";
@@ -23,7 +24,8 @@ int main(int argc, char const *argv[]) {
         std::cout << " <distance multiplier>";
         std::cout << " <theta multiplier>";
         std::cout << " <wave 1>";
-        std::cout << " <wave 2";
+        std::cout << " <wave 2>";
+        /*TODO: colormap*/
         std::cout << std::endl;
         return 1;
     }

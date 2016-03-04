@@ -17,14 +17,14 @@
 
 namespace image_utils {
 
-    void image_fill_dist(matrix<long double> &out_double, const matrix<bool> &defined);
+    void image_fill_dist(matrix<double> &out_double, const matrix<bool> &defined);
 
 
-    void image_fill_rose_ripples(matrix<long double> &out_double, long double n, long double a, long double b,
-                                 long double zoom = 1.1);
+    void image_fill_rose_ripples(matrix<double> &out_double, double n, double a, double b,
+                                 double zoom = 1.1);
 
-    void image_fill_rose_ripples_parallel(matrix<long double> &out_double, long double n, long double a, long double b,
-                                          long double zoom);
+    void image_fill_rose_ripples_parallel(matrix<double> &out_double, double n, double a, double b,
+                                          double zoom);
 
 
 }

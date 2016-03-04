@@ -20,13 +20,13 @@ namespace image_utils {
                         rgb_data.x());
     };
 
-    void image_sanity_check(const matrix<long double> &doubles,
+    void image_sanity_check(const matrix<double> &doubles,
                             bool print_minmax) {
         /*checks the output to make sure it looks valid*/
         auto min_max_tuple = std::minmax_element(doubles.begin(),
                                                  doubles.end());
-        long double min = *min_max_tuple.first;
-        long double max = *min_max_tuple.second;
+        double min = *min_max_tuple.first;
+        double max = *min_max_tuple.second;
         if (min == INFINITY || min == -INFINITY || max == INFINITY ||
             max == -INFINITY || std::isnan(min) ||
             std::isnan(max)) {
@@ -42,7 +42,7 @@ namespace image_utils {
         }
     }
 
-    void color_write_image(matrix<long double> &grid, colormap *cmap,
+    void color_write_image(matrix<double> &grid, colormap *cmap,
                            const std::string &output_filename) {
         /* modifies argument! */
         scale_grid(grid);
@@ -53,10 +53,10 @@ namespace image_utils {
 
     }
 
-    void scale_grid(matrix<long double> &doubles) {
+    void scale_grid(matrix<double> &doubles) {
         auto g = std::minmax_element(doubles.begin(), doubles.end());
-        long double min = *g.first;
-        long double max = *g.second;
+        double min = *g.first;
+        double max = *g.second;
         doubles -= min;
         doubles /= (max - min);
     }

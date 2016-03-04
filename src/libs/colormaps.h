@@ -11,21 +11,21 @@ namespace image_utils {
     /*colormaps expect 0 <= x <= 1 */
     class colormap {
     public:
-        virtual RGB get_rgb(const long double x) const = 0;
+        virtual RGB get_rgb(const double x) const = 0;
     };
     class colormap_basic_hot : public colormap {
     public:
-        virtual RGB get_rgb(const long double d) const;
+        virtual RGB get_rgb(const double d) const;
     };
     class colormap_grayscale : public colormap {
 
     public:
-        virtual RGB get_rgb(const long double x) const;
+        virtual RGB get_rgb(const double x) const;
     };
 
 
 
-    void grayscale_to_rgb(const matrix<long double> &in_double, image_RGB &out_rgb,
+    void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb,
                           colormap *fun);
 
 

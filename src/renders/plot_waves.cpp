@@ -22,8 +22,8 @@ int main(int argc, char const *argv[]) {
 
     std::cout << "clear;clc;close all;" << std::endl;
     std::cout << "x = [" << std::endl;
-    std::vector<long double> xvalues;
-    for (long double x = 0; x <= 2; x += 2.0L/10000.0L) {
+    std::vector<double> xvalues;
+    for (double x = 0; x <= 2; x += 2.0L/10000.0L) {
         std::cout << std::setprecision(7) << x << ", " ;
         xvalues.push_back(x);
     }

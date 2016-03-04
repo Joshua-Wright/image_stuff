@@ -32,22 +32,22 @@ int main(int argc, char const *argv[]) {
     /*setup command-line parameters*/
     std::string output(argv[1]);
     const size_t z = std::strtoull(argv[2], NULL, 10);
-    const long double mul_dist = std::strtold(argv[3], NULL);
-    const long double mul_theta = std::strtold(argv[4], NULL);
+    const double mul_dist = std::strtold(argv[3], NULL);
+    const double mul_theta = std::strtold(argv[4], NULL);
     wave *w1 = parse_wave_spec(argv[5]);
     wave *w2 = parse_wave_spec(argv[6]);
 #else
     /*defaults for easy debugging*/
     std::string output("/home/j0sh/Dropbox/code/Cpp/image_stuff/build/out.png");
     const size_t z = 100;
-    const long double mul_dist = 6;
-    const long double mul_theta = 20;
+    const double mul_dist = 6;
+    const double mul_theta = 20;
     wave *w1 = parse_wave_spec("fourier:3");
     wave *w2 = parse_wave_spec("sine");
 #endif
 
     /*allocate a grid for the math*/
-    matrix<long double> grid(z, z);
+    matrix<double> grid(z, z);
 
     /*fill the grid*/
     image_fill_circle_grid(grid, mul_theta, mul_dist, w1, w2);

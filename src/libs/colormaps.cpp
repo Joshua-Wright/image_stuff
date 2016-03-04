@@ -4,9 +4,9 @@
 
 namespace image_utils {
 
-    RGB colormap_basic_hot::get_rgb(const long double x) const {
+    RGB colormap_basic_hot::get_rgb(const double x) const {
         /* expects 0 <= x <= 1 */
-        long double d = x * 255;
+        double d = x * 255;
         RGB pix;
         /* red */
         if (d > 94) {
@@ -33,7 +33,7 @@ namespace image_utils {
         return pix;
     }
 
-    RGB colormap_grayscale::get_rgb(const long double x) const {
+    RGB colormap_grayscale::get_rgb(const double x) const {
         RGB pix;
         pix.r = (unsigned char) (256 * x);
         pix.g = pix.r;
@@ -42,14 +42,14 @@ namespace image_utils {
     }
 
 
-    void grayscale_to_rgb(const matrix<long double> &in_double,
+    void grayscale_to_rgb(const matrix<double> &in_double,
                           image_RGB &out_rgb, colormap *fun) {
 
         if (in_double.x() != out_rgb.x() || in_double.y() != out_rgb.y()) {
             throw std::runtime_error("Image dimensions must be the same!");
         }
 
-        const long double *d = in_double.cbegin();
+        const double *d = in_double.cbegin();
         RGB *px = out_rgb.begin();
         while (d < in_double.end()) {
             *px = fun->get_rgb(*d);

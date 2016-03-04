@@ -23,19 +23,19 @@ int main(int argc, char const *argv[]) {
         /*5*/ std::cout << " <d>";
         /*6*/ std::cout << " [wave size]";
         /*7*/ std::cout << " [wave type]";
-        /*8*/ std::cout << " [lookup table size]"; /*TODO with default*/
-        /*9*/ /*TODO: colormap*/
+        /*8*/ std::cout << " [colormap]"; /*TODO: colormap*/
+        /*9*/ std::cout << " [lookup table size]"; /*TODO with default*/
         std::cout << std::endl;
         std::cout << "wave size:         default 16" << std::endl;
-        std::cout << "lookup table size: 2^x, default 21" << std::endl;
+        std::cout << "lookup table size: 2^x, default 20" << std::endl;
         return 1;
     }
     std::string output(argv[1]);
-    matrix<long double> grid(std::stoull(argv[2]), std::stoull(argv[3]));
+    matrix<double> grid(std::stoull(argv[2]), std::stoull(argv[3]));
     int n = std::stoi(argv[4]);
     int d = std::stoi(argv[5]);
 
-    long double distance_multiplier = 16;
+    double distance_multiplier = 16;
     if (argc >= 6) {
         distance_multiplier = std::stold(argv[6]);
     }
@@ -46,8 +46,13 @@ int main(int argc, char const *argv[]) {
         w = new wave_sawtooth();
     }
 
+    size_t table_size2 = 20;
+    if (argc >= 9) {
+        table_size2 = std::stoull(argv[9]);
+    }
+
     std::cout << "filling lookup table" << std::endl;
-    rose_dist *rose_dist1 = new rose_dist(w, n, d, std::pow(2, 21),
+    rose_dist *rose_dist1 = new rose_dist(w, n, d, std::pow(2, table_size2),
                                           distance_multiplier);
 
 #else
@@ -55,7 +60,7 @@ int main(int argc, char const *argv[]) {
     std::string output("/home/j0sh/Dropbox/code/Cpp/image_stuff/build/out.png");
     rose_dist *rose_dist1 = new rose_dist(nullptr, 3, 7, std::pow(2,23), 2*8);
     size_t z = 2*1920;
-    matrix<long double> grid(z, z);
+    matrix<double> grid(z, z);
 
 #endif
 

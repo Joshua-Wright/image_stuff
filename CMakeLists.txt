@@ -22,6 +22,7 @@ set(LIB_FILES
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
+add_executable(lissajous_dist ${LIB_FILES} src/renders/lissajous_dist.cpp)
 add_executable(rose_dist ${LIB_FILES} src/renders/rose_dist.cpp)
 add_executable(rose_dist_range ${LIB_FILES} src/renders/rose_dist_range.cpp)
 add_executable(benchmark_types src/tests/benchmark_types.cpp)

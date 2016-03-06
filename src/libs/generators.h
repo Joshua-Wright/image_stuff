@@ -15,7 +15,7 @@ namespace image_utils {
     /////////////////////
     class wave {
     public:
-    virtual double operator()(const double &x) const = 0;
+        virtual double operator()(const double &x) const = 0;
 
         virtual ~wave() { };
     };
@@ -60,12 +60,25 @@ namespace image_utils {
     class wave_2d {
     public:
         virtual double operator()(const double &x,
-                                       const double &y) const = 0;
+                                  const double &y) const = 0;
 
         virtual ~wave_2d() { };
     };
 
-    class rose_dist : public wave_2d {
+    class distance_wave : public wave_2d {
+
+        double wave_size;
+        wave *w;
+
+        size_t _find_min(size_t left, size_t right,
+                         const double &x,
+                         const double &y) const;
+
+    protected:
+        /*these values must be provided by the subclass*/
+        double offset;
+        double max_t;
+        size_t wid;
 
         struct cached_value {
 
@@ -82,28 +95,19 @@ namespace image_utils {
             const double C2_x1;
             const double C2_y1;
 
-            cached_value(const double n,
-                         const double _t) : t(_t),
-                                                 C1_0(pow(cos(n * t), 2) *
-                                                      pow(cos(t), 2) +
-                                                      pow(cos(n * t), 2) *
-                                                      pow(sin(t), 2)),
-                                                 C1_x1(-2 * cos(n * t) *
-                                                       cos(t)),
-                                                 C1_y1(-2 * cos(n * t) *
-                                                       sin(t)),
-                                                 C2_0(-2 * n * cos(n * t) *
-                                                      pow(cos(t), 2) *
-                                                      sin(n * t) -
-                                                      2 * n * cos(n * t) *
-                                                      sin(n * t) *
-                                                      pow(sin(t), 2)),
-                                                 C2_x1(2 * n * cos(t) *
-                                                       sin(n * t) +
-                                                       2 * cos(n * t) * sin(t)),
-                                                 C2_y1(2 * n * sin(n * t) *
-                                                       sin(t) - 2 * cos(n * t) *
-                                                                cos(t)) { }
+            cached_value(const double _t,
+                         const double _C1_0,
+                         const double _C1_x1,
+                         const double _C1_y1,
+                         const double _C2_0,
+                         const double _C2_x1,
+                         const double _C2_y1) : t(_t),
+                                                C1_0(_C1_0),
+                                                C1_x1(_C1_x1),
+                                                C1_y1(_C1_y1),
+                                                C2_0(_C2_0),
+                                                C2_x1(_C2_x1),
+                                                C2_y1(_C2_y1) { }
 
             double dist2(const double x, const double y) const {
                 return C1_0
@@ -116,33 +120,92 @@ namespace image_utils {
             }
 
             double diff(const double x,
-                             const double y) const {
+                        const double y) const {
                 return C2_0 + C2_x1 * x + C2_y1 * y;
             }
         };
 
         std::vector<cached_value> lookup_table;
-        double max_t;
-        double wave_size;
-        double offset;
-        size_t wid;
-        wave *w;
-
-        size_t _find_min(size_t left, size_t right,
-                         const double &x,
-                         const double &y) const;
 
     public:
-        rose_dist(wave *w, const int n, const int d,
-                  const size_t table_size, const double wave_size);
+        distance_wave(wave *_w, const size_t table_size,
+                      const double wave_size);
 
         void set_offset(const double x);
 
         virtual double operator()(const double &x,
-                                       const double &y) const;
+                                  const double &y) const;
 
-        virtual ~rose_dist();
+        virtual ~distance_wave();
 
+    };
+
+    class rose_dist : public distance_wave {
+    public:
+        rose_dist(wave *w, const size_t table_size,
+                  const double wav_sz,
+                  const int n,
+                  const int d) : distance_wave(w, table_size, wav_sz) {
+
+            /*rho=1 if n*d is odd, rho=2 if n*d is even*/
+            /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
+            double rho = ((n * d) % 2) ? 1.0 : 2.0;
+            /*1.01 to account for rounding errors on teh max value*/
+            max_t = PI * d * rho * 1.01;
+
+            const double k = (double) (n) / (double) (d);
+            for (double t = 0; t <= max_t; t += max_t / table_size) {
+                lookup_table.emplace_back(t * 1.0,
+                                          pow(cos(k * t), 2) * pow(cos(t), 2) +
+                                          pow(cos(k * t), 2) * pow(sin(t), 2),
+                                          -2 * cos(k * t) * cos(t),
+                                          -2 * cos(k * t) * sin(t),
+                                          -2 * k * cos(k * t) * pow(cos(t), 2) *
+                                          sin(k * t) -
+                                          2 * k * cos(k * t) * sin(k * t) *
+                                          pow(sin(t), 2),
+                                          2 * k * cos(t) * sin(k * t) +
+                                          2 * cos(k * t) * sin(t),
+                                          2 * k * sin(k * t) * sin(t) -
+                                          2 * cos(k * t) * cos(t));
+            }
+            /*determine interval width*/
+            /*PI/(3*max_t) determined by experimentation*/
+            if (n < d) {
+                wid = (size_t) (table_size * PI / (3 * max_t));
+            } else {
+                wid = (size_t) (table_size * PI / (6 * rho * max_t));
+            }
+
+        }
+    };
+
+    class dist_lissajous : public distance_wave {
+    public:
+        dist_lissajous(wave *w, const size_t table_size,
+                       const double wave_size,
+                       const double A, const double B,
+                       const double a, const double b,
+                       const double sigma) : distance_wave(w, table_size,
+                                                           wave_size) {
+            max_t = (2.01 * PI);
+            /*TODO: move this to initializer*/
+            wid = (size_t) (table_size * PI / (12*max_t));
+//            wid = 3000;
+            for (double t = 0; t <= max_t; t += max_t / table_size) {
+                lookup_table.emplace_back(t * 1.0,
+                                          A * A * pow(sin(a * t + sigma), 2) +
+                                          B * B * pow(sin(b * t), 2),
+                                          -2 * A * sin(a * t + sigma),
+                                          -2 * B * sin(b * t),
+                                          2 * A * A * a * cos(a * t + sigma) *
+                                          sin(a * t + sigma)
+                                          + 2 * B * B * b * cos(b * t) *
+                                            sin(b * t),
+                                          -2 * A * a * cos(a * t + sigma),
+                                          -2 * B * b * cos(b * t));
+            }
+        }
     };
 
 

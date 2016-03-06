@@ -1,4 +1,4 @@
-// (c) Copyright 2015 Josh Wright
+// (c) Copyright 201s Josh Wright
 #include <iostream>
 #include <string>
 #include <map>
@@ -31,9 +31,9 @@ int main(int argc, char const *argv[]) {
 
 
     std::cout << "filling lookup table" << std::endl;
-    rose_dist *rose_dist1 = new rose_dist(new wave_noop(), n, d,
-                                          std::pow(2, 21),
-                                          wave_size);
+    distance_wave *rose_dist1 = new rose_dist(new wave_noop(),
+                                                  std::pow(2, 21),
+                                                  wave_size, n, d);
     image_fill_2d_wave(grid_distances, rose_dist1);
 
     size_t max = 100;

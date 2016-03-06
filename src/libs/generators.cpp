@@ -23,27 +23,27 @@ namespace image_utils {
     /*wave functions*/
     double wave_triangle::operator()(const double &x) const {
         /*fix out-of-range values*/
-        double x2 = std::fabs(std::fmod(x, 1.0L));
+        double x2 = std::fabs(std::fmod(x, 1.0));
         if (x2 < 0.5) {
-            return 2.0L * x2;
+            return 2.0 * x2;
         } else {
-            return 2.0L - 2.0L * x2;
+            return 2.0 - 2.0 * x2;
         }
     }
 
     double wave_sawtooth::operator()(const double &x) const {
-        return std::fabs(std::fmod(x * 2, 1.0L));
+        return std::fabs(std::fmod(x * 2, 1.0));
     }
 
     double wave_sine::operator()(const double &x) const {
-        return 0.5L + std::sin(2.0L * PI * x) / 2.0L;
+        return 0.5 + std::sin(2.0 * PI * x) / 2.0;
     }
 
     double wave_square::operator()(const double &x) const {
-        if (std::fabs(std::fmod(x, 1.0L)) < 0.5L) {
-            return 0L;
+        if (std::fabs(std::fmod(x, 1.0)) < 0.5L) {
+            return 0;
         } else {
-            return 1.0L;
+            return 1.0;
         }
     }
 
@@ -53,12 +53,12 @@ namespace image_utils {
     }
 
     double wave_fourier_square::operator()(const double &x) const {
-        double result = 0.0L;
+        double result = 0.0;
         for (size_t i = 1; i < n; i++) {
             result +=
-                    sin((2.0L * i - 1.0L) * 2.0L * PI * x) / (2.0L * i - 1.0L);
+                    sin((2.0 * i - 1.0) * 2.0 * PI * x) / (2.0 * i - 1.0);
         }
-        return 0.5 + result * (2.0L / PI);
+        return 0.5 + result * (2.0 / PI);
     }
 
     wave *parse_wave_spec(const std::string &spec) {
@@ -76,40 +76,22 @@ namespace image_utils {
         return nullptr;
     }
 
-    rose_dist::rose_dist(wave *_w, const int n, const int d,
-                         const size_t table_size, const double wave_size)
-            : wave_size(wave_size),
-              w(_w) {
+
+    distance_wave::distance_wave(wave *_w, const size_t table_size,
+                                 const double wave_size) : w(_w), offset(0),
+                                                           wave_size(
+                                                                   wave_size) {
 
         lookup_table.reserve(table_size);
-
-        /*rho=1 if n*d is odd, rho=2 if n*d is even*/
-        /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
-        double rho = ((n * d) % 2) ? 1.0L : 2.0L;
-        max_t = PI * d * rho *
-                1.01; /*1.01 to account for rounding errors on teh max value*/
-
-        const double k = (double) (n) / (double) (d);
-        for (double t = 0; t <= max_t; t += max_t / table_size) {
-            lookup_table.emplace_back(k, t);
-        }
-
-        /*determine interval width*/
-        /*PI/(3*max_t) determined by experimentation*/
-        if (n < d) {
-            wid = (size_t) (table_size * PI / (3 * max_t));
-        } else {
-            wid = (size_t) (table_size * PI / (6 * rho * max_t));
-        }
 
         if (w == nullptr) {
             w = new wave_sawtooth();
         }
     }
 
-    size_t rose_dist::_find_min(size_t left, size_t right,
-                                const double &x,
-                                const double &y) const {
+    size_t distance_wave::_find_min(size_t left, size_t right,
+                                    const double &x,
+                                    const double &y) const {
         /*simply binary-search the lookup table, using the derivative at the
          * midpoint of the interval*/
         constexpr double threshold = std::sqrt(
@@ -129,8 +111,8 @@ namespace image_utils {
         return left;
     }
 
-    double rose_dist::operator()(const double &x,
-                                      const double &y) const {
+    double distance_wave::operator()(const double &x,
+                                     const double &y) const {
         double min_dist = INFINITY;
         size_t i = wid;
         for (; i < lookup_table.size(); i += wid) {
@@ -159,11 +141,11 @@ namespace image_utils {
         return (*w)(100 * std::sqrt(min_dist) / wave_size + offset);
     }
 
-    void rose_dist::set_offset(const double x) {
-        offset = std::fabs(std::fmod(x, 1.0L));
+    void distance_wave::set_offset(const double x) {
+        offset = std::fabs(std::fmod(x, 1.0));
     }
 
-    rose_dist::~rose_dist() { }
+    distance_wave::~distance_wave() { }
 
 
     /*fillers*/
@@ -177,13 +159,13 @@ namespace image_utils {
         if (w2 == nullptr) {
             w2 = new wave_sine();
         }
-        vctr<double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
-        double diagonal_dist = mid.mag() / 2.0L;
+        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
+        double diagonal_dist = mid.mag() / 2.0;
         double theta, d;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 d = mid.dist(x, y) * dist_mul / diagonal_dist;
-                theta = std::atan2(y - mid.y, x - mid.x) / (2.0L * PI) *
+                theta = std::atan2(y - mid.y, x - mid.x) / (2.0 * PI) *
                         theta_mul;
                 grid(x, y) = (*w1)(theta) + (*w2)(d);
             }
@@ -192,8 +174,8 @@ namespace image_utils {
 
     void image_fill_concentric_waves(matrix<double> &grid,
                                      const double &mul, wave *wave_func) {
-        vctr<double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
-        double diagonal_dist = mid.mag() / 2.0L;
+        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
+        double diagonal_dist = mid.mag() / 2.0;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 grid(x, y) = (*wave_func)(mid.dist(x, y) * mul / diagonal_dist);
@@ -203,18 +185,18 @@ namespace image_utils {
 
     void image_fill_pointing_out(matrix<double> &grid,
                                  const double &mul, wave *wave_func) {
-        vctr<double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
+        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 grid(x, y) = (*wave_func)(
-                        std::atan2(y - mid.y, x - mid.x) / (2.0L * PI) *
+                        std::atan2(y - mid.y, x - mid.x) / (2.0 * PI) *
                         mul);
             }
         }
     }
 
     void image_fill_2d_wave(matrix<double> &grid, wave_2d *w_2d) {
-        vctr<double> mid(grid.x() / 2.0L, grid.y() / 2.0L);
+        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
         double mag = std::min(grid.x(), grid.y()) / 2;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {

@@ -1,4 +1,5 @@
 // (c) Copyright 2016 Josh Wright
+
 #include <iostream>
 #include <string>
 #include <map>
@@ -8,7 +9,7 @@
 #include "../libs/colormaps.h"
 #include "../libs/io.h"
 
-#define DEBUG 0
+//#define DEBUG 0
 #define DEBUG 1
 
 int main(int argc, char const *argv[]) {
@@ -53,15 +54,15 @@ int main(int argc, char const *argv[]) {
     }
 
     std::cout << "filling lookup table" << std::endl;
-    distance_wave *rose_dist1 = new rose_dist(w, std::pow(2, table_size2),
+    distance_wave *rose_dist1 = new dist_lissajous(w, std::pow(2, table_size2),
                                                   distance_multiplier, n, d);
 
 #else
     /*constants for debugging*/
     std::string output("/home/j0sh/Dropbox/code/Cpp/image_stuff/build/out.png");
-    wave *w = new wave_sawtooth();
-    distance_wave *rose_dist1 = new rose_dist(w, std::pow(2,20), 4*8, 3, 7);
-    size_t z = 1500;
+    wave *w = new wave_fourier_square(3);
+    distance_wave *rose_dist1 = new dist_lissajous(w, std::pow(2,20), 2*8, 1,1,3,4,0);
+    size_t z = 500;
     matrix<double> grid(z, z);
 //    int g;
 //    std::cin >> g;
@@ -74,8 +75,6 @@ int main(int argc, char const *argv[]) {
     delete w;
     delete rose_dist1;
 
-//    colormap *map = new colormap_grayscale();
-    colormap *map = new colormap_threecolor();
-    color_write_image(grid, map, output);
+    color_write_image(grid, new colormap_basic_hot(), output);
     return 0;
 }

@@ -9,7 +9,7 @@
 #include "../libs/io.h"
 
 #define DEBUG 0
-#define DEBUG 1
+//#define DEBUG 1
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
@@ -75,7 +75,8 @@ int main(int argc, char const *argv[]) {
     delete rose_dist1;
 
 //    colormap *map = new colormap_grayscale();
-    colormap *map = new colormap_threecolor();
+//    colormap *map = new colormap_threecolor();
+    colormap *map = new colormap_offset_waves(new wave_sawtooth());
     color_write_image(grid, map, output);
     return 0;
 }

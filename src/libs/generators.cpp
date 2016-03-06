@@ -58,7 +58,8 @@ namespace image_utils {
             result +=
                     sin((2.0 * i - 1.0) * 2.0 * PI * x) / (2.0 * i - 1.0);
         }
-        return 0.5 + result * (2.0 / PI);
+        /*divide by max value on range*/
+        return (0.5 + result * (2.0 / PI))/1.13661977236758;
     }
 
     wave *parse_wave_spec(const std::string &spec) {

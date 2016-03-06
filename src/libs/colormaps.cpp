@@ -57,4 +57,25 @@ namespace image_utils {
             ++px;
         }
     }
+
+    RGB colormap_threecolor::get_rgb(const double x) const {
+        RGB pix;
+        pix.r = map_func(x);
+        pix.g = map_func(x + 1.0 / 3.0);
+        pix.b = map_func(x + 2.0 / 3.0);
+        return pix;
+    }
+
+    unsigned char colormap_threecolor::map_func(double x) const {
+        x = std::fabs(std::fmod(x, 1.0));
+        return std::max(256 * (1 - pow(3 * (x - 1.5 / 2.0), 2)), 0.0);
+    }
+
+    RGB colormap_offset_waves::get_rgb(const double x) const {
+        RGB pix;
+        pix.r = 255 * (*w)(x);
+        pix.g = 255 * (*w)(x + 1.0 / 3.0);
+        pix.b = 255 * (*w)(x + 2.0 / 3.0);
+        return pix;
+    }
 }

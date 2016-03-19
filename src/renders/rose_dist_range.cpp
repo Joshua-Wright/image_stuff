@@ -47,7 +47,7 @@ int main(int argc, char const *argv[]) {
 
 //        double offset = 1.0 * i / max;
         double offset = (*offset_wave)(1.0 * i / max) + 2 * i / max;
-        image_fill_apply_range_to_dist(grid_distances, grid_scaled, w, offset);
+        image_fill_apply_wave_to_dist(grid_distances, grid_scaled, w, offset);
         color_write_image(grid_scaled, cmap, out_filename);
     }
 

@@ -118,6 +118,9 @@ namespace image_utils {
             return std::sqrt(dist2(_x, _y));
         }
     };
+    /*TODO: make all vectors doubles
+     * doesn't make that much sense for this to be a template anyway*/
+    typedef vctr<double> vect;
 
     struct grayscale {
         unsigned char g;

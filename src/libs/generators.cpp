@@ -211,9 +211,9 @@ namespace image_utils {
         }
     }
 
-    void image_fill_apply_range_to_dist(const matrix<double> &in,
-                                        matrix<double> &out, wave *w,
-                                        const double offset) {
+    void image_fill_apply_wave_to_dist(const matrix<double> &in,
+                                       matrix<double> &out, wave *w,
+                                       const double offset) {
         for (size_t x = 0; x < in.x(); x++) {
             for (size_t y = 0; y < out.y(); y++) {
                 out(x, y) = (*w)(in(x, y) + offset);

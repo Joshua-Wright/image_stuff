@@ -230,9 +230,9 @@ namespace image_utils {
                                 wave *w1 = nullptr,
                                 wave *w2 = nullptr);
 
-    void image_fill_apply_range_to_dist(const matrix<double> &in,
-                                        matrix<double> &out, wave *w,
-                                        const double offset);
+    void image_fill_apply_wave_to_dist(const matrix<double> &in,
+                                       matrix<double> &out, wave *w,
+                                       const double offset);
 
     void image_fill_2d_wave(matrix<double> &grid, wave_2d *w_2d);
 

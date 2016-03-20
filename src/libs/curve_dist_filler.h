@@ -11,20 +11,20 @@ namespace image_utils {
 
     class curve {
     public:
-        virtual vctr<double> get_point(const double t) const = 0;
+        virtual vect get_point(const double t) const = 0;
 
-        virtual vctr<double> unit_normal_vector(const double t) const = 0;
+        virtual vect unit_normal_vector(const double t) const = 0;
         virtual double min_t() const = 0;
         virtual double max_t() const = 0;
     };
 
     class curve_circle : public curve {
     public:
-        virtual vctr<double> get_point(const double t) const {
+        virtual vect get_point(const double t) const {
             return vctr<double>(0.5 * cos(t), 0.5 * sin(t));
         }
 
-        virtual vctr<double> unit_normal_vector(const double t) const {
+        virtual vect unit_normal_vector(const double t) const {
             return vctr<double>(cos(t), sin(t));
         }
 
@@ -41,11 +41,11 @@ namespace image_utils {
     public:
         curve_rose(const double k) : k(k) { }
 
-        virtual vctr<double> get_point(const double t) const override {
-            return vctr<double>(cos(k*t)*cos(t), cos(k*t)*sin(t));
+        virtual vect get_point(const double t) const override {
+            return vect(cos(k*t)*cos(t), cos(k*t)*sin(t));
         }
 
-        virtual vctr<double> unit_normal_vector(const double t) const override {
+        virtual vect unit_normal_vector(const double t) const override {
 //            return vctr<double>((-2*(pow(fabs(cos(k*t)*sin(t) + k*cos(t)*sin(k*t)),2) +
 //                                     pow(fabs(cos(t)*cos(k*t) - k*sin(t)*sin(k*t)),2))*
 //                                 ((1 + pow(k,2))*cos(t)*cos(k*t) - 2*k*sin(t)*sin(k*t)) -

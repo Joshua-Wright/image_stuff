@@ -67,8 +67,8 @@ namespace image_utils {
 
     class distance_wave : public wave_2d {
 
-        double wave_size;
         wave *w;
+        double wave_size;
 
         size_t _find_min(size_t left, size_t right,
                          const double &x,

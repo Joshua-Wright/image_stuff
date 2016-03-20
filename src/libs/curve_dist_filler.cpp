@@ -11,7 +11,7 @@ namespace image_utils {
             /*TODO: make a filler method for grid*/
             x = 1;
         }
-        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
+        vect mid(grid.x() / 2.0, grid.y() / 2.0);
         double mid_mag = std::min(grid.x(), grid.y()) / 2;
 
         double distance_scale = 0;

@@ -59,7 +59,7 @@ namespace image_utils {
                     sin((2.0 * i - 1.0) * 2.0 * PI * x) / (2.0 * i - 1.0);
         }
         /*divide by max value on range*/
-        return (0.5 + result * (2.0 / PI))/1.13661977236758;
+        return (0.5 + result * (2.0 / PI)) / 1.13661977236758;
     }
 
     wave *parse_wave_spec(const std::string &spec) {
@@ -79,9 +79,9 @@ namespace image_utils {
 
 
     distance_wave::distance_wave(wave *_w, const size_t table_size,
-                                 const double wave_size) : w(_w), offset(0),
-                                                           wave_size(
-                                                                   wave_size) {
+                                 const double wave_size) : w(_w),
+                                                           wave_size(wave_size),
+                                                           offset(0) {
 
         lookup_table.reserve(table_size);
 
@@ -160,7 +160,7 @@ namespace image_utils {
         if (w2 == nullptr) {
             w2 = new wave_sine();
         }
-        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
+        vect mid(grid.x() / 2.0, grid.y() / 2.0);
         double diagonal_dist = mid.mag() / 2.0;
         double theta, d;
         for (size_t x = 0; x < grid.x(); x++) {
@@ -175,7 +175,7 @@ namespace image_utils {
 
     void image_fill_concentric_waves(matrix<double> &grid,
                                      const double &mul, wave *wave_func) {
-        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
+        vect mid(grid.x() / 2.0, grid.y() / 2.0);
         double diagonal_dist = mid.mag() / 2.0;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
@@ -186,7 +186,7 @@ namespace image_utils {
 
     void image_fill_pointing_out(matrix<double> &grid,
                                  const double &mul, wave *wave_func) {
-        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
+        vect mid(grid.x() / 2.0, grid.y() / 2.0);
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 grid(x, y) = (*wave_func)(
@@ -197,12 +197,12 @@ namespace image_utils {
     }
 
     void image_fill_2d_wave(matrix<double> &grid, wave_2d *w_2d) {
-        vctr<double> mid(grid.x() / 2.0, grid.y() / 2.0);
+        vect mid(grid.x() / 2.0, grid.y() / 2.0);
         double mag = std::min(grid.x(), grid.y()) / 2;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 /*current point*/
-                vctr<double> current(x, y);
+                vect current(x, y);
                 /*scale current point*/
                 current -= mid;
                 current /= mag;

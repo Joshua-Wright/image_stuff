@@ -14,7 +14,7 @@ namespace image_utils {
                             bool print_minmax = false);
 
     void color_write_image(matrix<double> &grid, colormap *cmap,
-                           const std::string &output_filename);
+                           const std::string &output_filename, bool write_save = true);
 
     void scale_grid(matrix<double> &doubles);
 

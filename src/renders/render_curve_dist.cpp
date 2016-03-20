@@ -1,4 +1,4 @@
-// (c) Copyright 2015 Josh Wright
+// (c) Copyright 2016 Josh Wright
 
 #include "../libs/curve_dist_filler.h"
 #include "../libs/io.h"

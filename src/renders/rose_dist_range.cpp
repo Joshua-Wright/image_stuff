@@ -1,4 +1,4 @@
-// (c) Copyright 201s Josh Wright
+// (c) Copyright 2016 Josh Wright
 #include <string>
 #include <iostream>
 #include <map>

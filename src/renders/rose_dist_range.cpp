@@ -86,7 +86,7 @@ int main(int argc, char const *argv[]) {
     /*TODO: output ffmpeg command line to render it*/
     std::cout << "Done! Render using:" << std::endl;
     std::cout
-    << "ffmpeg -i "
+    << "ffmpeg -framerate 60 -i "
     << output_folder
     << "out_frame_%05d.png "
     << output_folder

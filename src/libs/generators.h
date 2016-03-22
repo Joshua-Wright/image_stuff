@@ -227,8 +227,8 @@ namespace image_utils {
     void image_fill_circle_grid(matrix<double> &grid,
                                 const double &theta_mul,
                                 const double &dist_mul,
-                                wave *w1 = nullptr,
-                                wave *w2 = nullptr);
+                                wave *wave_dist = nullptr,
+                                wave *wave_theta = nullptr);
 
     void image_fill_apply_wave_to_dist(const matrix<double> &in,
                                        matrix<double> &out, wave *w,

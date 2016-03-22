@@ -2,59 +2,54 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 #include <functional>
+#include "../libs/cpp_containers/lib/arg_parser.h"
 #include "../libs/colormaps.h"
 #include "../libs/generators.h"
 #include "../libs/io.h"
 
-/*easy pre-defined parameters for consistent debugging*/
-#define DEBUG 0
-//#define DEBUG 1
-
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
     using image_utils::matrix;
+    using std::cout;
+    using std::endl;
+    using std::unordered_map;
+    using std::string;
+    unordered_map<string,string> config;
 
-#if !DEBUG
-    if (argc < 6) {
-        /*if not run with enough arguments, pring usage*/
-        std::cout << argv[0];
-        std::cout << " <output filename>";
-        std::cout << " <image size>";
-        std::cout << " <distance multiplier>";
-        std::cout << " <theta multiplier>";
-        std::cout << " <wave 1>";
-        std::cout << " <wave 2>";
-        /*TODO: colormap*/
-        std::cout << std::endl;
-        return 1;
-    }
-    /*setup command-line parameters*/
-    std::string output(argv[1]);
-    const size_t z = std::strtoull(argv[2], NULL, 10);
-    const double mul_dist = std::strtold(argv[3], NULL);
-    const double mul_theta = std::strtold(argv[4], NULL);
-    wave *w1 = parse_wave_spec(argv[5]);
-    wave *w2 = parse_wave_spec(argv[6]);
-#else
-    /*defaults for easy debugging*/
-    std::string output("/home/j0sh/Dropbox/code/Cpp/image_stuff/build/out.png");
-    const size_t z = 100;
-    const double mul_dist = 6;
-    const double mul_theta = 20;
-    wave *w1 = parse_wave_spec("fourier:3");
-    wave *w2 = parse_wave_spec("sine");
-#endif
+    /*output*/
+    config["output"] = "output.png";
+    config["x"] = "500";
+    config["y"] = "500";
+    config["xdist"] = "3";
+    config["xtheta"] = "10";
+    config["wdist"] = "sine";
+    config["wtheta"] = "fourier_square:3";
+    containers::parse_args(config, argc, argv);
+
+    /*TODO: print help text if (argc == 0) or help parameter*/
+
+    std::string output(config["output"]);
+    const size_t x = std::stoull(config["x"]);
+    const size_t y = std::stoull(config["y"]);
+    const double mul_dist = std::stod(config["xdist"]);
+    const double mul_theta = std::stod(config["xtheta"]);
+    wave *wave_dist = parse_wave_spec(config["wdist"]);
+    wave *wave_theta = parse_wave_spec(config["wtheta"]);
+
 
     /*allocate a grid for the math*/
-    matrix<double> grid(z, z);
+    matrix<double> grid(y, x);
 
     /*fill the grid*/
-    image_fill_circle_grid(grid, mul_theta, mul_dist, w1, w2);
+    image_fill_circle_grid(grid, mul_theta, mul_dist, wave_dist, wave_theta);
 
-    delete w1;
-    delete w2;
+    delete wave_dist;
+    delete wave_theta;
 
     /*write the image*/
-    color_write_image(grid, new colormap_basic_hot(), output);
+//    colormap *cmap = new colormap_basic_hot();
+    colormap *cmap = new colormap_threecolor();
+    color_write_image(grid, cmap, output);
 }

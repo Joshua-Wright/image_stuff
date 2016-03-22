@@ -17,6 +17,7 @@ set(LIB_FILES
         src/libs/io.cpp
         src/libs/colormaps.cpp
         src/libs/generators.cpp
+        src/libs/cpp_containers/lib/arg_parser.cpp
         )
 
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)

@@ -153,12 +153,12 @@ namespace image_utils {
     void image_fill_circle_grid(matrix<double> &grid,
                                 const double &theta_mul,
                                 const double &dist_mul,
-                                wave *w1, wave *w2) {
-        if (w1 == nullptr) {
-            w1 = new wave_sine();
+                                wave *wave_dist, wave *wave_theta) {
+        if (wave_dist == nullptr) {
+            wave_dist = new wave_sine();
         }
-        if (w2 == nullptr) {
-            w2 = new wave_sine();
+        if (wave_theta == nullptr) {
+            wave_theta = new wave_sine();
         }
         vect mid(grid.x() / 2.0, grid.y() / 2.0);
         double diagonal_dist = mid.mag() / 2.0;
@@ -168,7 +168,7 @@ namespace image_utils {
                 d = mid.dist(x, y) * dist_mul / diagonal_dist;
                 theta = std::atan2(y - mid.y, x - mid.x) / (2.0 * PI) *
                         theta_mul;
-                grid(x, y) = (*w1)(theta) + (*w2)(d);
+                grid(x, y) = (*wave_dist)(theta) + (*wave_theta)(d);
             }
         }
     }

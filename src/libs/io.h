@@ -10,6 +10,8 @@ namespace image_utils {
 
     void write_image(image_RGB &rgb_data, const std::string &out_filename);
 
+    image_RGB read_image(const std::string &filename);
+
     void image_sanity_check(const matrix<double> &doubles,
                             bool print_minmax = false);
 

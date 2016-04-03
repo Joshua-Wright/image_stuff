@@ -66,7 +66,7 @@ int main(int argc, char const *argv[]) {
     string output(config["output"]);
     /*yes, x and y are reversed. They're also reversed somewhere else in the
      * code, so it works this way...*/
-    matrix<double> grid(std::stoull(config["y"]), std::stoull(config["x"]));
+    matrix<double> grid(std::stoull(config["x"]), std::stoull(config["y"]));
     int n = std::stoi(config["n"]);
     int d = std::stoi(config["d"]);
     double distance_multiplier = std::stod(config["wave_size"]);
@@ -85,7 +85,8 @@ int main(int argc, char const *argv[]) {
 
     /*TODO: parameterize the colormap*/
 //    colormap *map = new colormap_offset_waves(new wave_triangle());
-    colormap *map = new colormap_threecolor();
+//    colormap *map = new colormap_threecolor();
+    colormap *map = new colormap_basic_hot();
 //    colormap *map = new colormap_grayscale();
     color_write_image(grid, map, output);
     return 0;

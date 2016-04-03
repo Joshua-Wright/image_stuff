@@ -16,6 +16,7 @@ int main(int argc, char const *argv[]) {
 
 
 #if !DEBUG
+    /*TODO: new arg system*/
     if (argc < 4/*TODO: arg count*/) {
         /*0*/ std::cout << argv[0];
         /*1*/ std::cout << " <output folder>";
@@ -59,7 +60,9 @@ int main(int argc, char const *argv[]) {
     matrix<double> grid_scaled(x, y);
 
 //    wave *offset_wave = new wave_fourier_square(3);
+    /*TODO: parameterize wave type*/
     wave *offset_wave = new wave_sawtooth();
+    /*TODO: parameterize colormap*/
     colormap *cmap = new colormap_basic_hot();
 
 
@@ -83,7 +86,6 @@ int main(int argc, char const *argv[]) {
         color_write_image(grid_scaled, cmap, out_filename, false);
     }
 
-    /*TODO: output ffmpeg command line to render it*/
     std::cout << "Done! Render using:" << std::endl;
     std::cout
     << "ffmpeg -framerate 60 -i "

@@ -23,8 +23,10 @@ void read_into_buffer(double *buffer, const size_t length);
 int main(int argc, char const *argv[]) {
 
     using namespace image_utils;
+    /*TODO: these as command-line arguments*/
     const size_t samples_per_second = 44100;
     const size_t stepsize = samples_per_second / 10;
+
 
 
     fftw_init_threads();
@@ -44,6 +46,7 @@ int main(int argc, char const *argv[]) {
         fftw_execute(plan);
 
         data_buffer.emplace_back();
+        data_buffer.back().reserve(stepsize);
         for (size_t i = 0; i < stepsize; i++) {
             data_buffer.back().push_back(std::sqrt(std::norm(out[i])));
 //            data_buffer.back().push_back(out_real[i]);

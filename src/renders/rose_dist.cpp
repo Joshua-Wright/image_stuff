@@ -38,28 +38,20 @@ int main(int argc, char const *argv[]) {
         std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
         << std::endl;
         std::cout << std::endl;
-        int param_width = 20;
-        int description_width = 80 - param_width - 10;
-        std::cout << std::setw(param_width) << "parameter:" << std::setw(
-                description_width) << "description:" << std::endl;
-        std::cout << std::setw(param_width) << "output" << std::setw(
-                description_width) << "output filename" << std::endl;
-        std::cout << std::setw(param_width) << "x" <<
-        std::setw(description_width) << "image width" << std::endl;
-        std::cout << std::setw(param_width) << "y" <<
-        std::setw(description_width) << "image height" << std::endl;
-        std::cout << std::setw(param_width) << "n" <<
-        std::setw(description_width) << "rose parameter" << std::endl;
-        std::cout << std::setw(param_width) << "d" <<
-        std::setw(description_width) << "rose parameter" << std::endl;
-        std::cout << std::setw(param_width) << "wave_size" << std::setw(
-                description_width) << "relative size of waves" << std::endl;
-        std::cout << std::setw(param_width) << "wave_type" << std::setw(
-                description_width) << "type of waves" << std::endl;
-        std::cout << std::setw(param_width) << "lookup_table_size" << std::setw(
-                description_width) << "size of lookup table size" << std::endl;
-        std::cout << std::setw(param_width + description_width) <<
-        "(given as 2^x)" << std::endl;
+        int pw = 20; /*parameter width*/
+        int dw = 80 - pw - 10; /*description width*/
+        // @formatter:off
+        std::cout << std::setw(pw) <<         "parameter:" << std::setw(dw) <<               "description:" << std::endl;
+        std::cout << std::setw(pw) <<             "output" << std::setw(dw) <<            "output filename" << std::endl;
+        std::cout << std::setw(pw) <<                  "x" << std::setw(dw) <<                "image width" << std::endl;
+        std::cout << std::setw(pw) <<                  "y" << std::setw(dw) <<               "image height" << std::endl;
+        std::cout << std::setw(pw) <<                  "n" << std::setw(dw) <<             "rose parameter" << std::endl;
+        std::cout << std::setw(pw) <<                  "d" << std::setw(dw) <<             "rose parameter" << std::endl;
+        std::cout << std::setw(pw) <<          "wave_size" << std::setw(dw) <<     "relative size of waves" << std::endl;
+        std::cout << std::setw(pw) <<          "wave_type" << std::setw(dw) <<              "type of waves" << std::endl;
+        std::cout << std::setw(pw) <<  "lookup_table_size" << std::setw(dw) <<  "size of lookup table size" << std::endl;
+        std::cout << std::setw(pw + dw) << "(given as 2^x)" << std::endl;
+        // @formatter:on
         return 0;
     }
 

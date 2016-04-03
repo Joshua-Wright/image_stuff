@@ -4,76 +4,88 @@
 #include <string>
 #include <map>
 #include <iomanip>
+#include <unordered_map>
 #include "../libs/generators.h"
 #include "../libs/cpp_containers/lib/debug.h"
 #include "../libs/colormaps.h"
 #include "../libs/io.h"
+#include "../libs/cpp_containers/lib/arg_parser.h"
 
-//#define DEBUG 0
-#define DEBUG 1
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
 
-#if !DEBUG
-    if (argc < 4/*TODO: arg count*/) {
-        /*0*/ std::cout << argv[0];
-        /*1*/ std::cout << " <output filename>";
-        /*2*/ std::cout << " <image x>";
-        /*3*/ std::cout << " <image y>";
-        /*4*/ std::cout << " <n>";
-        /*5*/ std::cout << " <d>";
-        /*6*/ std::cout << " [wave size]";
-        /*7*/ std::cout << " [wave type]";
-        /*8*/ std::cout << " [colormap]"; /*TODO: colormap*/
-        /*9*/ std::cout << " [lookup table size]"; /*TODO with default*/
+    using std::cout;
+    using std::endl;
+    using std::unordered_map;
+    using std::string;
+    unordered_map<string, string> config;
+
+    /*default values*/
+    config["output"] = "output.png";
+    config["x"] = "500";
+    config["y"] = "500";
+    config["A"] = "1";
+    config["B"] = "1";
+    config["a"] = "6";
+    config["b"] = "7";
+    config["sigma"] = "0";
+    config["wave_size"] = "16";
+    config["wave_type"] = "sawtooth";
+    config["lookup_table_size"] = "20";
+    containers::parse_args(config, argc, argv);
+
+
+    if (argc == 1 ||
+        config.find("--help") != config.end() ||
+        config.find("-h") != config.end()) {
+        /*help text*/
+        std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
+        << std::endl;
         std::cout << std::endl;
-        std::cout << "wave size:         default 16" << std::endl;
-        std::cout << "lookup table size: 2^x, default 20" << std::endl;
-        return 1;
+        int pw = 20; /*parameter width*/
+        int dw = 80 - pw - 10; /*description width*/
+        // @formatter:off
+        std::cout << std::setw(pw) <<         "parameter:" << std::setw(dw) <<               "description:" << std::endl;
+        std::cout << std::setw(pw) <<             "output" << std::setw(dw) <<            "output filename" << std::endl;
+        std::cout << std::setw(pw) <<                  "x" << std::setw(dw) <<                "image width" << std::endl;
+        std::cout << std::setw(pw) <<                  "y" << std::setw(dw) <<               "image height" << std::endl;
+        std::cout << std::setw(pw) <<                  "a" << std::setw(dw) <<  "lissajous curve parameter" << std::endl;
+        std::cout << std::setw(pw) <<                  "b" << std::setw(dw) <<  "lissajous curve parameter" << std::endl;
+        std::cout << std::setw(pw) <<                  "A" << std::setw(dw) <<  "lissajous curve parameter" << std::endl;
+        std::cout << std::setw(pw) <<                  "B" << std::setw(dw) <<  "lissajous curve parameter" << std::endl;
+        std::cout << std::setw(pw) <<              "sigma" << std::setw(dw) <<  "lissajous curve parameter" << std::endl;
+        std::cout << std::setw(pw) <<          "wave_size" << std::setw(dw) <<     "relative size of waves" << std::endl;
+        std::cout << std::setw(pw) <<          "wave_type" << std::setw(dw) <<              "type of waves" << std::endl;
+        std::cout << std::setw(pw) <<  "lookup_table_size" << std::setw(dw) <<  "size of lookup table size" << std::endl;
+        std::cout << std::setw(pw + dw) << "(given as 2^x)" << std::endl;
+        // @formatter:on
+        return 0;
     }
-    std::string output(argv[1]);
-    matrix<double> grid(std::stoull(argv[2]), std::stoull(argv[3]));
-    int n = std::stoi(argv[4]);
-    int d = std::stoi(argv[5]);
 
-    double distance_multiplier = 16;
-    if (argc >= 6) {
-        distance_multiplier = std::stod(argv[6]);
-    }
-    wave *w = nullptr;
-    if (argc >= 7) {
-        w = parse_wave_spec(argv[7]);
-    } else {
-        w = new wave_sawtooth();
-    }
+    std::string output(config["output"]);
+    matrix<double> grid(std::stoull(config["x"]), std::stoull(config["y"]));
+    const double A = std::stod(config["A"]);
+    const double B = std::stod(config["B"]);
+    const double a = std::stod(config["a"]);
+    const double b = std::stod(config["b"]);
+    const double sigma = std::stod(config["sigma"]);
 
-    size_t table_size2 = 20;
-    if (argc >= 9) {
-        table_size2 = std::stoull(argv[9]);
-    }
+    double distance_multiplier = std::stod(config["wave_size"]);
+    wave *w = parse_wave_spec(config["wave_type"]);
+
+    size_t table_size2 = std::stoull(config["lookup_table_size"]);
 
     std::cout << "filling lookup table" << std::endl;
-    distance_wave *rose_dist1 = new dist_lissajous(w, std::pow(2, table_size2),
-                                                  distance_multiplier, n, d);
-
-#else
-    /*constants for debugging*/
-    std::string output("/home/j0sh/Dropbox/code/Cpp/image_stuff/build/out.png");
-    wave *w = new wave_fourier_square(3);
-    distance_wave *rose_dist1 = new dist_lissajous(w, std::pow(2,20), 2*8, 1,1,3,4,0);
-    size_t z = 500;
-    matrix<double> grid(z, z);
-//    int g;
-//    std::cin >> g;
-
-#endif
+    distance_wave *dist_lissajous1 = new dist_lissajous(w, std::pow(2, table_size2),
+                                                   distance_multiplier, A, B, a,
+                                                   b, sigma);
 
     std::cout << "rendering image" << std::endl;
-    image_fill_2d_wave(grid, rose_dist1);
+    image_fill_2d_wave(grid, dist_lissajous1);
 
     delete w;
-    delete rose_dist1;
+    delete dist_lissajous1;
 
     color_write_image(grid, new colormap_basic_hot(), output);
     return 0;

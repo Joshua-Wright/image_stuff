@@ -48,7 +48,7 @@ namespace image_utils {
     }
 
     wave_fourier_square::wave_fourier_square(const std::string &spec) {
-        constexpr size_t spec_begin_length = std::strlen("fourier_square:");
+        const size_t spec_begin_length = std::strlen("fourier_square:");
         n = std::stoull(spec.substr(spec_begin_length));
     }
 
@@ -95,7 +95,7 @@ namespace image_utils {
                                     const double &y) const {
         /*simply binary-search the lookup table, using the derivative at the
          * midpoint of the interval*/
-        constexpr double threshold = std::sqrt(
+        const double threshold = std::sqrt(
                 std::numeric_limits<double>::epsilon());
         while (left != right && right - left > 1) {
             /*overflow-safe average*/

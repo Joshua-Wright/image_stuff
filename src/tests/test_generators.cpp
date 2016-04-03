@@ -1,8 +1,8 @@
 // (c) Copyright 2016 Josh Wright
 
 #include <iostream>
-#include "../libs/cpp_containers/lib/debug.h"
-#include "../libs/generators.h"
+#include "debug.h"
+#include "generators.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;

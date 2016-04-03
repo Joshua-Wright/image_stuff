@@ -1,6 +1,6 @@
 // (c) Copyright 2016 Josh Wright
 #include "colormaps.h"
-#include "../external_libs/csv.h"
+#include "csv.h"
 
 namespace image_utils {
 

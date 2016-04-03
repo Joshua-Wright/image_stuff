@@ -3,10 +3,10 @@
 #include <iostream>
 #include <map>
 #include <iomanip>
-#include "../libs/generators.h"
-#include "../libs/cpp_containers/lib/debug.h"
-#include "../libs/colormaps.h"
-#include "../libs/io.h"
+#include "generators.h"
+#include "debug.h"
+#include "colormaps.h"
+#include "io.h"
 
 #define DEBUG 0
 

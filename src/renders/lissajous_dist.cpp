@@ -5,11 +5,11 @@
 #include <map>
 #include <iomanip>
 #include <unordered_map>
-#include "../libs/generators.h"
-#include "../libs/cpp_containers/lib/debug.h"
-#include "../libs/colormaps.h"
-#include "../libs/io.h"
-#include "../libs/cpp_containers/lib/arg_parser.h"
+#include "generators.h"
+#include "debug.h"
+#include "colormaps.h"
+#include "io.h"
+#include "arg_parser.h"
 
 
 int main(int argc, char const *argv[]) {

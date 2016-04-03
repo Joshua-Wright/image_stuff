@@ -4,10 +4,10 @@
 #include <iostream>
 #include <unordered_map>
 #include <functional>
-#include "../libs/cpp_containers/lib/arg_parser.h"
-#include "../libs/colormaps.h"
-#include "../libs/generators.h"
-#include "../libs/io.h"
+#include "arg_parser.h"
+#include "colormaps.h"
+#include "generators.h"
+#include "io.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;

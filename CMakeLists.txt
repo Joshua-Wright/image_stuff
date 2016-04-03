@@ -5,6 +5,11 @@ project(image_stuff)
 set(CMAKE_C_COMPILER   "/usr/bin/clang")
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
+# includes:
+include_directories("src/libs/")
+include_directories("src/libs/cpp_containers/lib/")
+include_directories("src/external_libs/")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")

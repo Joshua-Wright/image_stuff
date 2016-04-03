@@ -8,7 +8,8 @@
 #include <fftw3.h>
 #include <iomanip>
 #include <cstring>
-#include "../libs/io.h"
+
+#include "io.h"
 
 /* make/test using
  * make fft_pcm random_notes && ./random_notes |./fft_pcm > test.png

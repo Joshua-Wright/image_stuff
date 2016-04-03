@@ -4,7 +4,7 @@
 #include <time.h>
 #include <iomanip>
 #include <cmath>
-#include "../libs/generators.h"
+#include "generators.h"
 
 //#define EXTERNAL 1
 //#define EXTERNAL 0

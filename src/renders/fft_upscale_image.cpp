@@ -8,7 +8,7 @@
 #include <fftw3.h>
 #include <iomanip>
 #include <cstring>
-#include "../libs/io.h"
+#include "io.h"
 
 
 int main(int argc, char const *argv[]) {

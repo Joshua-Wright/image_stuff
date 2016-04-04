@@ -20,74 +20,13 @@ namespace image_utils {
         return true;
     }
 
-    /*wave functions*/
-    double wave_triangle::operator()(const double &x) const {
-        /*fix out-of-range values*/
-        double x2 = std::fabs(std::fmod(x, 1.0));
-        if (x2 < 0.5) {
-            return 2.0 * x2;
-        } else {
-            return 2.0 - 2.0 * x2;
-        }
-    }
 
-    double wave_sawtooth::operator()(const double &x) const {
-        return std::fabs(std::fmod(x * 2, 1.0));
-    }
-
-    double wave_sine::operator()(const double &x) const {
-        return 0.5 + std::sin(2.0 * PI * x) / 2.0;
-    }
-
-    double wave_square::operator()(const double &x) const {
-        if (std::fabs(std::fmod(x, 1.0)) < 0.5L) {
-            return 0;
-        } else {
-            return 1.0;
-        }
-    }
-
-    wave_fourier_square::wave_fourier_square(const std::string &spec) {
-        const size_t spec_begin_length = std::strlen("fourier_square:");
-        n = std::stoull(spec.substr(spec_begin_length));
-    }
-
-    double wave_fourier_square::operator()(const double &x) const {
-        double result = 0.0;
-        for (size_t i = 1; i < n; i++) {
-            result +=
-                    sin((2.0 * i - 1.0) * 2.0 * PI * x) / (2.0 * i - 1.0);
-        }
-        /*divide by max value on range*/
-        return (0.5 + result * (2.0 / PI)) / 1.13661977236758;
-    }
-
-    wave *parse_wave_spec(const std::string &spec) {
-        if (startswith("sine", spec)) {
-            return new wave_sine();
-        } else if (startswith("sawtooth", spec)) {
-            return new wave_sawtooth();
-        } else if (startswith("triangle", spec)) {
-            return new wave_triangle();
-        } else if (startswith("fourier_square:", spec)) {
-            return new wave_fourier_square(spec);
-        } else if (startswith("noop", spec)) {
-            return new wave_noop();
-        }
-        return nullptr;
-    }
-
-
-    distance_wave::distance_wave(wave *_w, const size_t table_size,
+    distance_wave::distance_wave(const wave &_w, const size_t table_size,
                                  const double wave_size) : w(_w),
                                                            wave_size(wave_size),
                                                            offset(0) {
 
         lookup_table.reserve(table_size);
-
-        if (w == nullptr) {
-            w = new wave_sawtooth();
-        }
     }
 
     size_t distance_wave::_find_min(size_t left, size_t right,
@@ -139,7 +78,8 @@ namespace image_utils {
                 }
             }
         }
-        return (*w)(100 * std::sqrt(min_dist) / wave_size + offset);
+//        return (*w)(100 * std::sqrt(min_dist) / wave_size + offset);
+        return w(100 * std::sqrt(min_dist) / wave_size + offset);
     }
 
     void distance_wave::set_offset(const double x) {
@@ -153,13 +93,7 @@ namespace image_utils {
     void image_fill_circle_grid(matrix<double> &grid,
                                 const double &theta_mul,
                                 const double &dist_mul,
-                                wave *wave_dist, wave *wave_theta) {
-        if (wave_dist == nullptr) {
-            wave_dist = new wave_sine();
-        }
-        if (wave_theta == nullptr) {
-            wave_theta = new wave_sine();
-        }
+                                const wave &wave_dist, const wave &wave_theta) {
         vect mid(grid.x() / 2.0, grid.y() / 2.0);
         double diagonal_dist = mid.mag() / 2.0;
         double theta, d;
@@ -168,28 +102,28 @@ namespace image_utils {
                 d = mid.dist(x, y) * dist_mul / diagonal_dist;
                 theta = std::atan2(y - mid.y, x - mid.x) / (2.0 * PI) *
                         theta_mul;
-                grid(x, y) = (*wave_dist)(theta) + (*wave_theta)(d);
+                grid(x, y) = wave_dist(theta) + wave_theta(d);
             }
         }
     }
 
     void image_fill_concentric_waves(matrix<double> &grid,
-                                     const double &mul, wave *wave_func) {
+                                     const double &mul, const wave &wave_func) {
         vect mid(grid.x() / 2.0, grid.y() / 2.0);
         double diagonal_dist = mid.mag() / 2.0;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
-                grid(x, y) = (*wave_func)(mid.dist(x, y) * mul / diagonal_dist);
+                grid(x, y) = wave_func(mid.dist(x, y) * mul / diagonal_dist);
             }
         }
     }
 
     void image_fill_pointing_out(matrix<double> &grid,
-                                 const double &mul, wave *wave_func) {
+                                 const double &mul, const wave &wave_func) {
         vect mid(grid.x() / 2.0, grid.y() / 2.0);
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
-                grid(x, y) = (*wave_func)(
+                grid(x, y) = wave_func(
                         std::atan2(y - mid.y, x - mid.x) / (2.0 * PI) *
                         mul);
             }
@@ -212,13 +146,69 @@ namespace image_utils {
     }
 
     void image_fill_apply_wave_to_dist(const matrix<double> &in,
-                                       matrix<double> &out, wave *w,
+                                       matrix<double> &out, const wave &w,
                                        const double offset) {
         for (size_t x = 0; x < in.x(); x++) {
             for (size_t y = 0; y < out.y(); y++) {
-                out(x, y) = (*w)(in(x, y) + offset);
+                out(x, y) = w(in(x, y) + offset);
             }
         }
 
     }
 }
+
+image_utils::wave::wave(const std::string &spec) : data(nullptr),
+                                                   type(NOOP) {
+    if (startswith("sine", spec)) {
+        type = SINE;
+    } else if (startswith("sawtooth", spec)) {
+        type = SAWTOOTH;
+    } else if (startswith("triangle", spec)) {
+        type = TRIANGLE;
+    } else if (startswith("fourier_square:", spec)) {
+        type = FOURIER_SQUARE;
+        const size_t spec_begin_length = std::strlen("fourier_square:");
+        /*yes, store integer in the pointer*/
+        data = (void *) std::stoull(spec.substr(spec_begin_length));
+    } else if (startswith("noop", spec)) {
+        type = NOOP;
+    }
+}
+
+double image_utils::wave::operator()(const double &x) const {
+    switch (type) {
+        case NOOP:
+            return x;
+        case SINE:
+            return 0.5 + std::sin(2.0 * PI * x) / 2.0;
+        case TRIANGLE: {
+            /*fix out-of-range values*/
+            double x2 = std::fabs(std::fmod(x, 1.0));
+            if (x2 < 0.5) {
+                return 2.0 * x2;
+            } else {
+                return 2.0 - 2.0 * x2;
+            }
+        }
+        case SAWTOOTH:
+            return std::fabs(std::fmod(x * 2, 1.0));
+        case SQUARE:
+            if (std::fabs(std::fmod(x, 1.0)) < 0.5L) {
+                return 0;
+            } else {
+                return 1.0;
+            }
+        case FOURIER_SQUARE: {
+            double result = 0.0;
+            /*get the size_t back from our pointer*/
+            for (size_t i = 1; i < ((size_t) data); i++) {
+                result += sin((2.0 * i - 1.0) * 2.0 * PI * x) / (2.0 * i - 1.0);
+            }
+            /*divide by max value on range*/
+            return (0.5 + result * (2.0 / PI)) / 1.13661977236758;
+        }
+        default:
+            return x;
+    }
+}
+

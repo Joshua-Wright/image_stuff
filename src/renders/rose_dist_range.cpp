@@ -14,7 +14,6 @@
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
 
-
 #if !DEBUG
     /*TODO: new arg system*/
     if (argc < 4/*TODO: arg count*/) {
@@ -45,7 +44,8 @@ int main(int argc, char const *argv[]) {
     int n = std::stoi(argv[4]);
     int d = std::stoi(argv[5]);
     double wave_size = std::stod(argv[6]);
-    wave *w = parse_wave_spec(argv[7]);
+//    wave *w = parse_wave_spec(argv[7]);
+    wave w(argv[7]);
     size_t n_frames = std::stoull(argv[8]);
 #else
     size_t x = 500;
@@ -61,13 +61,13 @@ int main(int argc, char const *argv[]) {
 
 //    wave *offset_wave = new wave_fourier_square(3);
     /*TODO: parameterize wave type*/
-    wave *offset_wave = new wave_sawtooth();
+    wave offset_wave("noop");
     /*TODO: parameterize colormap*/
-    colormap *cmap = new colormap_basic_hot();
+    colormap_basic_hot cmap;
 
 
     std::cout << "filling lookup table" << std::endl;
-    distance_wave *rose_dist1 = new rose_dist(new wave_noop(),
+    distance_wave *rose_dist1 = new rose_dist(wave("noop"),
                                               std::pow(2, 21),
                                               wave_size, n, d);
     image_fill_2d_wave(grid_distances, rose_dist1);
@@ -81,9 +81,9 @@ int main(int argc, char const *argv[]) {
 
         std::cout << "rendering: " << out_filename << std::endl;
 
-        double offset = (*offset_wave)(1.0 * i / n_frames) + 2 * i / n_frames;
+        double offset = offset_wave(1.0 * i / n_frames) + 2 * i / n_frames;
         image_fill_apply_wave_to_dist(grid_distances, grid_scaled, w, offset);
-        color_write_image(grid_scaled, cmap, out_filename, false);
+        color_write_image(grid_scaled, &cmap, out_filename, false);
     }
 
     std::cout << "Done! Render using:" << std::endl;

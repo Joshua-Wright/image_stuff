@@ -72,21 +72,18 @@ int main(int argc, char const *argv[]) {
     const double sigma = std::stod(config["sigma"]);
 
     double distance_multiplier = std::stod(config["wave_size"]);
-    wave *w = parse_wave_spec(config["wave_type"]);
+    wave w(config["wave_type"]);
 
     size_t table_size2 = std::stoull(config["lookup_table_size"]);
 
     std::cout << "filling lookup table" << std::endl;
-    distance_wave *dist_lissajous1 = new dist_lissajous(w, std::pow(2, table_size2),
-                                                   distance_multiplier, A, B, a,
-                                                   b, sigma);
+    dist_lissajous dist_lissajous1(w, std::pow(2, table_size2),
+                                   distance_multiplier, A, B, a, b, sigma);
 
     std::cout << "rendering image" << std::endl;
-    image_fill_2d_wave(grid, dist_lissajous1);
+    image_fill_2d_wave(grid, &dist_lissajous1);
 
-    delete w;
-    delete dist_lissajous1;
-
-    color_write_image(grid, new colormap_basic_hot(), output);
+    colormap_basic_hot colormap;
+    color_write_image(grid, &colormap, output);
     return 0;
 }

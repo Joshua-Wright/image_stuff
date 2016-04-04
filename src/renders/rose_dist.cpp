@@ -56,30 +56,27 @@ int main(int argc, char const *argv[]) {
     }
 
     string output(config["output"]);
-    /*yes, x and y are reversed. They're also reversed somewhere else in the
-     * code, so it works this way...*/
     matrix<double> grid(std::stoull(config["x"]), std::stoull(config["y"]));
     int n = std::stoi(config["n"]);
     int d = std::stoi(config["d"]);
     double distance_multiplier = std::stod(config["wave_size"]);
-    wave *w = parse_wave_spec(config["wave_type"]);
+    wave w(config["wave_type"]);
     size_t table_size2 = std::stoull(config["lookup_table_size"]);
 
     std::cout << "filling lookup table" << std::endl;
-    distance_wave *rose_dist1 = new rose_dist(w, std::pow(2, table_size2),
-                                              distance_multiplier, n, d);
+    rose_dist rose_dist1(w, std::pow(2, table_size2), distance_multiplier, n,
+                         d);
 
     std::cout << "rendering image" << std::endl;
-    image_fill_2d_wave(grid, rose_dist1);
+    image_fill_2d_wave(grid, &rose_dist1);
 
-    delete w;
-    delete rose_dist1;
+//    delete rose_dist1;
 
     /*TODO: parameterize the colormap*/
 //    colormap *map = new colormap_offset_waves(new wave_triangle());
 //    colormap *map = new colormap_threecolor();
-    colormap *map = new colormap_basic_hot();
+    colormap_basic_hot map;
 //    colormap *map = new colormap_grayscale();
-    color_write_image(grid, map, output);
+    color_write_image(grid, &map, output);
     return 0;
 }

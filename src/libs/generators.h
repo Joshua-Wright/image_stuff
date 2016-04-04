@@ -13,49 +13,21 @@ namespace image_utils {
     /////////////////////
     // wave generators //
     /////////////////////
+
     class wave {
+
+        void *data;
+        enum wave_type {
+            NOOP, SINE, TRIANGLE, SAWTOOTH, SQUARE, FOURIER_SQUARE
+        };
+        wave_type type;
+
     public:
-        virtual double operator()(const double &x) const = 0;
+        wave(const std::string &spec);
 
-        virtual ~wave() { };
+        double operator()(const double &x) const;
     };
 
-    class wave_triangle : public wave {
-    public:
-        virtual double operator()(const double &x) const;
-    };
-
-    class wave_sine : public wave {
-    public:
-        virtual double operator()(const double &x) const;
-    };
-
-    class wave_square : public wave {
-    public:
-        virtual double operator()(const double &x) const;
-    };
-
-    class wave_sawtooth : public wave {
-    public:
-        virtual double operator()(const double &x) const;
-    };
-
-    class wave_fourier_square : public wave {
-        size_t n;
-    public:
-        wave_fourier_square(size_t _n) : n(_n) { }
-
-        wave_fourier_square(const std::string &spec);
-
-        virtual double operator()(const double &x) const;
-    };
-
-    class wave_noop : public wave {
-        virtual double operator()(
-                const double &x) const { return x; };
-    };
-
-    wave *parse_wave_spec(const std::string &spec);
 
     class wave_2d {
     public:
@@ -67,10 +39,11 @@ namespace image_utils {
 
     class distance_wave : public wave_2d {
 
-        wave *w;
+        const wave w;
         double wave_size;
 
-        size_t _find_min(size_t left, size_t right,
+        size_t _find_min(size_t left,
+                         size_t right,
                          const double &x,
                          const double &y) const;
 
@@ -128,7 +101,7 @@ namespace image_utils {
         std::vector<cached_value> lookup_table;
 
     public:
-        distance_wave(wave *_w, const size_t table_size,
+        distance_wave(const wave &_w, const size_t table_size,
                       const double wave_size);
 
         void set_offset(const double x);
@@ -142,10 +115,10 @@ namespace image_utils {
 
     class rose_dist : public distance_wave {
     public:
-        rose_dist(wave *w, const size_t table_size,
+        rose_dist(const wave &w, const size_t table_size,
                   const double wav_sz,
-                  const int n,
-                  const int d) : distance_wave(w, table_size, wav_sz) {
+                  const int n, const int d) : distance_wave(w, table_size,
+                                                            wav_sz) {
 
             /*rho=1 if n*d is odd, rho=2 if n*d is even*/
             /*ref: http://www.lmtsd.org/cms/lib/PA01000427/Centricity/Domain/116/Polar%20Roses.pdf*/
@@ -182,16 +155,14 @@ namespace image_utils {
 
     class dist_lissajous : public distance_wave {
     public:
-        dist_lissajous(wave *w, const size_t table_size,
+        dist_lissajous(const wave &w, const size_t table_size,
                        const double wave_size,
                        const double A, const double B,
                        const double a, const double b,
                        const double sigma) : distance_wave(w, table_size,
                                                            wave_size) {
             max_t = (2.01 * PI);
-            /*TODO: move this to initializer*/
-            wid = (size_t) (table_size * PI / (12*max_t));
-//            wid = 3000;
+            wid = (size_t) (table_size * PI / (12 * max_t));
             for (double t = 0; t <= max_t; t += max_t / table_size) {
                 lookup_table.emplace_back(t * 1.0,
                                           A * A * pow(sin(a * t + sigma), 2) +
@@ -214,11 +185,11 @@ namespace image_utils {
     /////////////
     void image_fill_concentric_waves(matrix<double> &grid,
                                      const double &mul,
-                                     wave *wave_func);
+                                     const wave &wave_func);
 
     void image_fill_pointing_out(matrix<double> &grid,
                                  const double &mul,
-                                 wave *wave_func);
+                                 const wave &wave_func);
 
     /*
      * theta_mul: larger => more angular ripples (each ripple is smaller)
@@ -227,11 +198,11 @@ namespace image_utils {
     void image_fill_circle_grid(matrix<double> &grid,
                                 const double &theta_mul,
                                 const double &dist_mul,
-                                wave *wave_dist = nullptr,
-                                wave *wave_theta = nullptr);
+                                const wave &wave_dist,
+                                const wave &wave_theta);
 
     void image_fill_apply_wave_to_dist(const matrix<double> &in,
-                                       matrix<double> &out, wave *w,
+                                       matrix<double> &out, const wave &w,
                                        const double offset);
 
     void image_fill_2d_wave(matrix<double> &grid, wave_2d *w_2d);

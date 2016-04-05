@@ -5,8 +5,8 @@
 #ifndef IMAGE_STUFF_TYPES_H
 #define IMAGE_STUFF_TYPES_H
 
-#include "cpp_containers/lib/matrix.h"
 #include <cstring>
+#include "matrix.h"
 
 namespace image_utils {
 

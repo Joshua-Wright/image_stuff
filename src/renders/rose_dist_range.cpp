@@ -44,7 +44,6 @@ int main(int argc, char const *argv[]) {
     int n = std::stoi(argv[4]);
     int d = std::stoi(argv[5]);
     double wave_size = std::stod(argv[6]);
-//    wave *w = parse_wave_spec(argv[7]);
     wave w(argv[7]);
     size_t n_frames = std::stoull(argv[8]);
 #else
@@ -59,7 +58,6 @@ int main(int argc, char const *argv[]) {
     matrix<double> grid_distances(x, y);
     matrix<double> grid_scaled(x, y);
 
-//    wave *offset_wave = new wave_fourier_square(3);
     /*TODO: parameterize wave type*/
     wave offset_wave("noop");
     /*TODO: parameterize colormap*/

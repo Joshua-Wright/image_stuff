@@ -7,13 +7,13 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 # includes:
 include_directories("src/libs/")
-include_directories("src/libs/cpp_containers/lib/")
+include_directories("src/libs/cpp_containers_utilities/lib/")
 include_directories("src/external_libs/")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lfftw3_omp -lfftw3 -lm")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -fopenmp")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
@@ -28,7 +28,7 @@ set(LIB_FILES
         src/libs/io.cpp
         src/libs/colormaps.cpp
         src/libs/generators.cpp
-        src/libs/cpp_containers/lib/arg_parser.cpp
+        src/libs/cpp_containers_utilities/lib/arg_parser.cpp
         )
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)

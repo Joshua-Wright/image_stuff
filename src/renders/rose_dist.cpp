@@ -70,13 +70,9 @@ int main(int argc, char const *argv[]) {
     std::cout << "rendering image" << std::endl;
     image_fill_2d_wave(grid, &rose_dist1);
 
-//    delete rose_dist1;
 
     /*TODO: parameterize the colormap*/
-//    colormap *map = new colormap_offset_waves(new wave_triangle());
-//    colormap *map = new colormap_threecolor();
     colormap_basic_hot map;
-//    colormap *map = new colormap_grayscale();
     color_write_image(grid, &map, output);
     return 0;
 }

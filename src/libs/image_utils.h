@@ -9,9 +9,7 @@
 #include <set>
 #include <cmath>
 #include <stdexcept>
-//#include <singular/structs.h>
-#include "../external_libs/lodepng.h"
-//#include "cpp_containers/lib/matrix.h"
+#include "lodepng.h"
 #include "colormaps.h"
 #include "types.h"
 

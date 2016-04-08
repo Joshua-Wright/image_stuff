@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.3)
 project(image_stuff)
 
 # for using clang
-set(CMAKE_C_COMPILER   "/usr/bin/clang")
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+#set(CMAKE_C_COMPILER   "/usr/bin/clang")
+#set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 # includes:
 include_directories("src/libs/")

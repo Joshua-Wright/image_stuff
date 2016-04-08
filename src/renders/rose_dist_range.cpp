@@ -6,93 +6,114 @@
 #include "generators.h"
 #include "debug.h"
 #include "colormaps.h"
+#include "arg_parser.h"
 #include "io.h"
-
-#define DEBUG 0
 
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
+    using std::cout;
+    using std::endl;
+    using std::unordered_map;
+    using std::string;
+    unordered_map<string, string> config;
 
-#if !DEBUG
-    /*TODO: new arg system*/
-    if (argc < 4/*TODO: arg count*/) {
-        /*0*/ std::cout << argv[0];
-        /*1*/ std::cout << " <output folder>";
-        /*2*/ std::cout << " <image x>";
-        /*3*/ std::cout << " <image y>";
-        /*4*/ std::cout << " <n>";
-        /*5*/ std::cout << " <d>";
-        /*6*/ std::cout << " [wave size]";
-        /*7*/ std::cout << " [wave type]";
-        /*8*/ std::cout << " [number of frames]";
-//        /*9*/ std::cout << " [colormap]"; /*TODO: colormap*/
-//        /*10*/ std::cout << " [lookup table size]"; /*TODO with default*/
+    /*default values*/
+    config["folder"] = "frames";
+    config["x"] = "500";
+    config["y"] = "500";
+    config["n"] = "3";
+    config["d"] = "7";
+    config["n_frames"] = "30";
+    config["wave_size"] = "16";
+    config["wave_type"] = "fourier_square:3";
+    config["off_wave"] = "noop";
+    config["base_offset"] = "0";
+    config["lookup_table_size"] = "20";
+    containers::parse_args(config, argc, argv);
+
+    if (argc == 1 ||
+        config.find("--help") != config.end() ||
+        config.find("-h") != config.end()) {
+        /*help text*/
+        std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
+        << std::endl;
         std::cout << std::endl;
-        /*TODO: these defaults*/
-//        std::cout << "wave size:         default 16" << std::endl;
-//        std::cout << "lookup table size: 2^x, default 20" << std::endl;
-        return 1;
+        int pw = 20; /*parameter width*/
+        int dw = 80 - pw - 10; /*description width*/
+        // @formatter:off
+        std::cout << std::setw(pw) <<         "parameter:" << std::setw(dw) <<               "description:" << std::endl;
+        std::cout << std::setw(pw) <<             "folder" << std::setw(dw) <<              "output folder" << std::endl;
+        std::cout << std::setw(pw) <<           "n_frames" << std::setw(dw) <<           "number of frames" << std::endl;
+        std::cout << std::setw(pw) <<                  "x" << std::setw(dw) <<                "image width" << std::endl;
+        std::cout << std::setw(pw) <<                  "y" << std::setw(dw) <<               "image height" << std::endl;
+        std::cout << std::setw(pw) <<                  "n" << std::setw(dw) <<             "rose parameter" << std::endl;
+        std::cout << std::setw(pw) <<                  "d" << std::setw(dw) <<             "rose parameter" << std::endl;
+        std::cout << std::setw(pw) <<          "wave_size" << std::setw(dw) <<     "relative size of waves" << std::endl;
+        std::cout << std::setw(pw) <<          "wave_type" << std::setw(dw) <<              "type of waves" << std::endl;
+        std::cout << std::setw(pw) <<           "off_wave" << std::setw(dw) <<        "type of offset wave" << std::endl;
+        std::cout << std::setw(pw) <<        "base_offset" << std::setw(dw) <<       "added to offset wave" << std::endl;
+        std::cout << std::setw(pw) <<  "lookup_table_size" << std::setw(dw) <<  "size of lookup table size" << std::endl;
+        std::cout << std::setw(pw + dw) << "(given as 2^x)" << std::endl;
+        // @formatter:on
+        return 0;
     }
-    std::string output_folder(argv[1]);
+
+
+    const size_t x = std::stoull(config["x"]);
+    const size_t y = std::stoull(config["y"]);
+    const int n = std::stoi(config["n"]);
+    const int d = std::stoi(config["d"]);
+    const double wave_size = std::stod(config["wave_size"]);
+    const double base_offset = std::stod(config["base_offset"]);
+    const wave w(config["wave_type"]);
+    const wave offset_wave(config["off_wave"]);
+    const size_t n_frames = std::stoull(config["n_frames"]);
+    size_t table_size2 = std::stoull(config["lookup_table_size"]);
+
+    std::string output_folder = config["folder"];
     /*make sure the path ends in a trailing slash*/
     if (output_folder.back() != '/') {
         output_folder.push_back('/');
     }
-    size_t x = std::stoull(argv[2]);
-    size_t y = std::stoull(argv[3]);
-    int n = std::stoi(argv[4]);
-    int d = std::stoi(argv[5]);
-    double wave_size = std::stod(argv[6]);
-    wave w(argv[7]);
-    size_t n_frames = std::stoull(argv[8]);
-#else
-    size_t x = 500;
-    size_t y = 500;
-    int n = 3;
-    int d = 5;
-    wave *w = new wave_fourier_square(3);
-    double wave_size = 20;
-#endif
 
     matrix<double> grid_distances(x, y);
-    matrix<double> grid_scaled(x, y);
 
-    /*TODO: parameterize wave type*/
-    wave offset_wave("noop");
+
     /*TODO: parameterize colormap*/
     colormap_basic_hot cmap;
 
 
     std::cout << "filling lookup table" << std::endl;
-    distance_wave *rose_dist1 = new rose_dist(wave("noop"),
-                                              std::pow(2, 21),
-                                              wave_size, n, d);
-    image_fill_2d_wave(grid_distances, rose_dist1);
+    rose_dist rose_dist1(wave("noop"), std::pow(2, table_size2),
+                         wave_size, n, d);
+    image_fill_2d_wave(grid_distances, &rose_dist1);
 
+#pragma omp parallel for schedule(static)
     for (size_t i = 0; i < n_frames; i++) {
+
         std::stringstream output;
-        output << output_folder
-        << "out_frame_"
-        << std::setfill('0') << std::setw(5) << i << ".png";
+
+        output << output_folder <<
+        "out_frame_" << std::setfill('0') <<
+        std::setw(5) << i << ".png";
+
         std::string out_filename = output.str();
-
-        std::cout << "rendering: " << out_filename << std::endl;
-
         double offset = offset_wave(1.0 * i / n_frames) + 2 * i / n_frames;
-        image_fill_apply_wave_to_dist(grid_distances, grid_scaled, w, offset);
+
+        matrix<double> grid_scaled(x, y);
+        image_fill_apply_wave_to_dist(grid_distances, grid_scaled, w,
+                                      offset + base_offset);
+
         color_write_image(grid_scaled, &cmap, out_filename, false);
+        std::cout << "rendered: " << out_filename << std::endl;
+
     }
 
     std::cout << "Done! Render using:" << std::endl;
-    std::cout
-    << "ffmpeg -framerate 60 -i "
-    << output_folder
-    << "out_frame_%05d.png "
-    << output_folder
-    << "output.mp4"
-    << std::endl;
-
+    std::cout << "ffmpeg -framerate 60 -i "
+    << output_folder << "out_frame_%05d.png "
+    << output_folder << "output.mp4" << std::endl;
 
     return 0;
 }

@@ -14,7 +14,6 @@
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
-
     using std::cout;
     using std::endl;
     using std::unordered_map;

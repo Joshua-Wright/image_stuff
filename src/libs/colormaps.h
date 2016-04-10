@@ -42,6 +42,24 @@ namespace image_utils {
         virtual RGB get_rgb(const double x) const;
     };
 
+    class colormap_gradient : public colormap {
+
+        /*p is positions in RGB color cube, n is vectors toward next p*/
+        std::vector<containers::vect<double, 3>> p;
+        std::vector<containers::vect<double, 3>> n;
+        /*l is desired lengths of those edges*/
+        std::vector<double> l;
+        /*total length of gradient path*/
+        double max_t;
+    public:
+        colormap_gradient(const double &r, const double &g, const double &b);
+
+        void add_color(const double &r, const double &g, const double &b,
+                       const double &t);
+
+        virtual RGB get_rgb(const double x) const;
+    };
+
 
     void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb,
                           colormap *fun);

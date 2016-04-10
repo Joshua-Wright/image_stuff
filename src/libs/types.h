@@ -7,6 +7,8 @@
 
 #include <cstring>
 #include "matrix.h"
+#include "vect.h"
+
 
 namespace image_utils {
 
@@ -26,101 +28,7 @@ namespace image_utils {
     const double pi = PI;
 #pragma clang diagnostic pop
 
-    template<typename T>
-    struct vctr {
-        T x, y;
-
-        vctr(T _x, T _y) : x(_x), y(_y) { }
-
-        vctr() : x(T()), y(T()) { }
-
-        vctr<T> operator+(const T &rhs) const {
-            return vctr<T>(x + rhs, y + rhs);
-        }
-
-        vctr<T> operator-(const T &rhs) const {
-            return vctr<T>(x - rhs, y - rhs);
-        }
-
-        vctr<T> operator*(const T &rhs) const {
-            return vctr<T>(x * rhs, y * rhs);
-        }
-
-        vctr<T> operator/(const T &rhs) const {
-            return vctr<T>(x / rhs, y / rhs);
-        }
-
-        vctr<T> &operator+=(const T &rhs) {
-            x += rhs;
-            y += rhs;
-            return *this;
-        }
-
-        vctr<T> &operator-=(const T &rhs) {
-            x -= rhs;
-            y -= rhs;
-            return *this;
-        }
-
-        vctr<T> &operator*=(const T &rhs) {
-            x *= rhs;
-            y *= rhs;
-            return *this;
-        }
-
-        vctr<T> &operator/=(const T &rhs) {
-            x /= rhs;
-            y /= rhs;
-            return *this;
-        }
-
-        vctr<T> operator+(const vctr<T> &rhs) const {
-            return vctr(x + rhs.x, y + rhs.y);
-        }
-
-        vctr<T> operator-(const vctr<T> &rhs) const {
-            return vctr(x - rhs.x, y - rhs.y);
-        }
-
-        vctr<T> &operator+=(const vctr<T> &rhs) {
-            x += rhs.x;
-            y += rhs.y;
-            return *this;
-        }
-
-        vctr<T> &operator-=(const vctr<T> &rhs) {
-            x -= rhs.x;
-            y -= rhs.y;
-            return *this;
-        }
-
-        T mag2() const {
-            return x * x + y * y;
-        }
-
-        T mag() const {
-            return std::sqrt(mag2());
-        }
-
-        T dist2(const vctr<T> &rhs) const {
-            return (rhs.x - x) * (rhs.x - x) + (rhs.y - y) * (rhs.y - y);
-        }
-
-        T dist(const vctr<T> &rhs) const {
-            return std::sqrt(dist2(rhs));
-        }
-
-        T dist2(const T &_x, const T &_y) const {
-            return (_x - x) * (_x - x) + (_y - y) * (_y - y);
-        }
-
-        T dist(const T &_x, const T &_y) const {
-            return std::sqrt(dist2(_x, _y));
-        }
-    };
-    /*TODO: make all vectors doubles
-     * doesn't make that much sense for this to be a template anyway*/
-    typedef vctr<double> vect;
+    typedef containers::vect<double,2> vect;
 
     struct grayscale {
         unsigned char g;

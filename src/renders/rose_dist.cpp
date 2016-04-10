@@ -17,9 +17,9 @@ int main(int argc, char const *argv[]) {
     using std::endl;
     using std::unordered_map;
     using std::string;
-    unordered_map<string, string> config;
 
     /*default values*/
+    unordered_map<string, string> config;
     config["output"] = "output.png";
     config["x"] = "500";
     config["y"] = "500";
@@ -71,7 +71,15 @@ int main(int argc, char const *argv[]) {
 
 
     /*TODO: parameterize the colormap*/
-    colormap_basic_hot map;
-    color_write_image(grid, &map, output);
+//    colormap_basic_hot map;
+//    color_write_image(grid, &map, output);
+
+    colormap_gradient colormap_gradient1(0, 0, 0);
+    colormap_gradient1.add_color(169, 74, 0, 1);
+    colormap_gradient1.add_color(255, 0, 0, 1);
+    colormap_gradient1.add_color(15, 0, 255, 1);
+    colormap_gradient1.add_color(0, 0, 0, 0.25);
+
+    color_write_image(grid, &colormap_gradient1, output);
     return 0;
 }

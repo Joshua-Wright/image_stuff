@@ -1,6 +1,6 @@
 // (c) Copyright 2016 Josh Wright
 #include "colormaps.h"
-#include "csv.h"
+#include "matrix.h"
 
 namespace image_utils {
 
@@ -77,5 +77,40 @@ namespace image_utils {
         pix.g = 255 * (*w)(x + 1.0 / 3.0);
         pix.b = 255 * (*w)(x + 2.0 / 3.0);
         return pix;
+    }
+
+    RGB colormap_gradient::get_rgb(const double x) const {
+        double t = x * max_t; /*we need to modify this, so copy it*/
+        /*assume that 0<=x<1*/
+        size_t idx = 0;
+
+        /*find the line where this color is*/
+        while (t > l[idx]) {
+            t -= l[idx];
+            ++idx;
+        }
+
+        /*find the color*/
+        containers::vect<double, 3> color = (t / l[idx]) * n[idx] + p[idx];
+        RGB out;
+        out.r = (unsigned char) color[0];
+        out.g = (unsigned char) color[1];
+        out.b = (unsigned char) color[2];
+        return out;
+    }
+
+    colormap_gradient::colormap_gradient(const double &r, const double &g, const double &b) {
+        containers::vect<double, 3> cur{r, g, b};
+        p.push_back(cur);
+    }
+
+    void colormap_gradient::add_color(const double &r, const double &g, const double &b,
+                                      const double &t) {
+
+        containers::vect<double, 3> cur{r, g, b};
+        n.push_back(cur - p.back());
+        p.push_back(cur);
+        l.push_back(t);
+        max_t = std::accumulate(l.begin(), l.end(), 0.0);
     }
 }

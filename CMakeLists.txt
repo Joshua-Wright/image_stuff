@@ -6,9 +6,10 @@ project(image_stuff)
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 # includes:
-include_directories("src/libs/")
-include_directories("src/libs/cpp_containers_utilities/lib/")
-include_directories("src/external_libs/")
+include_directories(
+        "src/cpp_containers_utilities/lib/"
+        "src/lodepng/"
+        "src/libs/")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
@@ -24,16 +25,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 
 set(LIB_FILES
-        src/external_libs/lodepng.cpp
+        src/lodepng/lodepng.cpp
         src/libs/io.cpp
         src/libs/colormaps.cpp
         src/libs/generators.cpp
-        src/libs/cpp_containers_utilities/lib/arg_parser.cpp
-        )
+        src/libs/expand_pixels.cpp
+        src/cpp_containers_utilities/lib/arg_parser.cpp)
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
-add_executable(test_io ${LIB_FILES} src/tests/test_io.cpp)
-configure_file(test_image.png test_image.png COPYONLY)
+#add_executable(test_io ${LIB_FILES} src/tests/test_io.cpp)
+#configure_file(test_image.png test_image.png COPYONLY)
 
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
@@ -49,3 +50,4 @@ add_executable(random_notes src/tmp_tests/random_notes_pcm.cpp)
 
 add_executable(fft_pcm ${LIB_FILES} src/tmp_tests/fft_pcm.cpp)
 add_executable(fft_upscale_image ${LIB_FILES} src/renders/fft_upscale_image.cpp)
+add_executable(expand_pixels ${LIB_FILES} src/renders/expand_pixels.cpp)

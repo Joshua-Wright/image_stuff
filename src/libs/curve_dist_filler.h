@@ -5,6 +5,7 @@
 #ifndef IMAGE_STUFF_CURVE_DIST_FILLER_H
 #define IMAGE_STUFF_CURVE_DIST_FILLER_H
 
+#include <cmath>
 #include "types.h"
 
 namespace image_utils {

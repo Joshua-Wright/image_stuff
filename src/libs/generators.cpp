@@ -33,15 +33,11 @@ namespace image_utils {
                                     const double &y) const {
         /*simply binary-search the lookup table, using the derivative at the
          * midpoint of the interval*/
-        const double threshold = std::sqrt(
-                std::numeric_limits<double>::epsilon());
         while (left != right && right - left > 1) {
             /*overflow-safe average*/
             size_t mid = left / 2 + right / 2 + (left & right & 1);
             double mid_diff = lookup_table[mid].diff(x, y);
-            if (std::fabs(mid_diff) < threshold) {
-                return mid;
-            } else if (mid_diff > 0) {
+            if (mid_diff > 0) {
                 right = mid;
             } else {
                 left = mid + 1;
@@ -92,13 +88,14 @@ namespace image_utils {
                                 const double &theta_mul,
                                 const double &dist_mul,
                                 const wave &wave_dist, const wave &wave_theta) {
-        vect mid(grid.x() / 2.0, grid.y() / 2.0);
-        double diagonal_dist = mid.mag() / 2.0;
-        double theta, d;
+        const vect mid{grid.x() / 2.0, grid.y() / 2.0};
+        const double diagonal_dist = mid.norm() / 2.0;
+#pragma omp parallel for schedule(static) collapse(2)
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
-                d = mid.dist(x, y) * dist_mul / diagonal_dist;
-                theta = std::atan2(y - mid.y, x - mid.x) / (2.0 * PI) *
+                vect pt{(double) x, (double) y};
+                double d = mid.dist(pt) * dist_mul / diagonal_dist;
+                double theta = std::atan2(y - mid[1], x - mid[0]) / (2.0 * PI) *
                         theta_mul;
                 grid(x, y) = wave_dist(theta) + wave_theta(d);
             }
@@ -107,39 +104,40 @@ namespace image_utils {
 
     void image_fill_concentric_waves(matrix<double> &grid,
                                      const double &mul, const wave &wave_func) {
-        vect mid(grid.x() / 2.0, grid.y() / 2.0);
-        double diagonal_dist = mid.mag() / 2.0;
+        vect mid{grid.x() / 2.0, grid.y() / 2.0};
+        double diagonal_dist = mid.norm() / 2.0;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
-                grid(x, y) = wave_func(mid.dist(x, y) * mul / diagonal_dist);
+                vect pt{(double) x, (double) y};
+                grid(x, y) = wave_func(mid.dist(pt) * mul / diagonal_dist);
             }
         }
     }
 
     void image_fill_pointing_out(matrix<double> &grid,
                                  const double &mul, const wave &wave_func) {
-        vect mid(grid.x() / 2.0, grid.y() / 2.0);
+        vect mid{grid.x() / 2.0, grid.y() / 2.0};
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 grid(x, y) = wave_func(
-                        std::atan2(y - mid.y, x - mid.x) / (2.0 * PI) *
+                        std::atan2(y - mid[1], x - mid[0]) / (2.0 * PI) *
                         mul);
             }
         }
     }
 
     void image_fill_2d_wave(matrix<double> &grid, wave_2d *w_2d) {
-        const vect mid(grid.x() / 2.0, grid.y() / 2.0);
+        const vect mid{grid.x() / 2.0, grid.y() / 2.0};
         const double mag = std::min(grid.x(), grid.y()) / 2;
 #pragma omp parallel for schedule(static) collapse(2)
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 /*current point*/
-                vect current(x, y);
+                vect pt{(double) x, (double) y};
                 /*scale current point*/
-                current -= mid;
-                current /= mag;
-                grid(x, y) = (*w_2d)(current.x, current.y);
+                pt -= mid;
+                pt /= mag;
+                grid(x, y) = (*w_2d)(pt[0], pt[1]);
             }
         }
     }
@@ -162,13 +160,13 @@ namespace image_utils {
                                    const double sigma) : distance_wave(w,
                                                                        table_size,
                                                                        wave_size) {
-        max_t = (2.01 * PI);
+        max_t = (2.1 * PI);
         wid = (size_t) (table_size * PI / (12 * max_t));
+//        wid = (size_t) (table_size * PI / (80 * max_t));
 
         lookup_table.reserve(table_size);
         lookup_table.assign(table_size, cached_value(0, 0, 0, 0, 0, 0, 0));
 
-        cached_value *out = lookup_table.data();
         size_t max = lookup_table.size();
 #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < max; i++) {
@@ -188,7 +186,8 @@ namespace image_utils {
 
     rose_dist::rose_dist(const wave &w, const size_t table_size,
                          const double wav_sz,
-                         const int n, const int d) : distance_wave(w, table_size,
+                         const int n, const int d) : distance_wave(w,
+                                                                   table_size,
                                                                    wav_sz) {
 
         /*rho=1 if n*d is odd, rho=2 if n*d is even*/

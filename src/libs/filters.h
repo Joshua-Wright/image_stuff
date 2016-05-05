@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-namespace containers {
+namespace image_utils {
 
-    matrix<double> gaussian_blur(const matrix<double> &in);
+    matrix<containers::vect<double, 3>> gaussian_blur(const matrix<containers::vect<double, 3>> &in);
 }

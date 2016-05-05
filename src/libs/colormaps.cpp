@@ -68,14 +68,14 @@ namespace image_utils {
 
     unsigned char colormap_threecolor::map_func(double x) const {
         x = std::fabs(std::fmod(x, 1.0));
-        return std::max(256 * (1 - pow(3 * (x - 1.5 / 2.0), 2)), 0.0);
+        return (unsigned char) std::max(256 * (1 - pow(3 * (x - 1.5 / 2.0), 2)), 0.0);
     }
 
     RGB colormap_offset_waves::get_rgb(const double x) const {
         RGB pix;
-        pix.r = 255 * (*w)(x);
-        pix.g = 255 * (*w)(x + 1.0 / 3.0);
-        pix.b = 255 * (*w)(x + 2.0 / 3.0);
+        pix.r = (unsigned char) (255 * (*w)(x));
+        pix.g = (unsigned char) (255 * (*w)(x + 1.0 / 3.0));
+        pix.b = (unsigned char) (255 * (*w)(x + 2.0 / 3.0));
         return pix;
     }
 

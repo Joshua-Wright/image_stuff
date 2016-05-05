@@ -27,6 +27,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 set(LIB_FILES
         src/lodepng/lodepng.cpp
         src/libs/io.cpp
+        src/libs/filters.cpp
         src/libs/colormaps.cpp
         src/libs/generators.cpp
         src/libs/expand_pixels.cpp
@@ -51,3 +52,6 @@ add_executable(random_notes src/tmp_tests/random_notes_pcm.cpp)
 add_executable(fft_pcm ${LIB_FILES} src/tmp_tests/fft_pcm.cpp)
 add_executable(fft_upscale_image ${LIB_FILES} src/renders/fft_upscale_image.cpp)
 add_executable(expand_pixels ${LIB_FILES} src/renders/expand_pixels.cpp)
+add_executable(gaussian_blur ${LIB_FILES} src/renders/gaussian_blur.cpp)
+
+add_executable(voronoi ${LIB_FILES} src/libs/voronoi_animation.cpp src/libs/voronoi_animation.h src/renders/voronoi.cpp)

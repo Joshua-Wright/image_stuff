@@ -8,35 +8,16 @@
 namespace image_utils {
 
     void write_image(image_RGB &rgb_data, const std::string &out_filename) {
-        std::vector<unsigned char> rgb_image_data(3 * rgb_data.size());
-#pragma omp parallel for schedule(static) collapse(2)
-        for (size_t i = 0; i < rgb_data.x(); i++) {
-            for (size_t j = 0; j < rgb_data.y(); j++) {
-                rgb_image_data[3 * (j * rgb_data.x() + i) + 0] = rgb_data(i,
-                                                                          j).r;
-                rgb_image_data[3 * (j * rgb_data.x() + i) + 1] = rgb_data(i,
-                                                                          j).g;
-                rgb_image_data[3 * (j * rgb_data.x() + i) + 2] = rgb_data(i,
-                                                                          j).b;
-            }
-        }
-        lodepng::encode(out_filename, rgb_image_data, rgb_data.x(),
-                        rgb_data.y(), LCT_RGB);
+        lodepng::encode(out_filename, (const unsigned char *) rgb_data.data(),
+                        rgb_data.x(), rgb_data.y(), LCT_RGB);
     };
 
-    matrix<RGB> read_image(const std::string &filename) {
+    image_RGB read_image(const std::string &filename) {
         std::vector<unsigned char> data;
         unsigned w, h;
         lodepng::decode(data, w, h, filename, LCT_RGB);
         matrix<RGB> output(w, h);
-#pragma omp parallel for schedule(static) collapse(2)
-        for (size_t i = 0; i < w; i++) {
-            for (size_t j = 0; j < h; j++) {
-                output(i, j).r = data[3 * (j + i * h) + 0];
-                output(i, j).g = data[3 * (j + i * h) + 1];
-                output(i, j).b = data[3 * (j + i * h) + 2];
-            }
-        }
+        memcpy(output.data(), data.data(), sizeof(RGB) * w * h);
         return output;
     }
 

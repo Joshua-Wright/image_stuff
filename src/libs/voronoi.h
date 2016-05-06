@@ -8,6 +8,12 @@
 #include "types.h"
 
 namespace image_utils {
+
+    enum distance_type {
+        EUCLIDIAN,
+        MANHATTAN
+    };
+
     class voronoi_animation {
 
         struct voronoi_point {
@@ -24,10 +30,16 @@ namespace image_utils {
 
         matrix<RGB> image_data;
 
-        voronoi_animation(const size_t x, const size_t y, const size_t n_points);
+        voronoi_animation(const size_t x, const size_t y,
+                          const size_t n_points);
 
         void advance(const double dt);
     };
+
+
+    image_RGB voronoi_filter(const image_RGB &in, const size_t n_points,
+                             const distance_type dist = EUCLIDIAN);
+
 }
 
 #endif //IMAGE_STUFF_VORONOI_H

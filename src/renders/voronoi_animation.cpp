@@ -4,7 +4,7 @@
 #include <iomanip>
 #include "arg_parser.h"
 #include "io.h"
-#include "voronoi_animation.h"
+#include "voronoi.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;

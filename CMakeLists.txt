@@ -54,4 +54,5 @@ add_executable(fft_upscale_image ${LIB_FILES} src/renders/fft_upscale_image.cpp)
 add_executable(expand_pixels ${LIB_FILES} src/renders/expand_pixels.cpp)
 add_executable(gaussian_blur ${LIB_FILES} src/renders/gaussian_blur.cpp)
 
-add_executable(voronoi ${LIB_FILES} src/libs/voronoi_animation.cpp src/libs/voronoi_animation.h src/renders/voronoi.cpp)
+add_executable(voronoi_animation ${LIB_FILES} src/libs/voronoi.cpp src/renders/voronoi_animation.cpp)
+add_executable(voronoi_transform ${LIB_FILES} src/libs/voronoi.cpp src/renders/voronoi_transform.cpp)

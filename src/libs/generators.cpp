@@ -1,6 +1,8 @@
 // (c) Copyright 2016 Josh Wright
 
 #include <cstring>
+#include <cmath>
+#include <math.h>
 #include "generators.h"
 
 namespace image_utils {
@@ -263,7 +265,7 @@ double image_utils::wave::operator()(const double &x) const {
             }
         }
         case SAWTOOTH:
-            return std::fabs(std::fmod(x * 2, 1.0));
+            return std::fabs(std::fmod(x, 1.0));
         case SQUARE:
             if (std::fabs(std::fmod(x, 1.0)) < 0.5L) {
                 return 0;

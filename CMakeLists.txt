@@ -43,7 +43,6 @@ add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
 add_executable(lissajous_dist ${LIB_FILES} src/renders/lissajous_dist.cpp)
 add_executable(rose_dist ${LIB_FILES} src/renders/rose_dist.cpp)
 add_executable(rose_dist_range ${LIB_FILES} src/renders/rose_dist_range.cpp)
-add_executable(curve_dist_filler ${LIB_FILES} src/libs/curve_dist_filler.cpp src/renders/render_curve_dist.cpp)
 
 add_executable(benchmark_types src/tests/benchmark_types.cpp)
 add_executable(benchmark_virtual ${LIB_FILES} src/tests/benchmark_virtual.cpp)

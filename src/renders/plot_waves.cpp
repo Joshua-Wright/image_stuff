@@ -10,7 +10,6 @@ int main(int argc, char const *argv[]) {
     using namespace image_utils;
 
     std::map<std::string, wave> waves_with_labels;
-//    waves_with_labels["triangle"] = wave(std::string("triangle"));
     waves_with_labels.insert(std::make_pair("triangle", wave("triangle")));
     waves_with_labels.insert(std::make_pair("square", wave("square")));
     waves_with_labels.insert(std::make_pair("sine", wave("sine")));

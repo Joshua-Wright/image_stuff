@@ -5,6 +5,7 @@
 #define IMAGE_UTILS_GENERATORS
 
 #include <iostream>
+#include <vector>
 #include "types.h"
 
 namespace image_utils {

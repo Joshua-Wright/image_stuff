@@ -5,6 +5,7 @@
 #ifndef IMAGE_STUFF_VORONOI_H
 #define IMAGE_STUFF_VORONOI_H
 
+#include <vector>
 #include "types.h"
 
 namespace image_utils {

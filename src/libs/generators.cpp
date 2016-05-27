@@ -235,6 +235,8 @@ image_utils::wave::wave(const std::string &spec) : data(nullptr),
         type = SAWTOOTH;
     } else if (startswith("triangle", spec)) {
         type = TRIANGLE;
+    }else if (startswith("square", spec)){
+        type = SQUARE;
     } else if (startswith("fourier_square:", spec)) {
         type = FOURIER_SQUARE;
         const size_t spec_begin_length = std::strlen("fourier_square:");

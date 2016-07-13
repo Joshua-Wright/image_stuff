@@ -37,23 +37,19 @@ namespace image_utils {
         }
 
         /*iterate the grid*/
-        for (size_t iter = 0; iter < iterations; ++iter) {
-#pragma omp parallel for schedule(static) collapse(2)
-            for (size_t i = 0; i < x; ++i) {
-                for (size_t j = 0; j < y; ++j) {
-                    if (!comp_grid(i, j).done) {
-                        if (abs(comp_grid(i, j).z) < 4) {
-                            comp_grid(i, j).z =
-                                    pow(comp_grid(i, j).z, 2) +
-                                    comp_grid(i, j).c;
-                        } else {
-                            comp_grid(i, j).done = true;
-                            comp_grid(i, j).i = iter;
-                        }
-                    }
+//#pragma omp parallel for schedule(static) collapse(2)
+        for (size_t i = 0; i < x; ++i) {
+            for (size_t j = 0; j < y; ++j) {
+
+                for (size_t iter = 0; iter < iterations; ++iter) {
+                    comp_grid(i, j).z =
+                            pow(comp_grid(i, j).z, 2) + comp_grid(i, j).c;
+                    if (abs(comp_grid(i, j).z) >= 2) { break; }
                 }
+
             }
         }
+
 
         /*normalize the grid (get the magnitude of all the imaginary stuff) */
         for (size_t i = 0; i < x; ++i) {

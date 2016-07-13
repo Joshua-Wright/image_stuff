@@ -40,8 +40,10 @@ int main(int argc, char const *argv[]) {
 
     matrix<double> grid(x, y);
 
-//    mandelbrot(iter, grid);
-    mandelbrot(iter, grid, {-2, 0, -1, 1});
+    mandelbrot(iter, grid);
+//    mandelbrot(iter, grid, {-2, 0, -1, 1});
+//    mandelbrot(iter, grid, {-1.5, -1, -0.25, 0.25});
+//    mandelbrot(iter, grid, {-1.5, -1, -0.25*9/16, 0.25*9/16});
 //    mandelbrot(iter, grid, {-2, 2, -2, 2});
 
     image_sanity_check(grid, true);

@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <stdlib.h>
 #include "arg_parser.h"
 #include "io.h"
 #include "voronoi.h"

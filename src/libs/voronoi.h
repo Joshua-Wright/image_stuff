@@ -6,6 +6,7 @@
 #define IMAGE_STUFF_VORONOI_H
 
 #include <vector>
+#include <list>
 #include "types.h"
 
 namespace image_utils {
@@ -24,8 +25,12 @@ namespace image_utils {
         };
 
         std::vector<voronoi_point> points;
+        size_t factor;
+        matrix<std::list<voronoi_point>> buckets;
 
         void fill_pixels();
+
+        voronoi_point find_closest(const matrix<std::list<voronoi_point>> &buckets, const size_t factor, const vect_l pt);
 
     public:
 

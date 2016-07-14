@@ -29,6 +29,7 @@ namespace image_utils {
 #pragma clang diagnostic pop
 
     typedef containers::vect<double,2> vect;
+    typedef containers::vect<size_t,2> vect_ull;
 
     struct grayscale {
         unsigned char g;

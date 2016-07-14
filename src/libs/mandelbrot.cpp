@@ -3,64 +3,169 @@
 //
 #include <complex>
 #include <cmath>
+#include <stack>
+#include <boost/lockfree/stack.hpp>
+#include <thread>
+#include <vector>
 #include "mandelbrot.h"
+#include "debug.h"
+#include "vect.h"
+#include "types.h"
+
+using std::cerr;
+using std::endl;
+using boost::lockfree::stack;
 
 namespace image_utils {
+    const size_t NOT_DEFINED = (const size_t) -1;
 
-    void mandelbrot(size_t iterations, matrix<double> &grid,
-                    std::array<double, 4> bounds) {
-        const size_t x = grid.x();
-        const size_t y = grid.y();
-        using std::complex;
-        using std::pow;
-        using std::abs;
-        struct mand_cell {
-            complex<double> z, c;
-            /*iteration that this diverted*/
-            size_t i;
-            bool done;
+    struct line {
+        vect_ull start_point;
+        vect_ull end_point;
+    };
+
+    struct rectangle {
+        // bounds are inclusive
+        size_t xmin, xmax, ymin, ymax;
+        vect_ull corners[4];
+        line sides[4];
+
+        rectangle() { }
+
+        rectangle(const size_t x_min, const size_t x_max,
+                  const size_t y_min, const size_t y_max) : xmin(x_min), xmax(x_max),
+                                                            ymin(y_min), ymax(y_max) {
+            corners[0] = {x_min, y_min};
+            corners[1] = {x_max, y_min};
+            corners[2] = {x_min, y_max};
+            corners[3] = {x_max, y_max};
+
+            sides[0] = {corners[0], corners[1]};
+            sides[1] = {corners[0], corners[2]};
+            sides[2] = {corners[1], corners[3]};
+            sides[3] = {corners[2], corners[3]};
         };
+    };
 
-        /*initialize the complex grid*/
-        matrix<mand_cell> comp_grid(x, y);
-        for (size_t i = 0; i < x; ++i) {
-            double cr = (double(i) / x) * (bounds[1] - bounds[0]) + bounds[0];
-            for (size_t j = 0; j < y; ++j) {
-                double ci =
-                        (double(j) / y) * (bounds[3] - bounds[2]) + bounds[2];
-                comp_grid(i, j).z.real(0);
-                comp_grid(i, j).z.imag(0);
-                comp_grid(i, j).c.real(cr);
-                comp_grid(i, j).c.imag(ci);
-                comp_grid(i, j).done = false;
+    size_t iterate_cell(const size_t iterations, const std::complex<double> pos) {
+        std::complex<double> val = pos;
+        for (size_t iter = 0; iter < iterations; ++iter) {
+            if (std::abs(val) < 4) {
+                val = pow(val, 2) + pos;
+            } else {
+                return iter;
             }
         }
+        return 0;
+    }
 
-        /*iterate the grid*/
-        for (size_t iter = 0; iter < iterations; ++iter) {
-#pragma omp parallel for schedule(static) collapse(2)
-            for (size_t i = 0; i < x; ++i) {
-                for (size_t j = 0; j < y; ++j) {
-                    if (!comp_grid(i, j).done) {
-                        if (abs(comp_grid(i, j).z) < 4) {
-                            comp_grid(i, j).z =
-                                    pow(comp_grid(i, j).z, 2) +
-                                    comp_grid(i, j).c;
-                        } else {
-                            comp_grid(i, j).done = true;
-                            comp_grid(i, j).i = iter;
-                        }
-                    }
+    bool process_line(matrix<size_t> &grid_iter, const size_t iterations, line l, const std::array<double, 4> bounds) {
+        vect start = l.start_point;
+        vect end = l.end_point;
+        vect diff;
+        // handle lines containing only a single pixel
+        if ((start - end) != vect{0, 0}) {
+            diff = (end - start).unitV();
+        } else {
+            diff = vect{0, 0};
+        }
+        bool all_equal = true;
+        std::complex<double> start_complex(
+                (start[0] / grid_iter.x()) * (bounds[1] - bounds[0]) + bounds[0],
+                (start[1] / grid_iter.y()) * (bounds[3] - bounds[2]) + bounds[2]
+        );
+        size_t first_iter = iterate_cell(iterations, start_complex);
+        for (size_t i = 0; i <= (end - start).norm(); i++) {
+            vect pos = start + diff * i;
+            if (grid_iter((const size_t) pos[0], (const size_t) pos[1]) == NOT_DEFINED) {
+                std::complex<double> complex_pos;
+                complex_pos.real((pos[0] / grid_iter.x()) * (bounds[1] - bounds[0]) + bounds[0]);
+                complex_pos.imag((pos[1] / grid_iter.y()) * (bounds[3] - bounds[2]) + bounds[2]);
+                size_t iter = iterate_cell(iterations, complex_pos);
+                grid_iter((const size_t) pos[0], (const size_t) pos[1]) = iter;
+            }
+            all_equal &= (first_iter == grid_iter((const size_t) pos[0], (const size_t) pos[1]));
+        }
+        return all_equal;
+    }
+
+    void process_rectangle(stack<rectangle> &rect_stack, matrix<size_t> &grid_iter, const size_t iterations,
+                           const std::array<double, 4> bounds) {
+        rectangle rect;
+        while (!rect_stack.pop(rect)) {
+            if (rect_stack.empty()) { return; }
+        };
+        bool edges_equal = true;
+        for (auto &line : rect.sides) {
+            // pre-calculate to avoid lazy evaluation skipping
+            bool res = process_line(grid_iter, iterations, line, bounds);
+            edges_equal = edges_equal && res;
+        }
+        size_t shortest_edge = std::min(rect.xmax - rect.xmin, rect.ymax - rect.ymin);
+        size_t longest_bound = std::max(grid_iter.x(), grid_iter.y());
+        // todo improve magic number?
+        if (edges_equal && shortest_edge < longest_bound / 10) {
+            size_t iter_fill = grid_iter(rect.xmin, rect.ymin);
+            for (size_t i = rect.xmin; i < rect.xmax; i++) {
+                for (size_t j = rect.ymin; j < rect.ymax; j++) {
+                    grid_iter(i, j) = iter_fill;
                 }
             }
+        } else if (rect.xmax - rect.xmin == 2 || rect.ymax - rect.ymin == 2) {
+            // handle single line case, because we can't easily split that up into sub-rectangles
+            while (!
+                    rect_stack.push(rectangle(rect.xmin + 1, rect.xmax - 1, rect.ymin + 1, rect.ymax - 1))
+                    ) { };
+        } else if (shortest_edge > 1) {
+            // must be careful how we round up and down because rectangles are inclusive on all bounds
+            while (!
+                    rect_stack.push(rectangle(rect.xmin + 1, (rect.xmin + rect.xmax) / 2,
+                                              rect.ymin + 1, (rect.ymin + rect.ymax) / 2))
+                    ) { }
+            while (!
+                    rect_stack.push(rectangle((rect.xmin + rect.xmax) / 2,
+                                              rect.xmax, rect.ymin, (rect.ymin + rect.ymax + 1) / 2))
+                    ) { }
+            while (!
+                    rect_stack.push(rectangle(rect.xmin, (rect.xmin + rect.xmax) / 2,
+                                              (rect.ymin + rect.ymax + 1) / 2, rect.ymax))
+                    ) { }
+            while (!
+                    rect_stack.push(rectangle((rect.xmin + rect.xmax + 1) / 2, rect.xmax - 1,
+                                              (rect.ymin + rect.ymax + 1) / 2, rect.ymax - 1))
+                    ) { }
         }
+    }
 
-        /*normalize the grid (get the magnitude of all the imaginary stuff) */
-        for (size_t i = 0; i < x; ++i) {
-            for (size_t j = 0; j < y; ++j) {
-//                grid(i, j) = abs(comp_grid(i, j).z);
-                grid(i, j) = comp_grid(i, j).i;
+    void stack_processor_thread(stack<rectangle> &rect_stack, matrix<size_t> &grid_iter, const size_t iterations,
+                                const std::array<double, 4> bounds) {
+        while (!rect_stack.empty()) {
+            process_rectangle(rect_stack, grid_iter, iterations, bounds);
+        }
+    }
+
+    void fast_mandelbrot(size_t iterations, matrix<double> &grid, std::array<double, 4> bounds) {
+        matrix<size_t> grid_iter(grid.x(), grid.y(), NOT_DEFINED);
+        stack<rectangle> rect_stack(std::sqrt(grid.size()));
+        rectangle starter(0, grid.x() - 1, 0, grid.y() - 1);
+        rect_stack.push(starter);
+
+        if (grid.size() > 3000) { // threshold for needing threads
+            std::vector<std::thread> threads;
+            for (size_t i = 0; i < std::thread::hardware_concurrency(); i++) {
+                threads.emplace_back(stack_processor_thread, std::ref(rect_stack), std::ref(grid_iter), std::ref(iterations), std::ref(bounds));
+            }
+            for (auto &t : threads) {
+                t.join();
+            }
+        } else {
+            stack_processor_thread(rect_stack, grid_iter, iterations, bounds);
+        }
+        for (size_t i = 0; i < grid.x(); ++i) {
+            for (size_t j = 0; j < grid.y(); ++j) {
+                grid(i, j) = grid_iter(i, j);
             }
         }
     }
+
 }

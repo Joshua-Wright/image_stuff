@@ -9,7 +9,6 @@
 
 namespace image_utils {
     /*bounds is in the form {xmin, xmax, ymin, ymax} */
-    void mandelbrot(size_t iterations, matrix<double> &grid,
-                    std::array<double, 4> bounds = {-2, 2, -2, 2});
+    void fast_mandelbrot(size_t iterations, matrix<double> &grid, std::array<double, 4> bounds = {-2, 2, -2, 2});
 }
 #endif //IMAGE_STUFF_MANDELBROT_H

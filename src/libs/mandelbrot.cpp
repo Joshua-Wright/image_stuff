@@ -89,12 +89,8 @@ namespace image_utils {
         return all_equal;
     }
 
-    void process_rectangle(stack<rectangle> &rect_stack, matrix<size_t> &grid_iter, const size_t iterations,
+    void process_rectangle(const rectangle &rect, matrix<size_t> &grid_iter, const size_t iterations,
                            const std::array<double, 4> bounds) {
-        rectangle rect;
-        while (!rect_stack.pop(rect)) {
-            if (rect_stack.empty()) { return; }
-        };
         bool edges_equal = true;
         for (auto &line : rect.sides) {
             // pre-calculate to avoid lazy evaluation skipping
@@ -104,63 +100,38 @@ namespace image_utils {
         size_t shortest_edge = std::min(rect.xmax - rect.xmin, rect.ymax - rect.ymin);
         size_t longest_bound = std::max(grid_iter.x(), grid_iter.y());
         // todo improve magic number?
-        if (edges_equal && shortest_edge < longest_bound / 10) {
+        if (edges_equal && shortest_edge < longest_bound / 2) {
             size_t iter_fill = grid_iter(rect.xmin, rect.ymin);
-            for (size_t i = rect.xmin; i < rect.xmax; i++) {
-                for (size_t j = rect.ymin; j < rect.ymax; j++) {
+            for (size_t i = rect.xmin + 1; i < rect.xmax; i++) {
+                for (size_t j = rect.ymin + 1; j < rect.ymax; j++) {
                     grid_iter(i, j) = iter_fill;
                 }
+                // uncomment the following to include visualizations of the recursion in the output
+//                grid_iter(i, rect.ymin) = 100;
             }
+//            for (size_t j = rect.ymin; j < rect.ymax; j++) {
+//                grid_iter(rect.xmin, j) = 100;
+//            }
         } else if (rect.xmax - rect.xmin == 2 || rect.ymax - rect.ymin == 2) {
             // handle single line case, because we can't easily split that up into sub-rectangles
-            while (!
-                    rect_stack.push(rectangle(rect.xmin + 1, rect.xmax - 1, rect.ymin + 1, rect.ymax - 1))
-                    ) { };
+            process_rectangle(rectangle(rect.xmin + 1, rect.xmax - 1, rect.ymin + 1, rect.ymax - 1), grid_iter, iterations, bounds);
         } else if (shortest_edge > 1) {
             // must be careful how we round up and down because rectangles are inclusive on all bounds
-            while (!
-                    rect_stack.push(rectangle(rect.xmin + 1, (rect.xmin + rect.xmax) / 2,
-                                              rect.ymin + 1, (rect.ymin + rect.ymax) / 2))
-                    ) { }
-            while (!
-                    rect_stack.push(rectangle((rect.xmin + rect.xmax) / 2,
-                                              rect.xmax, rect.ymin, (rect.ymin + rect.ymax + 1) / 2))
-                    ) { }
-            while (!
-                    rect_stack.push(rectangle(rect.xmin, (rect.xmin + rect.xmax) / 2,
-                                              (rect.ymin + rect.ymax + 1) / 2, rect.ymax))
-                    ) { }
-            while (!
-                    rect_stack.push(rectangle((rect.xmin + rect.xmax + 1) / 2, rect.xmax - 1,
-                                              (rect.ymin + rect.ymax + 1) / 2, rect.ymax - 1))
-                    ) { }
-        }
-    }
-
-    void stack_processor_thread(stack<rectangle> &rect_stack, matrix<size_t> &grid_iter, const size_t iterations,
-                                const std::array<double, 4> bounds) {
-        while (!rect_stack.empty()) {
-            process_rectangle(rect_stack, grid_iter, iterations, bounds);
+            process_rectangle(rectangle(rect.xmin + 1, (rect.xmin + rect.xmax) / 2,
+                                        rect.ymin + 1, (rect.ymin + rect.ymax) / 2), grid_iter, iterations, bounds);
+            process_rectangle(rectangle((rect.xmin + rect.xmax) / 2,
+                                        rect.xmax, rect.ymin, (rect.ymin + rect.ymax + 1) / 2), grid_iter, iterations, bounds);
+            process_rectangle(rectangle(rect.xmin, (rect.xmin + rect.xmax) / 2,
+                                        (rect.ymin + rect.ymax + 1) / 2, rect.ymax), grid_iter, iterations, bounds);
+            process_rectangle(rectangle((rect.xmin + rect.xmax + 1) / 2, rect.xmax - 1,
+                                        (rect.ymin + rect.ymax + 1) / 2, rect.ymax - 1), grid_iter, iterations, bounds);
         }
     }
 
     void fast_mandelbrot(size_t iterations, matrix<double> &grid, std::array<double, 4> bounds) {
         matrix<size_t> grid_iter(grid.x(), grid.y(), NOT_DEFINED);
-        stack<rectangle> rect_stack(std::sqrt(grid.size()));
         rectangle starter(0, grid.x() - 1, 0, grid.y() - 1);
-        rect_stack.push(starter);
-
-        if (grid.size() > 3000) { // threshold for needing threads
-            std::vector<std::thread> threads;
-            for (size_t i = 0; i < std::thread::hardware_concurrency(); i++) {
-                threads.emplace_back(stack_processor_thread, std::ref(rect_stack), std::ref(grid_iter), std::ref(iterations), std::ref(bounds));
-            }
-            for (auto &t : threads) {
-                t.join();
-            }
-        } else {
-            stack_processor_thread(rect_stack, grid_iter, iterations, bounds);
-        }
+        process_rectangle(starter, grid_iter, iterations, bounds);
         for (size_t i = 0; i < grid.x(); ++i) {
             for (size_t j = 0; j < grid.y(); ++j) {
                 grid(i, j) = grid_iter(i, j);

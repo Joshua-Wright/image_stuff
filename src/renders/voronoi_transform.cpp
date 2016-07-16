@@ -45,13 +45,14 @@ int main(int argc, char const *argv[]) {
         output = config["out"];
     }
     size_t n = std::stoull(config["n"]);
-    distance_type distance_type1 = EUCLIDIAN;
+    distance_type distance_type1 = EUCLIDEAN;
     if (config["dist"] == "m") {
         distance_type1 = MANHATTAN;
     }
 
     image_RGB image1 = read_image(input);
-    image_RGB image2 = voronoi_filter(image1, n, distance_type1);
+//    image_RGB image2 = voronoi_filter(image1, n, distance_type1);
+    image_RGB image2 = fast_voronoi_filter(image1, n);
     write_image(image2, output);
 
     return 0;

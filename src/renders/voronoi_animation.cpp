@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <stdlib.h>
 #include "arg_parser.h"
 #include "io.h"
 #include "voronoi.h"
@@ -16,7 +17,7 @@ int main(int argc, char const *argv[]) {
     srand((unsigned int) time(NULL));
 
     /*default values*/
-    unordered_map<string, string> config;
+    unordered_map <string, string> config;
     config["folder"] = "voronoi_frames";
     config["x"] = "1000";
     config["y"] = "1000";
@@ -25,15 +26,14 @@ int main(int argc, char const *argv[]) {
     config["n_frames"] = "600";
     containers::parse_args(config, argc, argv);
 
-    size_t sz = 1000;
-
     std::string output_folder = config["folder"];
     if (output_folder.back() != '/') {
         output_folder.push_back('/');
     }
     const size_t n_frames = std::stoull(config["n_frames"]);
-    voronoi_animation voronoi1(std::stoull(config["x"]), std::stoull(config["y"]),std::stoull(config["pts"]));
+    voronoi_animation voronoi1(std::stoull(config["x"]), std::stoull(config["y"]), std::stoull(config["pts"]));
 
+#pragma omp parallel for schedule(static)
     for (size_t i = 0; i < n_frames; i++) {
 
         std::stringstream output;
@@ -44,8 +44,7 @@ int main(int argc, char const *argv[]) {
 
         std::string out_filename = output.str();
 
-        voronoi1.advance(1);
-        write_image(voronoi1.image_data, out_filename);
+        write_image(voronoi1.get_advanced_to_time(i), out_filename);
 
         std::cout << "rendered: " << out_filename << std::endl;
     }

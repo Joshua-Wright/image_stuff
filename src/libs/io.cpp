@@ -7,7 +7,7 @@
 
 namespace image_utils {
 
-    void write_image(image_RGB &rgb_data, const std::string &out_filename) {
+    void write_image(const image_RGB &rgb_data, const std::string &out_filename) {
         lodepng::encode(out_filename, (const unsigned char *) rgb_data.data(),
                         rgb_data.x(), rgb_data.y(), LCT_RGB);
     };

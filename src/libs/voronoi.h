@@ -11,7 +11,7 @@
 namespace image_utils {
 
     enum distance_type {
-        EUCLIDIAN,
+        EUCLIDEAN,
         MANHATTAN
     };
 
@@ -24,22 +24,23 @@ namespace image_utils {
         };
 
         std::vector<voronoi_point> points;
-
-        void fill_pixels();
+        const size_t size_x;
+        const size_t size_y;
 
     public:
-
-        matrix<RGB> image_data;
 
         voronoi_animation(const size_t x, const size_t y,
                           const size_t n_points);
 
-        void advance(const double dt);
+        image_RGB get_advanced_to_time(const double time) const;
+
     };
 
 
     image_RGB voronoi_filter(const image_RGB &in, const size_t n_points,
-                             const distance_type dist = EUCLIDIAN);
+                             const distance_type dist = EUCLIDEAN);
+
+    image_RGB fast_voronoi_filter(const image_RGB &in, const size_t n_points);
 
 }
 

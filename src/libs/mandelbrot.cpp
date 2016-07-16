@@ -129,7 +129,7 @@ namespace image_utils {
     }
 
     void fast_mandelbrot(size_t iterations, matrix<double> &grid, std::array<double, 4> bounds) {
-        matrix<size_t> grid_iter(grid.x(), grid.y(), NOT_DEFINED);
+        matrix <size_t> grid_iter(grid.x(), grid.y(), NOT_DEFINED);
         rectangle starter(0, grid.x() - 1, 0, grid.y() - 1);
         process_rectangle(starter, grid_iter, iterations, bounds);
         for (size_t i = 0; i < grid.x(); ++i) {

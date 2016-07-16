@@ -30,6 +30,7 @@ namespace image_utils {
 
     typedef containers::vect<double,2> vect;
     typedef containers::vect<size_t,2> vect_ull;
+    typedef containers::vect<long,2> vect_ll;
 
     struct grayscale {
         unsigned char g;

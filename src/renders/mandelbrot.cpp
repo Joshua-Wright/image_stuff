@@ -41,7 +41,8 @@ int main(int argc, char const *argv[]) {
     matrix<double> grid(x, y);
 
     fast_mandelbrot(iter, grid, {-2, 0, -1, 1});
-//    mandelbrot(iter, grid, {-2, 2, -2, 2});
+//    fast_mandelbrot(iter, grid, {-2, 2, -2, 2});
+//    fast_mandelbrot(iter, grid, {-1, 0, -1, 0});
 
     image_sanity_check(grid, true);
     scale_grid(grid);

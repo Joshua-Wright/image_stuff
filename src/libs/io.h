@@ -8,7 +8,7 @@
 
 namespace image_utils {
 
-    void write_image(image_RGB &rgb_data, const std::string &out_filename);
+    void write_image(const image_RGB &rgb_data, const std::string &out_filename);
 
     image_RGB read_image(const std::string &filename);
 

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
-#include "debug.h"
+#include "util/debug.h"
 #include "voronoi.h"
 
 #ifndef DO_GRID

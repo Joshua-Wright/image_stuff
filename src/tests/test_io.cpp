@@ -1,7 +1,7 @@
 // (c) Copyright 2015 Josh Wright
 
 #include "io.h"
-#include "debug.h"
+#include "util/debug.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;

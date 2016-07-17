@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include "voronoi.h"
-#include "arg_parser.h"
+#include "util/arg_parser.h"
 #include "io.h"
 
 int main(int argc, char const *argv[]) {

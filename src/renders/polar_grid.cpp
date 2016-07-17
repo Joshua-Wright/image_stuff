@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <functional>
 #include <iomanip>
-#include "arg_parser.h"
+#include "util/arg_parser.h"
 #include "colormaps.h"
 #include "generators.h"
 #include "io.h"

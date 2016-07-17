@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <stdlib.h>
-#include "arg_parser.h"
+#include "util/arg_parser.h"
 #include "io.h"
 #include "voronoi.h"
 
@@ -37,11 +37,7 @@ int main(int argc, char const *argv[]) {
     for (size_t i = 0; i < n_frames; i++) {
 
         std::stringstream output;
-
-        output << output_folder <<
-        "out_frame_" << std::setfill('0') <<
-        std::setw(5) << i << ".png";
-
+        output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
         std::string out_filename = output.str();
 
         write_image(voronoi1.get_advanced_to_time(i), out_filename);

@@ -1,7 +1,7 @@
 // (c) Copyright 2016 Josh Wright
 
 #include <iostream>
-#include "debug.h"
+#include "util/debug.h"
 #include "generators.h"
 
 int main(int argc, char const *argv[]) {

@@ -8,8 +8,8 @@
 #include <thread>
 #include <vector>
 #include "fractal.h"
-#include "debug.h"
-#include "vect.h"
+#include "util/debug.h"
+#include "util/vect.h"
 #include "types.h"
 
 #ifndef DO_GRID
@@ -53,10 +53,9 @@ namespace image_utils {
 
     class fractal {
         matrix<size_t> indexes;
-        const std::array<double, 4> bounds;
         const size_t iterations;
+        const std::array<double, 4> bounds;
         bool do_grid;
-
         bool is_julia;
         complex c;
 
@@ -149,10 +148,10 @@ namespace image_utils {
 
     public:
         fractal(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, bool do_grid = false)
-                : do_grid(do_grid), indexes(w, h, NOT_DEFINED), iterations(iter), bounds(bounds), is_julia(false), c(0, 0) { }
+                : indexes(w, h, NOT_DEFINED), iterations(iter), bounds(bounds), do_grid(do_grid), is_julia(false), c(0, 0) { }
 
         fractal(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, complex c, bool do_grid = false)
-                : do_grid(do_grid), indexes(w, h, NOT_DEFINED), iterations(iter), bounds(bounds), is_julia(true), c(c) { }
+                : indexes(w, h, NOT_DEFINED), iterations(iter), bounds(bounds), do_grid(do_grid), is_julia(true), c(c) { }
 
         matrix<double> run() {
             matrix<double> grid(indexes.x(), indexes.y());
@@ -175,5 +174,11 @@ namespace image_utils {
     matrix<double> fast_julia(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, complex c) {
         return fractal(w, h, iter, bounds, c).run();
     }
+
+    complex complex_circle(const complex center, const double r, const double t) {
+        complex pos(std::cos(2 * PI * t), std::sin(2 * PI * t));
+        return center + r * pos;
+    }
+
 
 }

@@ -7,8 +7,8 @@
 
 #include <cstring>
 #include <complex>
-#include "matrix.h"
-#include "vect.h"
+#include "util/matrix.h"
+#include "util/vect.h"
 
 
 namespace image_utils {

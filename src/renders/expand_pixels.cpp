@@ -1,7 +1,7 @@
 // (c) Copyright 2015 Josh Wright
 #include <iostream>
 #include <iomanip>
-#include "arg_parser.h"
+#include "util/arg_parser.h"
 #include "io.h"
 #include "expand_pixels.h"
 

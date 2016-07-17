@@ -4,9 +4,9 @@
 #include <map>
 #include <iomanip>
 #include "generators.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "colormaps.h"
-#include "arg_parser.h"
+#include "util/arg_parser.h"
 #include "io.h"
 
 

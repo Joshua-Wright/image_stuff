@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 #include <iomanip>
-#include "debug.h"
+#include "util/debug.h"
 #include "generators.h"
 
 int main(int argc, char const *argv[]) {

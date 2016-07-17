@@ -1,6 +1,6 @@
 // (c) Copyright 2016 Josh Wright
 #include "colormaps.h"
-#include "matrix.h"
+#include "util/matrix.h"
 
 namespace image_utils {
 

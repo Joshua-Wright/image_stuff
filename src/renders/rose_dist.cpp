@@ -5,10 +5,10 @@
 #include <iomanip>
 #include <unordered_map>
 #include "generators.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "colormaps.h"
 #include "io.h"
-#include "arg_parser.h"
+#include "util/arg_parser.h"
 
 
 int main(int argc, char const *argv[]) {

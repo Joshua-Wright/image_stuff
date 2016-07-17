@@ -33,7 +33,6 @@ int main(int argc, char const *argv[]) {
     config["cr"] = "1";
     config["ci"] = "1";
     config["iter"] = "100";
-    config["wtheta"] = "fourier_square:3";
 
     containers::parse_args(config, argc, argv);
 
@@ -54,7 +53,7 @@ int main(int argc, char const *argv[]) {
     complex c(std::stod(config["cr"]), std::stod(config["ci"]));
 
     matrix<double> grid(0, 0);
-    if (config.find("julia") != config.end()) {
+    if (config.find("julia") == config.end()) {
         grid = fast_mandelbrot(x, y, iter, bounds);
     } else {
         grid = fast_julia(x, y, iter, bounds, c);
@@ -62,7 +61,6 @@ int main(int argc, char const *argv[]) {
 
     image_sanity_check(grid, true);
     scale_grid(grid);
-    image_sanity_check(grid, true);
 //    colormap *cmap = new colormap_threecolor();
     colormap *cmap = new colormap_basic_hot();
     color_write_image(grid, cmap, output);

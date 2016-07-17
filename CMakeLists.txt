@@ -7,9 +7,10 @@ project(image_stuff)
 
 # includes:
 include_directories(
-        "src/cpp_containers_utilities/lib/"
         "src/lodepng/"
-        "src/libs/")
+        "src/libs/"
+        "src/libs/util"
+)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts")
@@ -32,7 +33,9 @@ set(LIB_FILES
         src/libs/colormaps.cpp
         src/libs/generators.cpp
         src/libs/expand_pixels.cpp
-        src/cpp_containers_utilities/lib/arg_parser.cpp)
+        src/libs/util/arg_parser.cpp
+        src/libs/util/arg_parser.h
+        )
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 #add_executable(test_io ${LIB_FILES} src/tests/test_io.cpp)
@@ -58,3 +61,4 @@ add_executable(voronoi_animation ${LIB_FILES} src/libs/voronoi.cpp src/renders/v
 add_executable(voronoi_transform ${LIB_FILES} src/libs/voronoi.cpp src/renders/voronoi_transform.cpp)
 
 add_executable(mandelbrot ${LIB_FILES} src/libs/fractal.cpp src/libs/fractal.h src/renders/mandelbrot.cpp)
+add_executable(mandelbrot_zoom ${LIB_FILES} src/libs/fractal.cpp src/libs/fractal.h src/renders/fractal_animation.cpp)

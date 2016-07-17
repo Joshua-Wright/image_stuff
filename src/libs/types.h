@@ -6,6 +6,7 @@
 #define IMAGE_STUFF_TYPES_H
 
 #include <cstring>
+#include <complex>
 #include "matrix.h"
 #include "vect.h"
 
@@ -81,6 +82,8 @@ namespace image_utils {
     typedef matrix<RGBd> image_RGBd;
     typedef matrix<RGBAd> image_RGBAd;
     typedef matrix<grayscaled> image_gsd;
+
+    typedef std::complex<double> complex;
 
 }
 #endif //IMAGE_STUFF_TYPES_H

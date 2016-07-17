@@ -57,4 +57,4 @@ add_executable(gaussian_blur ${LIB_FILES} src/renders/gaussian_blur.cpp)
 add_executable(voronoi_animation ${LIB_FILES} src/libs/voronoi.cpp src/renders/voronoi_animation.cpp)
 add_executable(voronoi_transform ${LIB_FILES} src/libs/voronoi.cpp src/renders/voronoi_transform.cpp)
 
-add_executable(mandelbrot ${LIB_FILES} src/libs/mandelbrot.cpp src/libs/mandelbrot.h src/renders/mandelbrot.cpp)
+add_executable(mandelbrot ${LIB_FILES} src/libs/fractal.cpp src/libs/fractal.h src/renders/mandelbrot.cpp)

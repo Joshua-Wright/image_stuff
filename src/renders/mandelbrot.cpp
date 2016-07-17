@@ -10,7 +10,7 @@
 #include "colormaps.h"
 #include "generators.h"
 #include "io.h"
-#include "mandelbrot.h"
+#include "fractal.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
@@ -26,6 +26,12 @@ int main(int argc, char const *argv[]) {
     config["output"] = "output.png";
     config["x"] = "500";
     config["y"] = "500";
+    config["xa"] = "-2";
+    config["xb"] = "2";
+    config["ya"] = "-2";
+    config["yb"] = "2";
+    config["cr"] = "1";
+    config["ci"] = "1";
     config["iter"] = "100";
     config["wtheta"] = "fourier_square:3";
 
@@ -38,11 +44,21 @@ int main(int argc, char const *argv[]) {
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
 
-    matrix<double> grid(x, y);
+    const std::array<double, 4> bounds = {
+            std::stod(config["xa"]),
+            std::stod(config["xb"]),
+            std::stod(config["ya"]),
+            std::stod(config["yb"]),
+    };
 
-    fast_mandelbrot(iter, grid, {-2, 0, -1, 1});
-//    fast_mandelbrot(iter, grid, {-2, 2, -2, 2});
-//    fast_mandelbrot(iter, grid, {-1, 0, -1, 0});
+    complex c(std::stod(config["cr"]), std::stod(config["ci"]));
+
+    matrix<double> grid(0, 0);
+    if (config.find("julia") != config.end()) {
+        grid = fast_mandelbrot(x, y, iter, bounds);
+    } else {
+        grid = fast_julia(x, y, iter, bounds, c);
+    }
 
     image_sanity_check(grid, true);
     scale_grid(grid);

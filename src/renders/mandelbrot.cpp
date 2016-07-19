@@ -29,8 +29,8 @@ int main(int argc, char const *argv[]) {
     config["xb"] = "2";
     config["ya"] = "-2";
     config["yb"] = "2";
-    config["cr"] = "1";
-    config["ci"] = "1";
+    config["cr"] = "-0.7269";
+    config["ci"] = "0.1889";
     config["iter"] = "100";
 
     containers::parse_args(config, argc, argv);
@@ -41,6 +41,7 @@ int main(int argc, char const *argv[]) {
     const size_t x = std::stoull(config["x"]);
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
+    const bool do_grid = config.find("grid") != config.end();
 
     const std::array<double, 4> bounds = {
             std::stod(config["xa"]),
@@ -48,14 +49,15 @@ int main(int argc, char const *argv[]) {
             std::stod(config["ya"]),
             std::stod(config["yb"]),
     };
+    check_bounds(bounds);
 
     complex c(std::stod(config["cr"]), std::stod(config["ci"]));
 
     matrix<double> grid(0, 0);
     if (config.find("julia") == config.end()) {
-        grid = fast_mandelbrot(x, y, iter, bounds);
+        grid = fast_mandelbrot(x, y, iter, bounds, do_grid);
     } else {
-        grid = fast_julia(x, y, iter, bounds, c);
+        grid = fast_julia(x, y, iter, bounds, c, do_grid);
     }
 
     image_sanity_check(grid, true);

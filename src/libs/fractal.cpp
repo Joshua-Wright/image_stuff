@@ -45,6 +45,7 @@ namespace image_utils {
 
     class fractal {
         matrix<size_t> indexes;
+        matrix<bool> grid_mask;
         const size_t iterations;
         const std::array<double, 4> bounds;
         bool do_grid;
@@ -85,24 +86,24 @@ namespace image_utils {
             }
             bool all_equal = true;
             complex start_complex(
-                    (start[0] / indexes.x()) * (bounds[1] - bounds[0]) + bounds[0],
-                    (start[1] / indexes.y()) * (bounds[3] - bounds[2]) + bounds[2]
+                    (start[0] * 1.0 / indexes.x()) * (bounds[1] - bounds[0]) + bounds[0],
+                    (start[1] * 1.0 / indexes.y()) * (bounds[3] - bounds[2]) + bounds[2]
             );
             size_t first_iter = iterate_cell(iterations, start_complex);
             for (size_t i = 0; i <= (end - start).norm(); i++) {
                 vect_ull pos = start + diff * i;
-                if (indexes((const size_t) pos[0], (const size_t) pos[1]) == NOT_DEFINED) {
-                    complex complex_pos;
-                    complex_pos.real((pos[0] * 1.0 / indexes.x()) * (bounds[1] - bounds[0]) + bounds[0]);
-                    complex_pos.imag((pos[1] * 1.0 / indexes.y()) * (bounds[3] - bounds[2]) + bounds[2]);
+                if (indexes(pos) == NOT_DEFINED) {
+                    complex complex_pos(
+                            (pos[0] * 1.0 / indexes.x()) * (bounds[1] - bounds[0]) + bounds[0],
+                            (pos[1] * 1.0 / indexes.y()) * (bounds[3] - bounds[2]) + bounds[2]
+                    );
                     size_t iter = iterate_cell(iterations, complex_pos);
-                    indexes((const size_t) pos[0], (const size_t) pos[1]) = iter;
+                    indexes(pos) = iter;
                 }
-                all_equal &= (first_iter == indexes((const size_t) pos[0], (const size_t) pos[1]));
+                all_equal = all_equal && (first_iter == indexes(pos));
             }
             return all_equal;
         }
-
 
         void process_rectangle(rectangle r) {
             bool edges_equal = true;
@@ -114,22 +115,22 @@ namespace image_utils {
             size_t shortest_edge = std::min(r.xmax - r.xmin, r.ymax - r.ymin);
             size_t longest_bound = std::max(indexes.x(), indexes.y());
             // todo improve magic number?
-            if (edges_equal && shortest_edge < longest_bound / 20) {
+            if (edges_equal && shortest_edge < longest_bound / 2) {
                 size_t iter_fill = indexes(r.xmin, r.ymin);
-                for (size_t i = r.xmin; i < r.xmax; i++) {
-                    for (size_t j = r.ymin; j < r.ymax; j++) {
+                for (size_t i = r.xmin; i <= r.xmax; i++) {
+                    for (size_t j = r.ymin; j <= r.ymax; j++) {
                         indexes(i, j) = iter_fill;
-                    }
-                    if (do_grid) {
-                        indexes(i, r.ymin) = 100;
                     }
                 }
                 if (do_grid) {
                     for (size_t j = r.ymin; j < r.ymax; j++) {
-                        indexes(r.xmin, j) = 100;
+                        grid_mask(r.xmin, j) = true;
+                    }
+                    for (size_t i = r.xmin; i < r.xmax; i++) {
+                        grid_mask(i, r.ymin) = true;
                     }
                 }
-            } else if (shortest_edge > 1) {
+            } else if (!edges_equal && shortest_edge > 1) {
                 // must be careful how we round up and down because rectangles are inclusive on all bounds
                 process_rectangle(rectangle(r.xmin, (r.xmin + r.xmax) / 2, r.ymin, (r.ymin + r.ymax) / 2));
                 process_rectangle(rectangle((r.xmin + r.xmax) / 2, r.xmax, r.ymin, (r.ymin + r.ymax) / 2));
@@ -138,12 +139,22 @@ namespace image_utils {
             }
         }
 
-    public:
-        fractal(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, bool do_grid = false)
-                : indexes(w, h, NOT_DEFINED), iterations(iter), bounds(bounds), do_grid(do_grid), is_julia(false), c(0, 0) { }
 
-        fractal(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, complex c, bool do_grid = false)
-                : indexes(w, h, NOT_DEFINED), iterations(iter), bounds(bounds), do_grid(do_grid), is_julia(true), c(c) { }
+    public:
+
+        fractal(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> _bounds, bool do_grid = false)
+                : indexes(w, h, NOT_DEFINED), grid_mask(0, 0), iterations(iter), bounds(_bounds), do_grid(do_grid), c(0, 0),
+                  is_julia(false) {
+            if (do_grid) {
+                grid_mask = matrix<bool>(w, h, false);
+            }
+        }
+
+        fractal(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, complex _c, bool do_grid = false)
+                : fractal(w, h, iter, bounds, do_grid) {
+            is_julia = true;
+            this->c = _c;
+        }
 
         matrix<double> run() {
             matrix<double> grid(indexes.x(), indexes.y());
@@ -154,22 +165,42 @@ namespace image_utils {
                     grid(i, j) = indexes(i, j);
                 }
             }
+            if (do_grid) {
+                /*get max iteration (that was used) and use that*/
+                size_t grid_color = *std::max_element(indexes.begin(), indexes.end());
+                for (size_t i = 0; i < grid.x(); ++i) {
+                    for (size_t j = 0; j < grid.y(); ++j) {
+                        if (grid_mask(i, j)) {
+                            grid(i, j) = grid_color;
+                        }
+                    }
+                }
+            }
             return grid;
         }
-
     };
 
-    matrix<double> fast_mandelbrot(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds) {
-        return fractal(w, h, iter, bounds).run();
+    matrix<double> fast_mandelbrot(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, bool do_grid) {
+        return fractal(w, h, iter, bounds, do_grid).run();
     }
 
-    matrix<double> fast_julia(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, complex c) {
-        return fractal(w, h, iter, bounds, c).run();
+    matrix<double> fast_julia(const size_t w, const size_t h, const size_t iter, const std::array<double, 4> bounds, complex c,
+                              bool do_grid) {
+        return fractal(w, h, iter, bounds, c, do_grid).run();
     }
 
     complex complex_circle(const complex center, const double r, const double t) {
         complex pos(std::cos(2 * PI * t), std::sin(2 * PI * t));
         return center + r * pos;
+    }
+
+    void check_bounds(const std::array<double, 4> &bounds) {
+        using std::runtime_error;
+        if (bounds[1] <= bounds[0]) {
+            throw runtime_error("xmin must be less than xmax");
+        } else if (bounds[3] <= bounds[2]) {
+            throw runtime_error("ymin must be less than ymax");
+        }
     }
 
 

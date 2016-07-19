@@ -8,6 +8,8 @@ Various for-fun image renders. Most are based on mathematical equations, fractal
 * parametric rose wave distance animation
 * Lissajous curve wave distance
 * mandelbrot fractal
+* julia fractal, with `f(z,c) = z^2 + c`
+* julia fractal animation
 * voronoi diagram
 * animated moving voronoi diagram
 

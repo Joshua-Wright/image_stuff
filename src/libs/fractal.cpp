@@ -12,14 +12,6 @@
 #include "util/vect.h"
 #include "types.h"
 
-#ifndef DO_GRID
-#define DO_GRID 1
-#endif
-
-
-using std::cerr;
-using std::endl;
-
 namespace image_utils {
     const size_t NOT_DEFINED = (const size_t) -1;
 

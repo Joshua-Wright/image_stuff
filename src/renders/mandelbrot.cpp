@@ -1,5 +1,4 @@
 // (c) Copyright 2015 Josh Wright
-
 #include <vector>
 #include <string>
 #include <iostream>

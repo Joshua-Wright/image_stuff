@@ -5,20 +5,18 @@
 #pragma once
 
 #include <iostream> // for std::cerr and std::endl
-#include <vector>
-#include <typeinfo> // for typeid(T).name()
-#include <cstring> // for strlen() and basename()
-#include <cxxabi.h> // for abi::__cxa_demangle()
-#include <sstream>
 #include <iomanip>
+#include <sstream>
+#include <vector>
+#include <cstring> // for strlen() and basename()
+#include <malloc.h>
+#include <typeinfo> // for typeid(T).name()
+#include <cxxabi.h> // for abi::__cxa_demangle()
 
 namespace __hidden__ {
 
     using std::endl;
     using std::setw;
-
-//    auto &out = std::cerr;
-#define out std::cerr
 
     struct print {
         bool space;
@@ -28,39 +26,42 @@ namespace __hidden__ {
 
         print(const char *file, int line, const char *expr) : space(false), expr(expr), file(file), line(line) { }
 
-        ~print() { out << std::endl; }
+        ~print() { std::cerr << std::endl; }
 
         template<typename T>
         print &operator,(const T &t) {
             if (space) {
-                out << ' ';
+                std::cerr << ' ';
             } else {
-                out << basename(file) << ":" << line << " " << expr << " = ";
+                std::cerr << basename(file) << ":" << line << " " << expr << " = ";
                 space = true;
             }
-            out << t;
+            std::cerr << t;
             return *this;
         }
     };
 
     template<typename T>
-    const char *demangle_type_name() {
+    std::string demangle_type_name() {
         /*gcc-specific way to de-mangle the type names, probably not portable*/
         if (typeid(T) == typeid(std::string)) {
             return "std::string";
         } else {
-            return abi::__cxa_demangle(typeid(T).name(), NULL, NULL, NULL);
+            char *n = abi::__cxa_demangle(typeid(T).name(), NULL, NULL, NULL);
+            std::string name(n);
+            free(n);
+            return name;
         }
     }
 
     template<typename T>
     void __debug_log(T v, const char *l, const char *f, int line, bool p) {
         /*debug logger that uses template type resolution to print whatever we give it*/
-        out << basename(f) << ":" << line << " ";
+        std::cerr << basename(f) << ":" << line << " ";
         if (p) {
-            out << demangle_type_name<T>() << " ";
+            std::cerr << demangle_type_name<T>() << " ";
         }
-        out << l << "=" << v << endl;
+        std::cerr << l << "=" << v << endl;
     }
 
     struct key_value_printer {
@@ -95,11 +96,11 @@ namespace __hidden__ {
                     max_type_length = (int) l.type.length();
                 }
             }
-            out << basename(file) << ":" << line << ":" << endl;
+            std::cerr << basename(file) << ":" << line << ":" << endl;
             for (auto &l : lines) {
-                out <<
-                setw(max_type_length) << std::left << l.type << " : " <<
-                setw(max_name_length) << std::left << l.key << " = "
+                std::cerr <<
+                setw((int) max_type_length) << std::left << l.type << " : " <<
+                setw((int) max_name_length) << std::left << l.key << " = "
                 << l.value << endl;
             }
         }

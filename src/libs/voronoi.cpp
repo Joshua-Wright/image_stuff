@@ -77,12 +77,22 @@ namespace image_utils {
             // rectangle has no content
         } else if ((r.xmax - r.xmin) > (r.ymax - r.ymin)) {
             // x side is longer, split along x
+#if DO_GRID
             process_rectangle(rectangle(r.xmin, (r.xmin + r.xmax) / 2, r.ymin, r.ymax), points, grid_indexes, mask);
             process_rectangle(rectangle((r.xmin + r.xmax) / 2, r.xmax, r.ymin, r.ymax), points, grid_indexes, mask);
+#else
+            process_rectangle(rectangle(r.xmin, (r.xmin + r.xmax) / 2, r.ymin, r.ymax), points, grid_indexes);
+            process_rectangle(rectangle((r.xmin + r.xmax) / 2, r.xmax, r.ymin, r.ymax), points, grid_indexes);
+#endif
         } else /*if ((r.xmax - r.xmin) > (r.ymax - r.ymin))*/ {
             // same for y-side
+#if DO_GRID
             process_rectangle(rectangle(r.xmin, r.xmax, r.ymin, (r.ymin + r.ymax) / 2), points, grid_indexes, mask);
             process_rectangle(rectangle(r.xmin, r.xmax, (r.ymin + r.ymax) / 2, r.ymax), points, grid_indexes, mask);
+#else
+            process_rectangle(rectangle(r.xmin, r.xmax, r.ymin, (r.ymin + r.ymax) / 2), points, grid_indexes);
+            process_rectangle(rectangle(r.xmin, r.xmax, (r.ymin + r.ymax) / 2, r.ymax), points, grid_indexes);
+#endif
         }
 #if DO_GRID
         for (size_t i = r.xmin; i <= r.xmax; i++) {

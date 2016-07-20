@@ -50,7 +50,7 @@ namespace image_utils {
 
     double distance_wave::operator()(const double &x,
                                      const double &y) const {
-        double min_dist = INFINITY;
+        double min_dist = INF;
         size_t i = wid;
         for (; i < lookup_table.size(); i += wid) {
             if (lookup_table[i - wid].diff(x, y) < 0 &&

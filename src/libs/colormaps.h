@@ -54,10 +54,12 @@ namespace image_utils {
     public:
         colormap_gradient(const double &r, const double &g, const double &b);
 
-        void add_color(const double &r, const double &g, const double &b,
-                       const double &t);
+        colormap_gradient &add_color(const double &r, const double &g, const double &b,
+                                     const double &t);
 
         virtual RGB get_rgb(const double x) const;
+
+        static colormap_gradient blue_yellow_gradient;
     };
 
 

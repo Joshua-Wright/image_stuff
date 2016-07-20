@@ -19,7 +19,6 @@ int main(int argc, char const *argv[]) {
     using std::unordered_map;
     using std::string;
 
-
     /*output*/
     unordered_map<string, string> config;
     config["output"] = "output.png";
@@ -31,6 +30,7 @@ int main(int argc, char const *argv[]) {
     config["yb"] = "2";
     config["cr"] = "-0.7269";
     config["ci"] = "0.1889";
+    config["mul"] = "1";
     config["iter"] = "100";
 
     containers::parse_args(config, argc, argv);
@@ -42,6 +42,7 @@ int main(int argc, char const *argv[]) {
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
     const bool do_grid = config.find("grid") != config.end();
+    const double color_multiplier = std::stod(config["mul"]);
 
     const std::array<double, 4> bounds = {
             std::stod(config["xa"]),
@@ -61,8 +62,12 @@ int main(int argc, char const *argv[]) {
     }
 
     image_sanity_check(grid, true);
+    grid *= color_multiplier;
+    grid.fmod_in_place(iter);
     scale_grid(grid);
+//    scale_iteration_grid_histogram(grid, iter);
 //    colormap *cmap = new colormap_threecolor();
     colormap *cmap = new colormap_basic_hot();
+//    colormap *cmap = &colormap_gradient::blue_yellow_gradient;
     color_write_image(grid, cmap, output);
 }

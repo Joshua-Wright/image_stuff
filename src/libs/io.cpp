@@ -2,6 +2,9 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <cmath>
+#include <set>
+#include <unordered_map>
 #include "io.h"
 #include "lodepng.h"
 
@@ -21,16 +24,16 @@ namespace image_utils {
         return output;
     }
 
-    void image_sanity_check(const matrix<double> &doubles,
+    void image_sanity_check(const matrix<double> &grid,
                             bool print_minmax) {
         /*checks the output to make sure it looks valid*/
-        auto min_max_tuple = std::minmax_element(doubles.begin(),
-                                                 doubles.end());
+        auto min_max_tuple = std::minmax_element(grid.begin(),
+                                                 grid.end());
         double min = *min_max_tuple.first;
         double max = *min_max_tuple.second;
-        if (min == INFINITY || min == -INFINITY || max == INFINITY ||
-            max == -INFINITY || std::isnan(min) ||
-            std::isnan(max)) {
+        if (min == INF || min == -INF ||
+            max == INF || max == -INF ||
+            std::isnan(min) || std::isnan(max)) {
             std::cout << "infinity detected" << std::endl;
         }
         if (print_minmax) {
@@ -57,13 +60,12 @@ namespace image_utils {
 
     }
 
-    void scale_grid(matrix<double> &doubles) {
-        auto g = std::minmax_element(doubles.begin(), doubles.end());
+    void scale_grid(matrix<double> &grid) {
+        auto g = std::minmax_element(grid.begin(), grid.end());
         double min = *g.first;
         double max = *g.second;
-        doubles -= min;
-        doubles /= (max - min);
+        grid -= min;
+        grid /= (max - min);
     }
-
 
 }

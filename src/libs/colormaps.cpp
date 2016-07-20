@@ -104,13 +104,22 @@ namespace image_utils {
         p.push_back(cur);
     }
 
-    void colormap_gradient::add_color(const double &r, const double &g, const double &b,
-                                      const double &t) {
+    colormap_gradient &colormap_gradient::add_color(const double &r, const double &g, const double &b,
+                                                    const double &t) {
 
         containers::vect<double, 3> cur{r, g, b};
         n.push_back(cur - p.back());
         p.push_back(cur);
         l.push_back(t);
         max_t = std::accumulate(l.begin(), l.end(), 0.0);
+        return *this;
     }
+
+    colormap_gradient colormap_gradient::blue_yellow_gradient = colormap_gradient
+            (0, 7, 100)
+            .add_color(32, 107, 203, 0.16)
+            .add_color(237, 255, 255, 0.42)
+            .add_color(255, 170, 0, 0.625)
+            .add_color(0, 2, 0, 0.8575)
+            .add_color(0, 7, 100, 1);
 }

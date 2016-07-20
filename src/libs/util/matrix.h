@@ -9,6 +9,15 @@
 namespace containers {
 
     template<typename T>
+    class matrix;
+
+    template<typename T, typename U>
+    bool dimensions_equal(const matrix<T> &a, const matrix<U> &b);
+
+    template<typename T, typename U>
+    void assert_same_size(const matrix<T> &a, const matrix<U> &b);
+
+    template<typename T>
     class matrix {
         std::size_t width, height;
         T *_data;
@@ -214,6 +223,13 @@ namespace containers {
                            [&lhs](const T &n) { return n % lhs; });
             return *this;
         };
+
+        template<typename F>
+        matrix<T> &fmod_in_place(const F &rhs) {
+            std::transform(begin(), end(), begin(),
+                           [&rhs](const T &n) { return std::fmod(n, rhs); });
+            return *this;
+        }
 
         template<typename U>
         matrix<T> &operator*=(const matrix<U> &lhs) {

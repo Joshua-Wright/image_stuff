@@ -25,8 +25,7 @@ namespace image_utils {
 #pragma clang diagnostic ignored "-Wunused-variable"
     /*keep these constants here for conveniece even if they aren't used*/
     const double PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482;
-    const double Pi = PI;
-    const double pi = PI;
+    const double INF = std::numeric_limits<double>::infinity();
 #pragma clang diagnostic pop
 
     typedef containers::vect<double,2> vect;

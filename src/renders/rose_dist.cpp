@@ -63,8 +63,7 @@ int main(int argc, char const *argv[]) {
     size_t table_size2 = std::stoull(config["lookup_table_size"]);
 
     std::cout << "filling lookup table" << std::endl;
-    rose_dist rose_dist1(w, std::pow(2, table_size2), distance_multiplier, n,
-                         d);
+    rose_dist rose_dist1(w, std::pow(2, table_size2), distance_multiplier, n, d);
 
     std::cout << "rendering image" << std::endl;
     image_fill_2d_wave(grid, &rose_dist1);
@@ -74,12 +73,8 @@ int main(int argc, char const *argv[]) {
 //    colormap_basic_hot map;
 //    color_write_image(grid, &map, output);
 
-    colormap_gradient colormap_gradient1(0, 0, 0);
-    colormap_gradient1.add_color(169, 74, 0, 1);
-    colormap_gradient1.add_color(255, 0, 0, 1);
-    colormap_gradient1.add_color(15, 0, 255, 1);
-    colormap_gradient1.add_color(0, 0, 0, 0.25);
+    colormap *cmap = &colormap_gradient::blue_yellow_gradient;
 
-    color_write_image(grid, &colormap_gradient1, output);
+    color_write_image(grid, cmap, output);
     return 0;
 }

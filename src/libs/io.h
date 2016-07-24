@@ -12,11 +12,9 @@ namespace image_utils {
 
     image_RGB read_image(const std::string &filename);
 
-    void image_sanity_check(const matrix<double> &grid,
-                            bool print_minmax = false);
+    void image_sanity_check(const matrix<double> &grid, bool print_minmax = false);
 
-    void color_write_image(matrix<double> &grid, colormap *cmap,
-                           const std::string &output_filename, bool write_save = true);
+    void color_write_image(matrix<double> &grid, colormap *cmap, const std::string &output_filename, bool write_save = true);
 
     void scale_grid(matrix<double> &grid);
 

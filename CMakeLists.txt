@@ -12,7 +12,6 @@ include_directories(
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
@@ -51,7 +50,7 @@ set(LIB_FILES
         src/libs/util/arg_parser.cpp
         src/libs/colormaps.h
         src/libs/filters.h
-        )
+)
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 

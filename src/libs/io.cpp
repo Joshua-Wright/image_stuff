@@ -24,8 +24,7 @@ namespace image_utils {
         return output;
     }
 
-    void image_sanity_check(const matrix<double> &grid,
-                            bool print_minmax) {
+    void image_sanity_check(const matrix<double> &grid, bool print_minmax) {
         /*checks the output to make sure it looks valid*/
         auto min_max_tuple = std::minmax_element(grid.begin(),
                                                  grid.end());
@@ -46,9 +45,7 @@ namespace image_utils {
         }
     }
 
-    void color_write_image(matrix<double> &grid, colormap *cmap,
-                           const std::string &output_filename,
-                           bool write_save) {
+    void color_write_image(matrix<double> &grid, colormap *cmap, const std::string &output_filename, bool write_save) {
         /* modifies argument! */
         scale_grid(grid);
         image_RGB color_image(grid.x(), grid.y());

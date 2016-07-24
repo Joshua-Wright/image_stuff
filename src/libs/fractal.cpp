@@ -4,7 +4,6 @@
 #include <complex>
 #include <cmath>
 #include <stack>
-#include <boost/lockfree/stack.hpp>
 #include <thread>
 #include <vector>
 #include "fractal.h"

@@ -18,7 +18,7 @@ namespace image_utils {
     struct rectangle {
         // bounds are inclusive
         size_t xmin, xmax, ymin, ymax;
-        vect_ull corners[4];
+        vec_ull corners[4];
 
         rectangle() { }
 
@@ -33,7 +33,7 @@ namespace image_utils {
         };
     };
 
-    size_t closest_point(const vect_ull pos, const std::vector<vect_ull> &points) {
+    size_t closest_point(const vec_ull pos, const std::vector<vec_ull> &points) {
         double min_dist = points[0].dist2(pos);
         size_t min_dist_idx = 0;
         for (size_t i = 1; i < points.size(); i++) {
@@ -46,9 +46,9 @@ namespace image_utils {
     }
 
 #if DO_GRID
-    void process_rectangle(const rectangle &r, const std::vector<vect_ull> &points, matrix<size_t> &grid_indexes, matrix<size_t> &mask) {
+    void process_rectangle(const rectangle &r, const std::vector<vec_ull> &points, matrix<size_t> &grid_indexes, matrix<size_t> &mask) {
 #else
-    void process_rectangle(const rectangle &r, const std::vector<vect_ull> &points, matrix<size_t> &grid_indexes) {
+    void process_rectangle(const rectangle &r, const std::vector<vec_ull> &points, matrix<size_t> &grid_indexes) {
 #endif
         containers::vect<size_t, 4> corner_indexes;
         for (size_t i = 0; i < corner_indexes.size(); i++) {
@@ -115,7 +115,7 @@ namespace image_utils {
 #endif
         std::uniform_int_distribution<size_t> d_posx(0, in.x() - 1);
         std::uniform_int_distribution<size_t> d_posy(0, in.y() - 1);
-        std::vector<vect_ull> points(n_points);
+        std::vector<vec_ull> points(n_points);
 #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < n_points; i++) {
             points[i][0] = d_posx(gen);
@@ -154,7 +154,7 @@ namespace image_utils {
     }
 
 
-    double manhattan_dist(const vect &a, const vect &b) {
+    double manhattan_dist(const vec &a, const vec &b) {
         /*2d only*/
         return std::fabs(a[0] - b[0]) + std::fabs(a[1] - b[1]);
     }
@@ -188,7 +188,7 @@ namespace image_utils {
 
     image_RGB voronoi_animation::get_advanced_to_time(const double time) const {
         image_RGB out(size_x, size_y);
-        std::vector<vect_ull> int_points(points.size());
+        std::vector<vec_ull> int_points(points.size());
 #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < points.size(); i++) {
             int_points[i] = points[i].pos + points[i].velocity * time;
@@ -226,7 +226,7 @@ namespace image_utils {
         std::uniform_int_distribution<size_t> d_posy(0, in.y() - 1);
         image_RGB out(in.x(), in.y());
         typedef containers::vect<size_t, 2> vect;
-        std::vector<vect> points(n_points);
+        std::vector<vec> points(n_points);
 #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < n_points; i++) {
             points[i][0] = d_posx(gen);
@@ -235,8 +235,8 @@ namespace image_utils {
 #pragma omp parallel for schedule(static) collapse(2)
         for (size_t x = 0; x < in.x(); x++) {
             for (size_t y = 0; y < in.y(); y++) {
-                vect cur{x, y};
-                vect min_point = points.front();
+                vec cur{x, y};
+                vec min_point = points.front();
                 double min_dist = in.size(); /*default to large value*/
 
                 for (size_t i = 0; i < points.size(); i++) {

@@ -20,6 +20,9 @@ namespace image_utils {
     using std::sin;
     using std::cos;
     using std::pow;
+    using std::log;
+    using std::log2;
+    using std::norm;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-variable"
@@ -28,9 +31,10 @@ namespace image_utils {
     const double INF = std::numeric_limits<double>::infinity();
 #pragma clang diagnostic pop
 
-    typedef containers::vect<double,2> vect;
-    typedef containers::vect<size_t,2> vect_ull;
-    typedef containers::vect<long,2> vect_ll;
+    typedef containers::vect<double,2> vec;
+    typedef containers::vect<double,3> vec3;
+    typedef containers::vect<size_t,2> vec_ull;
+    typedef containers::vect<long,2> vec_ll;
 
     struct grayscale {
         unsigned char g;

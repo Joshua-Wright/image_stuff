@@ -50,7 +50,7 @@ set(LIB_FILES
         src/libs/util/arg_parser.cpp
         src/libs/colormaps.h
         src/libs/filters.h
-)
+        src/libs/fractal_smooth.cpp src/libs/fractal_smooth.h)
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 
@@ -76,3 +76,4 @@ add_executable(voronoi_transform ${LIB_FILES} src/renders/voronoi_transform.cpp)
 
 add_executable(mandelbrot        ${LIB_FILES} src/renders/mandelbrot.cpp)
 add_executable(fractal_animation ${LIB_FILES} src/renders/fractal_animation.cpp)
+add_executable(smooth_fractal    ${LIB_FILES} src/renders/smooth_fractal.cpp)

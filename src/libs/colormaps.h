@@ -62,6 +62,19 @@ namespace image_utils {
         static colormap_gradient blue_yellow_gradient;
     };
 
+    /**
+     * formula: vec3 color = 255*( a + b*cos( c*inputValue + d) )
+     */
+    class colormap_3d_cosine : public colormap {
+        vec3 a, b, c, d;
+    public:
+        colormap_3d_cosine(const vec3 &a, const vec3 &b, const vec3 &c, const vec3 &d);
+
+        virtual RGB get_rgb(const double x) const override;
+
+        static colormap_3d_cosine blue_yellow;
+    };
+
 
     void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb,
                           colormap *fun);

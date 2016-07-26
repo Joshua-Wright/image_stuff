@@ -15,14 +15,14 @@ namespace image_utils {
     const size_t NOT_DEFINED = (const size_t) -1;
 
     struct line {
-        vect_ull start_point;
-        vect_ull end_point;
+        vec_ull start_point;
+        vec_ull end_point;
     };
 
     struct rectangle {
         // bounds are inclusive
         size_t xmin, xmax, ymin, ymax;
-        vect_ull corners[4];
+        vec_ull corners[4];
         line sides[4];
 
         rectangle() { }
@@ -74,14 +74,14 @@ namespace image_utils {
         }
 
         bool process_line(const line &l) {
-            vect_ull start = l.start_point;
-            vect_ull end = l.end_point;
-            vect_ull diff;
+            vec_ull start = l.start_point;
+            vec_ull end = l.end_point;
+            vec_ull diff;
             // handle lines containing only a single pixel
-            if ((start - end) != vect_ull{0, 0}) {
+            if ((start - end) != vec_ull{0, 0}) {
                 diff = (end - start).unitV();
             } else {
-                diff = vect{0, 0};
+                diff = vec{0, 0};
             }
             bool all_equal = true;
             complex start_complex(
@@ -90,7 +90,7 @@ namespace image_utils {
             );
             size_t first_iter = iterate_cell(iterations, start_complex);
             for (size_t i = 0; i <= (end - start).norm(); i++) {
-                vect_ull pos = start + diff * i;
+                vec_ull pos = start + diff * i;
                 if (indexes(pos) == NOT_DEFINED) {
                     complex complex_pos(
                             (pos[0] * 1.0 / indexes.x()) * (bounds[1] - bounds[0]) + bounds[0],

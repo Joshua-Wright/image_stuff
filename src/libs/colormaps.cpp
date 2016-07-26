@@ -115,6 +115,7 @@ namespace image_utils {
         return *this;
     }
 
+
     colormap_gradient colormap_gradient::blue_yellow_gradient = colormap_gradient
             (0, 7, 100)
             .add_color(32, 107, 203, 0.16)
@@ -122,4 +123,31 @@ namespace image_utils {
             .add_color(255, 170, 0, 0.625)
             .add_color(0, 2, 0, 0.8575)
             .add_color(0, 7, 100, 1);
+
+    colormap_3d_cosine::colormap_3d_cosine(const vec3 &a, const vec3 &b, const vec3 &c, const vec3 &d) : a(a), b(b), c(c), d(d) {}
+
+    /* this is just to make writing out get_rgb() easier */
+    vec3 cos(vec3 in) {
+        return {
+                cos(in[0]),
+                cos(in[1]),
+                cos(in[2])
+        };
+    }
+
+    RGB colormap_3d_cosine::get_rgb(const double x) const {
+        vec3 color = 256.0 * (a + b * cos(c * x*64+ d));
+        return {
+                (unsigned char) color[0],
+                (unsigned char) color[1],
+                (unsigned char) color[2]
+        };
+    }
+
+    colormap_3d_cosine colormap_3d_cosine::blue_yellow = colormap_3d_cosine(
+            {0.5, 0.5, 0.5},
+            {0.5, 0.5, 0.5},
+            {0.15, 0.15, 0.15},
+            {3.0, 3.6, 4.0}
+    );
 }

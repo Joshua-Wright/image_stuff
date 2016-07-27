@@ -37,12 +37,16 @@ int main(int argc, char const *argv[]) {
 
     /*TODO: help screen*/
 
+    const bool smooth = config.find("smooth") != config.end();
+    const bool do_grid = config.find("grid") != config.end();
+    const bool is_julia = config.find("julia") != config.end();
+
     std::string output(config["output"]);
     const size_t x = std::stoull(config["x"]);
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
-    const bool do_grid = config.find("grid") != config.end();
     const double color_multiplier = std::stod(config["mul"]);
+    complex c(std::stod(config["cr"]), std::stod(config["ci"]));
 
     const std::array<double, 4> bounds = {
             std::stod(config["xa"]),
@@ -52,21 +56,21 @@ int main(int argc, char const *argv[]) {
     };
     check_bounds(bounds);
 
-    complex c(std::stod(config["cr"]), std::stod(config["ci"]));
 
-    matrix<double> grid(0, 0);
-    if (config.find("julia") == config.end()) {
-        grid = fast_mandelbrot(x, y, iter, bounds, do_grid);
-    } else {
-        grid = fast_julia(x, y, iter, bounds, c, do_grid);
-    }
+    fractal fractal1(x, y);
+    fractal1.set_max_iterations(iter);
+    fractal1.set_is_julia(is_julia);
+    fractal1.set_c(c);
+    fractal1.set_smooth(smooth);
+    fractal1.set_do_grid(do_grid);
+    fractal1.set_color_multiplier(color_multiplier);
+    auto grid = fractal1.run();
 
     image_sanity_check(grid, true);
-    grid *= color_multiplier;
-    grid.fmod_in_place(iter);
     scale_grid(grid);
 //    colormap *cmap = new colormap_threecolor();
-    colormap *cmap = new colormap_basic_hot();
+//    colormap *cmap = new colormap_basic_hot();
+    colormap *cmap = &colormap_3d_cosine::blue_yellow;
 //    colormap *cmap = &colormap_gradient::blue_yellow_gradient;
     color_write_image(grid, cmap, output);
 }

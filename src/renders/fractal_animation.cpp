@@ -23,7 +23,7 @@ int main(int argc, char const *argv[]) {
     using std::string;
 
     unordered_map<string, string> config;
-    config["folder"] = "zoom_frames";
+    config["folder"] = "fractal_frames";
     config["x"] = "500";
     config["y"] = "500";
     config["xa"] = "-2";
@@ -32,12 +32,14 @@ int main(int argc, char const *argv[]) {
     config["yb"] = "2";
     config["cr"] = "-0.7269";
     config["ci"] = "0.1889";
+    config["mul"] = "0.1";
     config["n_frames"] = "600";
     config["iter"] = "100";
     containers::parse_args(config, argc, argv);
 
     /*TODO: help screen*/
 
+    /*todo create output folder if it doesn't exist*/
     std::string output_folder = config["folder"];
     if (output_folder.back() != '/') {
         output_folder.push_back('/');
@@ -46,6 +48,7 @@ int main(int argc, char const *argv[]) {
     const size_t x = std::stoull(config["x"]);
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
+    const double color_multiplier = std::stod(config["mul"]);
 
     complex center(std::stod(config["cr"]), std::stod(config["ci"]));
 
@@ -57,12 +60,20 @@ int main(int argc, char const *argv[]) {
         output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
         std::string out_filename = output.str();
 
-        complex c = complex_circle(center, 0.05, 1.0*i/n_frames);
+        complex c = complex_circle(center, 0.05, 1.0 * i / n_frames);
 
-        matrix<double> grid = fast_julia(x, y, iter, {-2,2,-2,2}, c);
+        fractal fractal1(x, y);
+        fractal1.set_max_iterations(iter);
+        fractal1.set_is_julia(true);
+        fractal1.set_c(c);
+        fractal1.set_smooth(true);
+        fractal1.set_do_grid(false);
+        fractal1.set_color_multiplier(color_multiplier);
+        auto grid = fractal1.run();
 
         scale_grid(grid);
-        colormap *cmap = new colormap_basic_hot();
+//        colormap *cmap = new colormap_basic_hot();
+        colormap *cmap = &colormap_3d_cosine::blue_yellow;
         color_write_image(grid, cmap, out_filename, false);
 
 #pragma omp critical
@@ -74,8 +85,8 @@ int main(int argc, char const *argv[]) {
 
     std::cout << "Done! Render using:" << std::endl;
     std::cout << "ffmpeg -framerate 60 -i "
-    << output_folder << "out_frame_%05d.png "
-    << output_folder << "output.mp4" << std::endl;
+              << output_folder << "out_frame_%05d.png "
+              << output_folder << "output.mp4" << std::endl;
 
 
     return 0;

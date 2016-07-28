@@ -24,12 +24,11 @@ int main(int argc, char const *argv[]) {
     config["output"] = "output.png";
     config["x"] = "500";
     config["y"] = "500";
-    config["xa"] = "-2";
-    config["xb"] = "2";
-    config["ya"] = "-2";
-    config["yb"] = "2";
     config["cr"] = "-0.7269";
     config["ci"] = "0.1889";
+    config["r"] = "0";
+    config["i"] = "0";
+    config["zoom"] = "1";
     config["mul"] = "1";
     config["iter"] = "100";
 
@@ -45,25 +44,17 @@ int main(int argc, char const *argv[]) {
     const size_t x = std::stoull(config["x"]);
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
-    const double color_multiplier = std::stod(config["mul"]);
     complex c(std::stod(config["cr"]), std::stod(config["ci"]));
-
-    const std::array<double, 4> bounds = {
-            std::stod(config["xa"]),
-            std::stod(config["xb"]),
-            std::stod(config["ya"]),
-            std::stod(config["yb"]),
-    };
-    check_bounds(bounds);
-
+    const double zoom = std::stod(config["zoom"]);
+    vec2 center{std::stod(config["r"]), std::stod(config["i"])};
 
     fractal fractal1(x, y);
     fractal1.set_max_iterations(iter);
     fractal1.set_is_julia(is_julia);
     fractal1.set_c(c);
+    fractal1.set_zoom(center, zoom);
     fractal1.set_smooth(smooth);
     fractal1.set_do_grid(do_grid);
-    fractal1.set_color_multiplier(color_multiplier);
     auto grid = fractal1.run();
 
     image_sanity_check(grid, true);

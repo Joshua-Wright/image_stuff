@@ -37,11 +37,10 @@ namespace image_utils {
         matrix<double> iterations;
         matrix<bool> grid_mask;
         size_t max_iterations = 512;
-        const std::array<double, 4> bounds{-2, 2, -2, 2};
+        vec4 bounds{-2, 2, -2, 2};
         bool do_grid = false;
         bool is_julia = false;
         bool smooth = false;
-        double color_multiplier = 0.15;
         bool do_sine_transform = true;
         complex c = complex(0.0, 0);
 
@@ -64,11 +63,11 @@ namespace image_utils {
 
         void set_smooth(bool smooth);
 
-        void set_color_multiplier(double color_multiplier);
-
         void set_do_sine_transform(bool do_sine_transform);
 
         void set_c(const complex &c);
+
+        void set_zoom(vec2 center, double zoom);
 
         matrix<double> run();
     };

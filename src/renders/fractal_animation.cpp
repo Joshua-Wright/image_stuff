@@ -48,7 +48,6 @@ int main(int argc, char const *argv[]) {
     const size_t x = std::stoull(config["x"]);
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
-    const double color_multiplier = std::stod(config["mul"]);
 
     complex center(std::stod(config["cr"]), std::stod(config["ci"]));
 
@@ -68,7 +67,6 @@ int main(int argc, char const *argv[]) {
         fractal1.set_c(c);
         fractal1.set_smooth(true);
         fractal1.set_do_grid(false);
-        fractal1.set_color_multiplier(color_multiplier);
         auto grid = fractal1.run();
 
         scale_grid(grid);

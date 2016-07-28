@@ -90,12 +90,12 @@ namespace image_utils {
                                 const double &theta_mul,
                                 const double &dist_mul,
                                 const wave &wave_dist, const wave &wave_theta) {
-        const vec mid{grid.x() / 2.0, grid.y() / 2.0};
+        const vec2 mid{grid.x() / 2.0, grid.y() / 2.0};
         const double diagonal_dist = mid.norm() / 2.0;
 #pragma omp parallel for schedule(static) collapse(2)
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
-                vec pt{(double) x, (double) y};
+                vec2 pt{(double) x, (double) y};
                 double d = mid.dist(pt) * dist_mul / diagonal_dist;
                 double theta = std::atan2(y - mid[1], x - mid[0]) / (2.0 * PI) *
                         theta_mul;
@@ -106,11 +106,11 @@ namespace image_utils {
 
     void image_fill_concentric_waves(matrix<double> &grid,
                                      const double &mul, const wave &wave_func) {
-        vec mid{grid.x() / 2.0, grid.y() / 2.0};
+        vec2 mid{grid.x() / 2.0, grid.y() / 2.0};
         double diagonal_dist = mid.norm() / 2.0;
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
-                vec pt{(double) x, (double) y};
+                vec2 pt{(double) x, (double) y};
                 grid(x, y) = wave_func(mid.dist(pt) * mul / diagonal_dist);
             }
         }
@@ -118,7 +118,7 @@ namespace image_utils {
 
     void image_fill_pointing_out(matrix<double> &grid,
                                  const double &mul, const wave &wave_func) {
-        vec mid{grid.x() / 2.0, grid.y() / 2.0};
+        vec2 mid{grid.x() / 2.0, grid.y() / 2.0};
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 grid(x, y) = wave_func(
@@ -129,13 +129,13 @@ namespace image_utils {
     }
 
     void image_fill_2d_wave(matrix<double> &grid, wave_2d *w_2d) {
-        const vec mid{grid.x() / 2.0, grid.y() / 2.0};
+        const vec2 mid{grid.x() / 2.0, grid.y() / 2.0};
         const double mag = std::min(grid.x(), grid.y()) / 2;
 #pragma omp parallel for schedule(static) collapse(2)
         for (size_t x = 0; x < grid.x(); x++) {
             for (size_t y = 0; y < grid.y(); y++) {
                 /*current point*/
-                vec pt{(double) x, (double) y};
+                vec2 pt{(double) x, (double) y};
                 /*scale current point*/
                 pt -= mid;
                 pt /= mag;

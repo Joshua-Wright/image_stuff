@@ -18,8 +18,8 @@ namespace image_utils {
     class voronoi_animation {
 
         struct voronoi_point {
-            vec pos;
-            vec velocity;
+            vec2 pos;
+            vec2 velocity;
             RGB color;
         };
 

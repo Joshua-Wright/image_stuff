@@ -62,12 +62,13 @@ namespace image_utils {
         if ((start - end) != vec_ull{0, 0}) {
             diff = (end - start).unitV();
         } else {
-            diff = vec{0, 0};
+            diff = vec2{0, 0};
         }
         bool all_equal = true;
+        // imaginary axis is different because it points opposite our +y axis
         complex start_complex(
                 (start[0] * 1.0 / iterations.x()) * (bounds[1] - bounds[0]) + bounds[0],
-                (start[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2]) + bounds[2]
+                bounds[3] - (start[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2])
         );
         double first_iter = iterate_cell(start_complex);
         for (size_t i = 0; i <= (end - start).norm(); i++) {
@@ -75,7 +76,7 @@ namespace image_utils {
             if (iterations(pos) == NOT_DEFINED) {
                 complex complex_pos(
                         (pos[0] * 1.0 / iterations.x()) * (bounds[1] - bounds[0]) + bounds[0],
-                        (pos[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2]) + bounds[2]
+                        bounds[3] - (pos[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2])
                 );
                 double iter = iterate_cell(complex_pos);
                 iterations(pos) = iter;
@@ -151,7 +152,7 @@ namespace image_utils {
 #pragma omp parallel for schedule(static) collapse(2)
         for (size_t i = 0; i < grid.x(); ++i) {
             for (size_t j = 0; j < grid.y(); ++j) {
-                grid(i, j) = pow(sin(iterations(i, j) * color_multiplier), 2);
+                grid(i, j) = pow(sin(log2(iterations(i, j) + 1) * PI / 4), 2);
             }
         }
         if (do_grid) {
@@ -195,12 +196,26 @@ namespace image_utils {
         fractal::smooth = smooth;
     }
 
-    void fractal::set_color_multiplier(double color_multiplier) {
-        fractal::color_multiplier = color_multiplier;
-    }
-
     void fractal::set_do_sine_transform(bool do_sine_transform) {
         this->do_sine_transform = do_sine_transform;
+    }
+
+    void fractal::set_zoom(vec2 center, double zoom) {
+        double dx = 2 / zoom;
+        double dy = 2 / zoom;
+        if (iterations.x() > iterations.y()) {
+            /* widescreen image */
+            dx = 1.0 * iterations.x() / iterations.y() * dy;
+        } else if (iterations.y() > iterations.x()) {
+            /* portrait */
+            dy = 1.0 * iterations.y() / iterations.x() * dx;
+        } // otherwise square
+        bounds = vec4({
+                              center[0] - dx,
+                              center[0] + dx,
+                              center[1] - dy,
+                              center[1] + dy,
+                      });
     }
 
     fractal::rectangle::rectangle(const size_t x_min, const size_t x_max, const size_t y_min, const size_t y_max) : xmin(x_min),

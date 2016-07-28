@@ -154,7 +154,7 @@ namespace image_utils {
     }
 
 
-    double manhattan_dist(const vec &a, const vec &b) {
+    double manhattan_dist(const vec2 &a, const vec2 &b) {
         /*2d only*/
         return std::fabs(a[0] - b[0]) + std::fabs(a[1] - b[1]);
     }
@@ -226,7 +226,7 @@ namespace image_utils {
         std::uniform_int_distribution<size_t> d_posy(0, in.y() - 1);
         image_RGB out(in.x(), in.y());
         typedef containers::vect<size_t, 2> vect;
-        std::vector<vec> points(n_points);
+        std::vector<vec2> points(n_points);
 #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < n_points; i++) {
             points[i][0] = d_posx(gen);
@@ -235,8 +235,8 @@ namespace image_utils {
 #pragma omp parallel for schedule(static) collapse(2)
         for (size_t x = 0; x < in.x(); x++) {
             for (size_t y = 0; y < in.y(); y++) {
-                vec cur{x, y};
-                vec min_point = points.front();
+                vec2 cur{x, y};
+                vec2 min_point = points.front();
                 double min_dist = in.size(); /*default to large value*/
 
                 for (size_t i = 0; i < points.size(); i++) {

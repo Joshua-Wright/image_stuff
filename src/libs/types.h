@@ -31,10 +31,11 @@ namespace image_utils {
     const double INF = std::numeric_limits<double>::infinity();
 #pragma clang diagnostic pop
 
-    typedef containers::vect<double,2> vec;
-    typedef containers::vect<double,3> vec3;
-    typedef containers::vect<size_t,2> vec_ull;
-    typedef containers::vect<long,2> vec_ll;
+    typedef containers::vect<double, 2> vec2;
+    typedef containers::vect<double, 3> vec3;
+    typedef containers::vect<double, 4> vec4;
+    typedef containers::vect<size_t, 2> vec_ull;
+    typedef containers::vect<long, 2> vec_ll;
 
     struct grayscale {
         unsigned char g;
@@ -70,6 +71,7 @@ namespace image_utils {
         }
         return std::memcmp(&(*it1), &(it2), sizeof(decltype(*it1)));
     };
+
     template<typename T1, typename T2>
     bool memcmp_equal(const T1 &a, const T2 &b) {
         if (sizeof(T1) != sizeof(T2)) {

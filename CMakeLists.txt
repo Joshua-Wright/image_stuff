@@ -76,3 +76,4 @@ add_executable(voronoi_transform ${LIB_FILES} src/renders/voronoi_transform.cpp)
 
 add_executable(mandelbrot        ${LIB_FILES} src/renders/mandelbrot.cpp)
 add_executable(fractal_animation ${LIB_FILES} src/renders/fractal_animation.cpp)
+add_executable(zoom              ${LIB_FILES} src/renders/zoom.cpp)

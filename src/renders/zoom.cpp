@@ -23,17 +23,18 @@ int main(int argc, char const *argv[]) {
     using std::string;
 
     unordered_map<string, string> config;
-    config["folder"] = "fractal_frames";
+    config["folder"] = "zoom_frames";
     config["x"] = "500";
     config["y"] = "500";
     config["xa"] = "-2";
     config["xb"] = "2";
     config["ya"] = "-2";
     config["yb"] = "2";
-    config["cr"] = "-0.7269";
-    config["ci"] = "0.1889";
-    config["n_frames"] = "600";
-    config["iter"] = "100";
+    config["r"] = "-0.743643887037151";
+    config["i"] = " 0.131825904205330";
+    config["n_frames"] = "50000";
+//    config["n_frames"] = "50000";
+    config["iter"] = "1024";
     containers::parse_args(config, argc, argv);
 
     /*TODO: help screen*/
@@ -47,23 +48,27 @@ int main(int argc, char const *argv[]) {
     const size_t x = std::stoull(config["x"]);
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
+    vec2 center{std::stod(config["r"]), std::stod(config["i"])};
 
-    complex center(std::stod(config["cr"]), std::stod(config["ci"]));
+    // beyond this, doubles aren't good enough
+    const double max_zoom = 1e13;
+    /* todo: add support for long double and __float128 */
 
     size_t progress = 0;
-#pragma omp parallel for schedule(static)
+    // don't need OpenMP here because the frames themselves are rendered in parallelg
+//#pragma omp parallel for schedule(dynamic)
     for (size_t i = 0; i < n_frames; i++) {
 
         std::stringstream output;
         output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
         std::string out_filename = output.str();
 
-        complex c = complex_circle(center, 0.05, 1.0 * i / n_frames);
+        double zoom = std::exp((1.0*i/ n_frames) * std::log(max_zoom));
 
         fractal fractal1(x, y);
         fractal1.set_max_iterations(iter);
-        fractal1.set_is_julia(true);
-        fractal1.set_c(c);
+        fractal1.set_is_julia(false);
+        fractal1.set_zoom(center, zoom);
         fractal1.set_smooth(true);
         fractal1.set_do_grid(false);
         auto grid = fractal1.run();
@@ -75,7 +80,8 @@ int main(int argc, char const *argv[]) {
 
 #pragma omp critical
         {
-            std::cout << "rendered: \t" << progress << "\t/" << n_frames << std::endl;
+            std::cout << "rendered: \t" << progress << "\t/" << n_frames
+                      << "\t file=" << out_filename << " zoom=" << zoom << std::endl;
             ++progress;
         }
     }

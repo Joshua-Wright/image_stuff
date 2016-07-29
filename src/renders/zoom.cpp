@@ -28,6 +28,7 @@ int main(int argc, char const *argv[]) {
     config["y"] = "500";
     config["xa"] = "-2";
     config["xb"] = "2";
+    config["skip"] = "0";
     config["ya"] = "-2";
     config["yb"] = "2";
     config["r"] = "-0.743643887037151";
@@ -45,6 +46,7 @@ int main(int argc, char const *argv[]) {
         output_folder.push_back('/');
     }
     const size_t n_frames = std::stoull(config["n_frames"]);
+    const size_t skip = std::stoull(config["skip"]);
     const size_t x = std::stoull(config["x"]);
     const size_t y = std::stoull(config["y"]);
     const size_t iter = std::stoull(config["iter"]);
@@ -57,7 +59,7 @@ int main(int argc, char const *argv[]) {
     size_t progress = 0;
     // don't need OpenMP here because the frames themselves are rendered in parallelg
 //#pragma omp parallel for schedule(dynamic)
-    for (size_t i = 0; i < n_frames; i++) {
+    for (size_t i = skip; i < n_frames; i++) {
 
         std::stringstream output;
         output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";

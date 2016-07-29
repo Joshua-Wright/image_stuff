@@ -53,11 +53,11 @@ namespace containers {
 
 
         ~matrix() {
-//      if (dealloc == nullptr) {
-//        delete[] _data;
-//      } else {
-//        dealloc(_data);
-//      }
+      if (dealloc == nullptr) {
+        delete[] _data;
+      } else {
+        dealloc(_data);
+      }
         }
 
         matrix &operator=(const matrix<T> &lhs) {

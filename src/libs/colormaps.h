@@ -37,7 +37,7 @@ namespace image_utils {
         wave *w;
     public:
 
-        colormap_offset_waves(wave *w) : w(w) { }
+        colormap_offset_waves(wave *w) : w(w) {}
 
         virtual RGB get_rgb(const double x) const;
     };
@@ -79,5 +79,14 @@ namespace image_utils {
     void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb,
                           colormap *fun);
 
+    class colormap_simple_gradient : public colormap {
+        vec3 start;
+        vec3 end;
+    public:
+        colormap_simple_gradient(vec3 start, vec3 end);
 
+        static colormap_simple_gradient hsv_ish;
+
+        virtual RGB get_rgb(const double x) const;
+    };
 }

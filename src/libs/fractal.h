@@ -38,13 +38,16 @@ namespace image_utils {
         matrix<bool> grid_mask;
         size_t max_iterations = 512;
         vec4 bounds{-2, 2, -2, 2};
+        double pixel_width_x;
+        double pixel_width_y;
         bool do_grid = false;
         bool is_julia = false;
         bool smooth = false;
         bool do_sine_transform = true;
+        bool subsample = false;
         complex c = complex(0.0, 0);
 
-        double iterate_cell(const complex pos);
+        double iterate_cell(const complex pos, const int depth = 0);
 
         bool process_line(const line &l);
 
@@ -64,6 +67,8 @@ namespace image_utils {
         void set_smooth(bool smooth);
 
         void set_do_sine_transform(bool do_sine_transform);
+
+        void set_subsample(bool subsample);
 
         void set_c(const complex &c);
 

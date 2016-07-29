@@ -29,6 +29,7 @@ namespace image_utils {
     /*keep these constants here for conveniece even if they aren't used*/
     const double PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482;
     const double INF = std::numeric_limits<double>::infinity();
+    const double SQRT_EPSILON = std::sqrt(std::numeric_limits<double>::epsilon());
 #pragma clang diagnostic pop
 
     typedef containers::vect<double, 2> vec2;

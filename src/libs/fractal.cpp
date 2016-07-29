@@ -46,44 +46,56 @@ namespace image_utils {
         }
     }
 
-    double fractal::iterate_cell(const complex pos) {
-        if (is_julia) {
-            return fractal_cell(pos, c, max_iterations, smooth, func_standard_plane);
+    double fractal::iterate_cell(const complex pos, const int depth) {
+        if (subsample) {
+            double out[] = {0, 0, 0, 0};
+            if (is_julia) {
+                out[0] = fractal_cell(pos + complex(-pixel_width_x, 0), c, max_iterations, smooth, func_standard_plane);
+                out[1] = fractal_cell(pos + complex(pixel_width_x, 0), c, max_iterations, smooth, func_standard_plane);
+                out[2] = fractal_cell(pos + complex(0, -pixel_width_y), c, max_iterations, smooth, func_standard_plane);
+                out[3] = fractal_cell(pos + complex(0, pixel_width_y), c, max_iterations, smooth, func_standard_plane);
+            } else {
+                out[0] = fractal_cell(complex(0, 0), pos + complex(-pixel_width_x, 0), max_iterations, smooth, func_standard_plane);
+                out[1] = fractal_cell(complex(0, 0), pos + complex(pixel_width_x, 0), max_iterations, smooth, func_standard_plane);
+                out[2] = fractal_cell(complex(0, 0), pos + complex(0, -pixel_width_y), max_iterations, smooth, func_standard_plane);
+                out[3] = fractal_cell(complex(0, 0), pos + complex(0, pixel_width_y), max_iterations, smooth, func_standard_plane);
+            }
+            return ((out[0] + out[1]) + (out[2] + out[3])) / 4;
         } else {
-            return fractal_cell(complex(0, 0), pos, max_iterations, smooth, func_standard_plane);
+            if (is_julia) {
+                return fractal_cell(pos, c, max_iterations, smooth, func_standard_plane);
+            } else {
+                return fractal_cell(complex(0, 0), pos, max_iterations, smooth, func_standard_plane);
+            }
         }
     }
 
     bool fractal::process_line(const fractal::line &l) {
-        vec_ull start = l.start_point;
-        vec_ull end = l.end_point;
-        vec_ull diff;
+        const vec_ull start = l.start_point;
+        const vec_ull end = l.end_point;
         // handle lines containing only a single pixel
-        if ((start - end) != vec_ull{0, 0}) {
-            diff = (end - start).unitV();
-        } else {
-            diff = vec2{0, 0};
-        }
-        bool all_equal = true;
-        // imaginary axis is different because it points opposite our +y axis
-        complex start_complex(
-                (start[0] * 1.0 / iterations.x()) * (bounds[1] - bounds[0]) + bounds[0],
-                bounds[3] - (start[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2])
-        );
-        double first_iter = iterate_cell(start_complex);
-        for (size_t i = 0; i <= (end - start).norm(); i++) {
+        const vec_ull diff = ((start - end) != vec_ull{0, 0}) ? (end - start).unitV() : vec_ull{0, 0};
+        const size_t length = (end - start).norm();
+
+        for (size_t i = 0; i <= length; i++) {
             vec_ull pos = start + diff * i;
             if (iterations(pos) == NOT_DEFINED) {
+                // imaginary axis is different because it points opposite our +y axis
                 complex complex_pos(
                         (pos[0] * 1.0 / iterations.x()) * (bounds[1] - bounds[0]) + bounds[0],
                         bounds[3] - (pos[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2])
                 );
-                double iter = iterate_cell(complex_pos);
-                iterations(pos) = iter;
+                iterations(pos) = iterate_cell(complex_pos);
             }
-            all_equal = all_equal && (first_iter == iterations(pos));
         }
-        return all_equal;
+
+        for (size_t i = 1; i <= length; i++) {
+            vec_ull pos = start + diff * i;
+            if (iterations(pos) != iterations(start)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     fractal::split_rectangle fractal::process_rectangle(fractal::rectangle r) {
@@ -149,11 +161,21 @@ namespace image_utils {
             rectange_stack = new_stack;
         }
 
+        if (do_sine_transform) {
 #pragma omp parallel for schedule(static) collapse(2)
-        for (size_t i = 0; i < grid.x(); ++i) {
-            for (size_t j = 0; j < grid.y(); ++j) {
-                grid(i, j) = pow(sin(log2(iterations(i, j) + 1) * PI / 4), 2);
+            for (size_t i = 0; i < grid.x(); ++i) {
+                for (size_t j = 0; j < grid.y(); ++j) {
+                    grid(i, j) = pow(sin(log2(iterations(i, j) + 1) * PI / 4), 2);
+                }
             }
+        } else {
+#pragma omp parallel for schedule(static) collapse(2)
+            for (size_t i = 0; i < grid.x(); ++i) {
+                for (size_t j = 0; j < grid.y(); ++j) {
+                    grid(i, j) = iterations(i, j);
+                }
+            }
+
         }
         if (do_grid) {
             /*get max iteration (that was used) and use that*/
@@ -170,7 +192,8 @@ namespace image_utils {
         return grid;
     }
 
-    fractal::fractal(const size_t w, const size_t h) : iterations(w, h, NOT_DEFINED), grid_mask(0, 0) {}
+    fractal::fractal(const size_t w, const size_t h) : iterations(w, h, NOT_DEFINED), grid_mask(0, 0),
+                                                       pixel_width_x(2 / w), pixel_width_y(2 / h) {}
 
 
     void fractal::set_do_grid(bool do_grid) {
@@ -216,6 +239,12 @@ namespace image_utils {
                               center[1] - dy,
                               center[1] + dy,
                       });
+        pixel_width_x = dx / iterations.x();
+        pixel_width_y = dy / iterations.y();
+    }
+
+    void fractal::set_subsample(bool subsample) {
+        fractal::subsample = subsample;
     }
 
     fractal::rectangle::rectangle(const size_t x_min, const size_t x_max, const size_t y_min, const size_t y_max) : xmin(x_min),

@@ -136,7 +136,7 @@ namespace image_utils {
     }
 
     RGB colormap_3d_cosine::get_rgb(const double x) const {
-        vec3 color = 256.0 * (a + b * cos(c * x*64+ d));
+        vec3 color = 256.0 * (a + b * cos(c * x * 64 + d));
         return {
                 (unsigned char) color[0],
                 (unsigned char) color[1],
@@ -150,4 +150,17 @@ namespace image_utils {
             {0.15, 0.15, 0.15},
             {3.0, 3.6, 4.0}
     );
+
+    colormap_simple_gradient::colormap_simple_gradient(vec3 start, vec3 end) : start(start), end(end) {}
+
+    RGB colormap_simple_gradient::get_rgb(const double x) const {
+        vec3 color = start + x * (end - start);
+        return {
+                (unsigned char) color[0],
+                (unsigned char) color[1],
+                (unsigned char) color[2]
+        };
+    }
+
+    colormap_simple_gradient colormap_simple_gradient::hsv_ish = colormap_simple_gradient({0, 0, 255}, {255, 0, 0});
 }

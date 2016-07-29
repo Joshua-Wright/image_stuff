@@ -56,7 +56,7 @@ int main(int argc, char const *argv[]) {
     const double max_zoom = 1e13;
     /* todo: add support for long double and __float128 */
 
-    size_t progress = 0;
+    size_t progress = skip;
     // don't need OpenMP here because the frames themselves are rendered in parallelg
 //#pragma omp parallel for schedule(dynamic)
     for (size_t i = skip; i < n_frames; i++) {

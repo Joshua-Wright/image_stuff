@@ -46,7 +46,7 @@ namespace image_utils {
         }
     }
 
-    double fractal::iterate_cell(const complex pos, const int depth) {
+    double fractal::iterate_cell(const complex pos) {
         if (subsample) {
             double out[] = {0, 0, 0, 0};
             if (is_julia) {

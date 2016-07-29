@@ -47,7 +47,7 @@ namespace image_utils {
         bool subsample = false;
         complex c = complex(0.0, 0);
 
-        double iterate_cell(const complex pos, const int depth = 0);
+        double iterate_cell(const complex pos);
 
         bool process_line(const line &l);
 

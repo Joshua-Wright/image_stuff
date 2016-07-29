@@ -72,6 +72,9 @@ int main(int argc, char const *argv[]) {
         fractal1.set_is_julia(false);
         fractal1.set_zoom(center, zoom);
         fractal1.set_smooth(true);
+        // videos look just horrible without subsampling
+        fractal1.set_subsample(true);
+        fractal1.set_subsample(true);
         fractal1.set_do_grid(false);
         auto grid = fractal1.run();
 

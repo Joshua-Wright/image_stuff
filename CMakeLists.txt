@@ -50,7 +50,7 @@ set(LIB_FILES
         src/libs/util/arg_parser.cpp
         src/libs/colormaps.h
         src/libs/filters.h
-        )
+        src/fast_mandelbrot/fast_mandelbrot.c src/fast_mandelbrot/fast_mandelbrot.h)
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 

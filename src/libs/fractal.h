@@ -18,14 +18,14 @@ namespace image_utils {
 
         struct rectangle {
             // bounds are inclusive
-            size_t xmin, xmax, ymin, ymax;
-            vec_ull corners[4];
-            line sides[4];
-
+            // uint16_t so that the whole struct fits in a single word
+            uint16_t xmin, xmax, ymin, ymax;
             rectangle();
 
             rectangle(const size_t x_min, const size_t x_max,
                       const size_t y_min, const size_t y_max);
+
+            std::array<fractal::line, 4> get_sides();
         };
 
         struct split_rectangle {

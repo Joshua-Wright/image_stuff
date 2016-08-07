@@ -100,9 +100,9 @@ namespace image_utils {
 
     fractal::split_rectangle fractal::process_rectangle(fractal::rectangle r) {
         bool edges_equal = true;
-        for (auto &line : r.sides) {
+        for (auto &side : r.get_sides()) {
             // pre-calculate to avoid lazy evaluation skipping
-            bool res = process_line(line);
+            bool res = process_line(side);
             edges_equal = edges_equal && res;
         }
         size_t shortest_edge = std::min(r.xmax - r.xmin, r.ymax - r.ymin);
@@ -138,12 +138,15 @@ namespace image_utils {
     }
 
     matrix<double> fractal::run() {
+        const size_t stack_size = iterations.x() * iterations.y();
         matrix<double> grid(iterations.x(), iterations.y());
         rectangle starter(0, iterations.x() - 1, 0, iterations.y() - 1);
 
         std::vector<rectangle> rectange_stack(1, starter);
+        rectange_stack.reserve(stack_size);
         while (!rectange_stack.empty()) {
             std::vector<rectangle> new_stack;
+            new_stack.reserve(stack_size);
 #pragma omp parallel for schedule(dynamic)
             for (size_t i = 0; i < rectange_stack.size(); i++) {
                 auto v = process_rectangle(rectange_stack[i]);
@@ -247,19 +250,29 @@ namespace image_utils {
         fractal::subsample = subsample;
     }
 
-    fractal::rectangle::rectangle(const size_t x_min, const size_t x_max, const size_t y_min, const size_t y_max) : xmin(x_min),
-                                                                                                                    xmax(x_max),
-                                                                                                                    ymin(y_min),
-                                                                                                                    ymax(y_max) {
-        corners[0] = {x_min, y_min};
-        corners[1] = {x_max, y_min};
-        corners[2] = {x_min, y_max};
-        corners[3] = {x_max, y_max};
+    fractal::rectangle::rectangle(const size_t x_min, const size_t x_max,
+                                  const size_t y_min, const size_t y_max) : xmin(x_min), xmax(x_max),
+                                                                            ymin(y_min), ymax(y_max) {}
 
-        sides[0] = {corners[0], corners[1]};
-        sides[1] = {corners[0], corners[2]};
-        sides[2] = {corners[1], corners[3]};
-        sides[3] = {corners[2], corners[3]};
+    std::array<fractal::line, 4> fractal::rectangle::get_sides() {
+        return std::array<fractal::line, 4>{
+                fractal::line{
+                        {xmin, ymin},
+                        {xmax, ymin}
+                },
+                fractal::line{
+                        {xmin, ymin},
+                        {xmin, ymax}
+                },
+                fractal::line{
+                        {xmax, ymin},
+                        {xmax, ymax}
+                },
+                fractal::line{
+                        {xmin, ymax},
+                        {xmax, ymax}
+                }
+        };
     }
 
     fractal::rectangle::rectangle() {}

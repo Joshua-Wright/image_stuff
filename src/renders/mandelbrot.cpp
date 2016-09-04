@@ -63,8 +63,8 @@ int main(int argc, char const *argv[]) {
     image_sanity_check(grid, true);
     scale_grid(grid);
 //    colormap *cmap = new colormap_threecolor();
-//    colormap *cmap = new colormap_basic_hot();
-    colormap *cmap = &colormap_3d_cosine::blue_yellow;
+    colormap *cmap = new colormap_basic_hot();
+//    colormap *cmap = &colormap_3d_cosine::blue_yellow;
 //    colormap *cmap = &colormap_simple_gradient::hsv_ish;
 //    colormap *cmap = new colormap_grayscale;
 //    colormap *cmap = &colormap_gradient::blue_yellow_gradient;

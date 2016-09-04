@@ -87,10 +87,6 @@ namespace image_utils {
                 );
                 iterations(pos) = iterate_cell(complex_pos);
             }
-        }
-
-        for (size_t i = 1; i <= length; i++) {
-            vec_ull pos = start + diff * i;
             if (iterations(pos) != iterations(start)) {
                 return false;
             }
@@ -250,8 +246,8 @@ namespace image_utils {
         fractal::subsample = subsample;
     }
 
-    fractal::rectangle::rectangle(const size_t x_min, const size_t x_max,
-                                  const size_t y_min, const size_t y_max) : xmin(x_min), xmax(x_max),
+    fractal::rectangle::rectangle(const uint16_t x_min, const uint16_t x_max,
+                                  const uint16_t y_min, const uint16_t y_max) : xmin(x_min), xmax(x_max),
                                                                             ymin(y_min), ymax(y_max) {}
 
     std::array<fractal::line, 4> fractal::rectangle::get_sides() {

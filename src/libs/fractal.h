@@ -22,8 +22,8 @@ namespace image_utils {
             uint16_t xmin, xmax, ymin, ymax;
             rectangle();
 
-            rectangle(const size_t x_min, const size_t x_max,
-                      const size_t y_min, const size_t y_max);
+            rectangle(const uint16_t x_min, const uint16_t x_max,
+                      const uint16_t y_min, const uint16_t y_max);
 
             std::array<fractal::line, 4> get_sides();
         };

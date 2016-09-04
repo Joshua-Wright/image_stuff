@@ -16,7 +16,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lfftw3_omp -lfftw3 -lm")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -fopenmp")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
@@ -50,7 +49,7 @@ set(LIB_FILES
         src/libs/util/arg_parser.cpp
         src/libs/colormaps.h
         src/libs/filters.h
-        src/fast_mandelbrot/fast_mandelbrot.c src/fast_mandelbrot/fast_mandelbrot.h)
+)
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 
@@ -68,6 +67,8 @@ add_executable(random_notes     src/tmp_tests/random_notes_pcm.cpp)
 
 add_executable(fft_pcm           ${LIB_FILES} src/tmp_tests/fft_pcm.cpp)
 add_executable(fft_upscale_image ${LIB_FILES} src/renders/fft_upscale_image.cpp)
+target_link_libraries(fft_pcm           fftw3_omp fftw3 m)
+target_link_libraries(fft_upscale_image fftw3_omp fftw3 m)
 add_executable(expand_pixels     ${LIB_FILES} src/renders/expand_pixels.cpp)
 add_executable(gaussian_blur     ${LIB_FILES} src/renders/gaussian_blur.cpp)
 

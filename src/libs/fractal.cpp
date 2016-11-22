@@ -6,7 +6,6 @@
 #include <stack>
 #include <thread>
 #include <vector>
-#include <map>
 #include "fractal.h"
 #include "util/debug.h"
 #include "util/vect.h"
@@ -15,11 +14,17 @@
 namespace image_utils {
     const double NOT_DEFINED = -1.0;
 
-    auto func_standard_plane = [](const complex &z, const complex c) { return pow(z, 2) + c; };
-    auto func_inv_c = [](const complex &z, const complex c) { return pow(z, 2) + 1.0 / c; };
+    auto func_standard_plane = [](const complex &z, const complex &c) { return pow(z, 2) + c; };
+    auto func_inv_c = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / c; };
+    auto func_inv_c_parabola = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / c + 0.25; };
+    auto func_quadratic_rational = [](const complex &z, const complex &c) { return pow(z, 2) + pow(c, 2) / (pow(c, 4) - 0.25); };
     // TODO these don't work
-    auto func_lambda = [](const complex &z, const complex c) { return c * (1.0 - c); };
-    auto func_inv_lambda = [](const complex &z, const complex c) { return 1.0 / (c * (c - 1.0)); };
+    auto func_lambda = [](const complex &z, const complex &c) {
+//        const auto lambda = -sqrt(-4.0 * c - 1.0) - 1.0;
+        const auto lambda = pow(c, 2) / 4.0 + c / 2.0;
+        return lambda * z * (1.0 - z);
+    };
+    auto func_inv_lambda = [](const complex &z, const complex &c) { return 1.0 / (c * (c - 1.0)); };
 
     template<typename T>
     double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard_plane) {
@@ -47,6 +52,10 @@ namespace image_utils {
                 return fractal_cell_(z, c, m, s, func_lambda);
             case fractal::INV_LAMBDA:
                 return fractal_cell_(z, c, m, s, func_inv_lambda);
+            case fractal::INV_C_PARABOLA:
+                return fractal_cell_(z, c, m, s, func_inv_c_parabola);
+            case fractal::QUADRATIC_RATIONAL:
+                return fractal_cell_(z, c, m, s, func_quadratic_rational);
         }
 
     }
@@ -276,12 +285,6 @@ namespace image_utils {
     }
 
     void fractal::set_polynomial(const std::string &name) {
-        std::map<std::string, polynomial_t> names{
-                {"standard",   STANDARD},
-                {"inv-c",      INV_C},
-                {"lambda",     LAMBDA},
-                {"inv-lambda", INV_LAMBDA},
-        };
         auto iter_name = names.find(name);
         if (iter_name == names.end()) {
             polynomial = STANDARD;

@@ -5,6 +5,7 @@
 #ifndef IMAGE_STUFF_MANDELBROT_H
 #define IMAGE_STUFF_MANDELBROT_H
 
+#include <map>
 #include "types.h"
 
 namespace image_utils {
@@ -13,9 +14,19 @@ namespace image_utils {
     public:
         enum polynomial_t {
             STANDARD,
+            QUADRATIC_RATIONAL,
             INV_C,
+            INV_C_PARABOLA,
             LAMBDA,
             INV_LAMBDA,
+        };
+        const std::map<std::string, polynomial_t> names{
+                {"standard",           STANDARD},
+                {"inv-c",              INV_C},
+                {"quadratic-rational", QUADRATIC_RATIONAL},
+                {"inv-c-parabola",     INV_C_PARABOLA},
+                {"lambda",             LAMBDA},
+                {"inv-lambda",         INV_LAMBDA},
         };
     private:
 

@@ -20,17 +20,19 @@ int main(int argc, char const *argv[]) {
     using std::string;
 
     /*output*/
-    unordered_map<string, string> config;
-    config["output"] = "output.png";
-    config["x"] = "500";
-    config["y"] = "500";
-    config["cr"] = "-0.7269";
-    config["ci"] = "0.1889";
-    config["r"] = "0";
-    config["i"] = "0";
-    config["zoom"] = "1";
-    config["mul"] = "1";
-    config["iter"] = "100";
+    unordered_map<string, string> config{
+            {"output", "output.png"},
+            {"x",      "500"},
+            {"y",      "500"},
+            {"cr",     "-0.7269"},
+            {"ci",     "0.1889"},
+            {"r",      "0"},
+            {"i",      "0"},
+            {"zoom",   "1"},
+            {"mul",    "1"},
+            {"iter",   "100"},
+            {"poly",   "std"},
+    };
 
     containers::parse_args(config, argc, argv);
 
@@ -47,6 +49,7 @@ int main(int argc, char const *argv[]) {
     const size_t iter = std::stoull(config["iter"]);
     complex c(std::stod(config["cr"]), std::stod(config["ci"]));
     const double zoom = std::stod(config["zoom"]);
+    const double mul = std::stod(config["mul"]);
     vec2 center{std::stod(config["r"]), std::stod(config["i"])};
 
     fractal fractal1(x, y);
@@ -55,9 +58,10 @@ int main(int argc, char const *argv[]) {
     fractal1.set_c(c);
     fractal1.set_zoom(center, zoom);
     fractal1.set_subsample(subsample);
-//    fractal1.set_do_sine_transform(false);
     fractal1.set_smooth(smooth);
     fractal1.set_do_grid(do_grid);
+    fractal1.set_polynomial(config["poly"]);
+    fractal1.set_mul(mul);
     auto grid = fractal1.run();
 
     image_sanity_check(grid, true);

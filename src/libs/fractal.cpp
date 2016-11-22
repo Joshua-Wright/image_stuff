@@ -6,6 +6,7 @@
 #include <stack>
 #include <thread>
 #include <vector>
+#include <map>
 #include "fractal.h"
 #include "util/debug.h"
 #include "util/vect.h"
@@ -15,9 +16,13 @@ namespace image_utils {
     const double NOT_DEFINED = -1.0;
 
     auto func_standard_plane = [](const complex &z, const complex c) { return pow(z, 2) + c; };
+    auto func_inv_c = [](const complex &z, const complex c) { return pow(z, 2) + 1.0 / c; };
+    // TODO these don't work
+    auto func_lambda = [](const complex &z, const complex c) { return c * (1.0 - c); };
+    auto func_inv_lambda = [](const complex &z, const complex c) { return 1.0 / (c * (c - 1.0)); };
 
     template<typename T>
-    double fractal_cell(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard_plane) {
+    double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard_plane) {
         for (size_t i = 0; i < max_iterations; i++) {
             z = func(z, c);
             if (norm(z) > max_iterations * max_iterations) {
@@ -29,6 +34,21 @@ namespace image_utils {
             }
         }
         return 0.0;
+    }
+
+    double fractal_cell(complex z, const complex &c, const size_t m, const bool s, const fractal::polynomial_t poly) {
+        switch (poly) {
+            default:
+            case fractal::STANDARD:
+                return fractal_cell_(z, c, m, s, func_standard_plane);
+            case fractal::INV_C:
+                return fractal_cell_(z, c, m, s, func_inv_c);
+            case fractal::LAMBDA:
+                return fractal_cell_(z, c, m, s, func_lambda);
+            case fractal::INV_LAMBDA:
+                return fractal_cell_(z, c, m, s, func_inv_lambda);
+        }
+
     }
 
 
@@ -50,22 +70,22 @@ namespace image_utils {
         if (subsample) {
             double out[] = {0, 0, 0, 0};
             if (is_julia) {
-                out[0] = fractal_cell(pos + complex(-pixel_width_x, 0), c, max_iterations, smooth, func_standard_plane);
-                out[1] = fractal_cell(pos + complex(pixel_width_x, 0), c, max_iterations, smooth, func_standard_plane);
-                out[2] = fractal_cell(pos + complex(0, -pixel_width_y), c, max_iterations, smooth, func_standard_plane);
-                out[3] = fractal_cell(pos + complex(0, pixel_width_y), c, max_iterations, smooth, func_standard_plane);
+                out[0] = fractal_cell(pos + complex(-pixel_width_x, 0), c, max_iterations, smooth, polynomial);
+                out[1] = fractal_cell(pos + complex(pixel_width_x, 0), c, max_iterations, smooth, polynomial);
+                out[2] = fractal_cell(pos + complex(0, -pixel_width_y), c, max_iterations, smooth, polynomial);
+                out[3] = fractal_cell(pos + complex(0, pixel_width_y), c, max_iterations, smooth, polynomial);
             } else {
-                out[0] = fractal_cell(complex(0, 0), pos + complex(-pixel_width_x, 0), max_iterations, smooth, func_standard_plane);
-                out[1] = fractal_cell(complex(0, 0), pos + complex(pixel_width_x, 0), max_iterations, smooth, func_standard_plane);
-                out[2] = fractal_cell(complex(0, 0), pos + complex(0, -pixel_width_y), max_iterations, smooth, func_standard_plane);
-                out[3] = fractal_cell(complex(0, 0), pos + complex(0, pixel_width_y), max_iterations, smooth, func_standard_plane);
+                out[0] = fractal_cell(complex(0, 0), pos + complex(-pixel_width_x, 0), max_iterations, smooth, polynomial);
+                out[1] = fractal_cell(complex(0, 0), pos + complex(pixel_width_x, 0), max_iterations, smooth, polynomial);
+                out[2] = fractal_cell(complex(0, 0), pos + complex(0, -pixel_width_y), max_iterations, smooth, polynomial);
+                out[3] = fractal_cell(complex(0, 0), pos + complex(0, pixel_width_y), max_iterations, smooth, polynomial);
             }
             return ((out[0] + out[1]) + (out[2] + out[3])) / 4;
         } else {
             if (is_julia) {
-                return fractal_cell(pos, c, max_iterations, smooth, func_standard_plane);
+                return fractal_cell(pos, c, max_iterations, smooth, polynomial);
             } else {
-                return fractal_cell(complex(0, 0), pos, max_iterations, smooth, func_standard_plane);
+                return fractal_cell(complex(0, 0), pos, max_iterations, smooth, polynomial);
             }
         }
     }
@@ -136,9 +156,14 @@ namespace image_utils {
     matrix<double> fractal::run() {
         const size_t stack_size = iterations.x() * iterations.y();
         matrix<double> grid(iterations.x(), iterations.y());
-        rectangle starter(0, iterations.x() - 1, 0, iterations.y() - 1);
 
-        std::vector<rectangle> rectange_stack(1, starter);
+        std::vector<rectangle> rectange_stack;
+        // four quadrants for starting
+        rectange_stack.push_back(rectangle(0, iterations.x() / 2, 0, iterations.y() / 2));
+        rectange_stack.push_back(rectangle(iterations.x() / 2, iterations.x() - 1, 0, iterations.y() / 2));
+        rectange_stack.push_back(rectangle(0, iterations.x() / 2, iterations.y() / 2, iterations.y() - 1));
+        rectange_stack.push_back(rectangle(iterations.x() / 2, iterations.x() - 1, iterations.y() / 2, iterations.y() - 1));
+
         rectange_stack.reserve(stack_size);
         while (!rectange_stack.empty()) {
             std::vector<rectangle> new_stack;
@@ -164,7 +189,7 @@ namespace image_utils {
 #pragma omp parallel for schedule(static) collapse(2)
             for (size_t i = 0; i < grid.x(); ++i) {
                 for (size_t j = 0; j < grid.y(); ++j) {
-                    grid(i, j) = pow(sin(log2(iterations(i, j) + 1) * PI / 4), 2);
+                    grid(i, j) = pow(sin(log2(iterations(i, j) + 1) * PI / 4 * mul), 2);
                 }
             }
         } else {
@@ -246,9 +271,32 @@ namespace image_utils {
         fractal::subsample = subsample;
     }
 
+    void fractal::set_polynomial(polynomial_t polynomial) {
+        polynomial = polynomial;
+    }
+
+    void fractal::set_polynomial(const std::string &name) {
+        std::map<std::string, polynomial_t> names{
+                {"standard",   STANDARD},
+                {"inv-c",      INV_C},
+                {"lambda",     LAMBDA},
+                {"inv-lambda", INV_LAMBDA},
+        };
+        auto iter_name = names.find(name);
+        if (iter_name == names.end()) {
+            polynomial = STANDARD;
+        } else {
+            polynomial = iter_name->second;
+        }
+    }
+
+    void fractal::set_mul(double mul) {
+        fractal::mul = mul;
+    }
+
     fractal::rectangle::rectangle(const uint16_t x_min, const uint16_t x_max,
                                   const uint16_t y_min, const uint16_t y_max) : xmin(x_min), xmax(x_max),
-                                                                            ymin(y_min), ymax(y_max) {}
+                                                                                ymin(y_min), ymax(y_max) {}
 
     std::array<fractal::line, 4> fractal::rectangle::get_sides() {
         return std::array<fractal::line, 4>{

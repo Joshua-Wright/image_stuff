@@ -10,6 +10,14 @@
 namespace image_utils {
 
     class fractal {
+    public:
+        enum polynomial_t {
+            STANDARD,
+            INV_C,
+            LAMBDA,
+            INV_LAMBDA,
+        };
+    private:
 
         struct line {
             vec_ull start_point;
@@ -45,6 +53,8 @@ namespace image_utils {
         bool smooth = false;
         bool do_sine_transform = true;
         bool subsample = false;
+        double mul = 1;
+        polynomial_t polynomial = STANDARD;
         complex c = complex(0.0, 0);
 
         double iterate_cell(const complex pos);
@@ -73,6 +83,12 @@ namespace image_utils {
         void set_c(const complex &c);
 
         void set_zoom(vec2 center, double zoom);
+
+        void set_polynomial(polynomial_t polynomial);
+
+        void set_polynomial(const std::string &name);
+
+        void set_mul(double mul);
 
         matrix<double> run();
     };

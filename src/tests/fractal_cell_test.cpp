@@ -23,10 +23,10 @@
 
 namespace image_utils {
 
-    auto func_standard_plane = [](const complex &z, const complex c) { return pow(z, 2) + c; };
+    auto func_standard = [](const complex &z, const complex c) { return pow(z, 2) + c; };
 
     template<typename T>
-    double fractal_cell(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard_plane) {
+    double fractal_cell(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard) {
         for (size_t i = 0; i < max_iterations; i++) {
             z = func(z, c);
             if (norm(z) > max_iterations * max_iterations) {
@@ -46,7 +46,7 @@ namespace image_utils {
 int main(int argc, char const *argv[]) {
     using image_utils::fractal_cell;
     using image_utils::complex;
-    using image_utils::func_standard_plane;
+    using image_utils::func_standard;
 
     const complex z(0, 0);
     const size_t max_iter = 2048;
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[]) {
 
     for (double r = -2; r < 2; r += d) {
         for (double i = -2; i < 2; i += d) {
-            double cell = fractal_cell(z, complex(r, i), max_iter, true, func_standard_plane);
+            double cell = fractal_cell(z, complex(r, i), max_iter, true, func_standard);
             total += cell;
         }
     }

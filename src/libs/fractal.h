@@ -14,6 +14,7 @@ namespace image_utils {
     public:
         enum polynomial_t {
             STANDARD,
+            CUBIC,
             QUADRATIC_RATIONAL,
             INV_C,
             INV_C_PARABOLA,
@@ -22,6 +23,7 @@ namespace image_utils {
         };
         const std::map<std::string, polynomial_t> names{
                 {"standard",           STANDARD},
+                {"cubic",              CUBIC},
                 {"inv-c",              INV_C},
                 {"quadratic-rational", QUADRATIC_RATIONAL},
                 {"inv-c-parabola",     INV_C_PARABOLA},

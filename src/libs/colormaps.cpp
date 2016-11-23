@@ -1,4 +1,6 @@
 // (c) Copyright 2016 Josh Wright
+#include <iterator>
+#include <map>
 #include "colormaps.h"
 #include "util/matrix.h"
 
@@ -32,6 +34,8 @@ namespace image_utils {
         }
         return pix;
     }
+
+    colormap_basic_hot colormap_basic_hot::map = colormap_basic_hot();
 
     RGB colormap_grayscale::get_rgb(const double x) const {
         RGB pix;
@@ -163,4 +167,86 @@ namespace image_utils {
     }
 
     colormap_simple_gradient colormap_simple_gradient::hsv_ish = colormap_simple_gradient({0, 0, 255}, {255, 0, 0});
+
+    RGB colormap_rainbow::get_rgb(const double x) const {
+        // https://en.wikibooks.org/wiki/Color_Theory/Color_gradient#How_to_use_color_gradients_in_computer_programs
+        // here are some my modification but the main code is the same
+        // as in Witold J.Janik code
+
+        if (x == 0) {
+            return {0, 0, 0};
+        }
+
+        unsigned char R = 0, G = 0, B = 0;// byte
+        int nmax = 6;// number of color bars
+        double m = nmax * x;
+        int n = int(m); // integer of m
+        double f = m - n;  // fraction of m
+        unsigned char t = int(f * 255);
+
+        switch (n) {
+            case 0: {
+                R = 255;
+                G = t;
+                B = 0;
+                break;
+            };
+            case 1: {
+                R = 255 - t;
+                G = 255;
+                B = 0;
+                break;
+            };
+            case 2: {
+                R = 0;
+                G = 255;
+                B = t;
+                break;
+            };
+            case 3: {
+                R = 0;
+                G = 255 - t;
+                B = 255;
+                break;
+            };
+            case 4: {
+                R = t;
+                G = 0;
+                B = 255;
+                break;
+            };
+            case 5: {
+                R = 255;
+                G = 0;
+                B = 255 - t;
+                break;
+            };
+
+        };
+
+        return {R, G, B};
+    }
+
+    colormap_rainbow colormap_rainbow::map = colormap_rainbow();
+
+
+    const std::map<std::string, colormap *> default_colormaps{
+            {"hot",     &colormap_basic_hot::map},
+            {"rainbow", &colormap_rainbow::map},
+    };
+
+    colormap *read_colormap_from_string(const std::string &spec) {
+        std::istringstream iss(spec);
+        std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
+                                        std::istream_iterator<std::string>{}};
+        auto it = default_colormaps.find(tokens[0]);
+        if (it != default_colormaps.end()) {
+            return it->second;
+        }
+
+        // todo other colormaps
+
+        // default
+        return &colormap_basic_hot::map;
+    }
 }

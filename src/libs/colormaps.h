@@ -18,6 +18,7 @@ namespace image_utils {
     class colormap_basic_hot : public colormap {
     public:
         virtual RGB get_rgb(const double d) const;
+        static colormap_basic_hot map;
     };
 
     class colormap_grayscale : public colormap {
@@ -76,8 +77,7 @@ namespace image_utils {
     };
 
 
-    void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb,
-                          colormap *fun);
+    void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb, colormap *fun);
 
     class colormap_simple_gradient : public colormap {
         vec3 start;
@@ -89,4 +89,12 @@ namespace image_utils {
 
         virtual RGB get_rgb(const double x) const;
     };
+
+    class colormap_rainbow : public colormap {
+    public:
+        virtual RGB get_rgb(const double x) const override;
+        static colormap_rainbow map;
+    };
+
+    colormap *read_colormap_from_string(const std::string &spec);
 }

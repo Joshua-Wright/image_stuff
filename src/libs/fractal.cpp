@@ -14,7 +14,8 @@
 namespace image_utils {
     const double NOT_DEFINED = -1.0;
 
-    auto func_standard_plane = [](const complex &z, const complex &c) { return pow(z, 2) + c; };
+    auto func_standard = [](const complex &z, const complex &c) { return pow(z, 2) + c; };
+    auto func_cubic = [](const complex &z, const complex &c) { return pow(z, 3) + c; };
     auto func_inv_c = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / c; };
     auto func_inv_c_parabola = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / c + 0.25; };
     auto func_quadratic_rational = [](const complex &z, const complex &c) { return pow(z, 2) + pow(c, 2) / (pow(c, 4) - 0.25); };
@@ -27,7 +28,7 @@ namespace image_utils {
     auto func_inv_lambda = [](const complex &z, const complex &c) { return 1.0 / (c * (c - 1.0)); };
 
     template<typename T>
-    double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard_plane) {
+    double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard) {
         for (size_t i = 0; i < max_iterations; i++) {
             z = func(z, c);
             if (norm(z) > max_iterations * max_iterations) {
@@ -45,7 +46,9 @@ namespace image_utils {
         switch (poly) {
             default:
             case fractal::STANDARD:
-                return fractal_cell_(z, c, m, s, func_standard_plane);
+                return fractal_cell_(z, c, m, s, func_standard);
+            case fractal::CUBIC:
+                return fractal_cell_(z, c, m, s, func_cubic);
             case fractal::INV_C:
                 return fractal_cell_(z, c, m, s, func_inv_c);
             case fractal::LAMBDA:

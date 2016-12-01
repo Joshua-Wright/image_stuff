@@ -244,9 +244,41 @@ namespace image_utils {
             return it->second;
         }
 
+        if (spec == "cubic-blue-yellow") {
+            return new colormap_interpolant(
+                    {{0.0,    {0,   7,   100}},
+                     {0.16,   {32,  107, 203}},
+                     {0.42,   {237, 255, 255}},
+                     {0.6425, {255, 170, 0}},
+                     {0.8575, {0,   2,   0}},
+                     {1.0,    {0,   7,   100}},
+                    });
+        }
+
         // todo other colormaps
 
         // default
         return &colormap_basic_hot::map;
     }
+
+    RGB colormap_interpolant::get_rgb(const double x) const {
+        return {r(x), g(x), b(x)};
+    }
+
+    colormap_interpolant::colormap_interpolant(std::vector<std::pair<double, vec3>> xps) {
+        std::sort(xps.begin(), xps.end(), [](auto a, auto b) { return a.first < b.first; });
+        std::vector<double> xs, yr, yg, yb;
+        for (auto p : xps) {
+            xs.push_back(p.first);
+            yr.push_back(p.second[0]);
+            yg.push_back(p.second[1]);
+            yb.push_back(p.second[2]);
+        }
+
+        r = cubic_interp(0, 255, xs, yr);
+        g = cubic_interp(0, 255, xs, yg);
+        b = cubic_interp(0, 255, xs, yb);
+    }
+
+
 }

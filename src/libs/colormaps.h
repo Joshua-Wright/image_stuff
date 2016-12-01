@@ -1,10 +1,15 @@
 // (c) Copyright 2016 Josh Wright
 #pragma once
 
+#include <functional>
 #include "types.h"
+#include "cubic_interp.h"
 #include "generators.h"
 
 namespace image_utils {
+
+//    typedef const double &(*double_func)(const double);
+    typedef std::function<double(double)> double_func;
 
     //////////////////
     // colormap ADT //
@@ -95,6 +100,18 @@ namespace image_utils {
         virtual RGB get_rgb(const double x) const override;
         static colormap_rainbow map;
     };
+
+    class colormap_interpolant : public colormap {
+        cubic_interp r, g, b;
+
+    public:
+        colormap_interpolant(std::vector<std::pair<double, vec3>> xps);
+        virtual RGB get_rgb(const double x) const override;
+    };
+
+
+    ///////////////////////////////////////////////////////////////////////////////
+
 
     colormap *read_colormap_from_string(const std::string &spec);
 }

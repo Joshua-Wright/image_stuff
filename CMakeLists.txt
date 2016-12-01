@@ -11,7 +11,7 @@ include_directories(
         "src/libs/util"
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
@@ -47,6 +47,8 @@ set(LIB_FILES
         src/libs/util/matrix.h
         src/libs/util/arg_parser.h
         src/libs/util/arg_parser.cpp
+        src/libs/util/cubic_interp.cpp
+        src/libs/util/cubic_interp.h
         src/libs/colormaps.h
         src/libs/filters.h
 )
@@ -80,3 +82,4 @@ add_executable(fractal_animation ${LIB_FILES} src/renders/fractal_animation.cpp)
 add_executable(zoom              ${LIB_FILES} src/renders/zoom.cpp)
 
 add_executable(fractal_cell_test ${LIB_FILES} src/tests/fractal_cell_test.cpp)
+add_executable(monotone_cubic_test ${LIB_FILES} src/tmp_tests/monotone_cubic_test.cpp)

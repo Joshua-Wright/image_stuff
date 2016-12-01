@@ -16,14 +16,18 @@ namespace image_utils {
 
     auto func_standard = [](const complex &z, const complex &c) { return pow(z, 2) + c; };
     auto func_cubic = [](const complex &z, const complex &c) { return pow(z, 3) + c; };
-    auto func_inv_c = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / c; };
+//    auto func_inv_c = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / c; };
+    auto func_inv_c = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / (c - 1.0); };
     auto func_inv_c_parabola = [](const complex &z, const complex &c) { return pow(z, 2) + 1.0 / c + 0.25; };
     auto func_quadratic_rational = [](const complex &z, const complex &c) { return pow(z, 2) + pow(c, 2) / (pow(c, 4) - 0.25); };
     // TODO these don't work
     auto func_lambda = [](const complex &z, const complex &c) {
 //        const auto lambda = -sqrt(-4.0 * c - 1.0) - 1.0;
-        const auto lambda = pow(c, 2) / 4.0 + c / 2.0;
-        return lambda * z * (1.0 - z);
+        const auto lambda = pow(c, 2) / 4.0 - c / 2.0;
+//        return pow(z, 2) + lambda;
+//        return pow(z, 2) * lambda;
+        return z * (1.0 - z) - lambda;
+//        return lambda * z * (1.0 - z);
     };
     auto func_inv_lambda = [](const complex &z, const complex &c) { return 1.0 / (c * (c - 1.0)); };
 

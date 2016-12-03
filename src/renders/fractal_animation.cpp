@@ -69,8 +69,8 @@ int main(int argc, char const *argv[]) {
         auto grid = fractal1.run();
 
         scale_grid(grid);
-//        colormap *cmap = new colormap_basic_hot();
-        colormap *cmap = &colormap_3d_cosine::blue_yellow;
+        // TODO read from arg
+        colormap cmap = read_colormap_from_string("hot");
         color_write_image(grid, cmap, out_filename, false);
 
 #pragma omp critical

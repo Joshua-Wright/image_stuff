@@ -65,7 +65,7 @@ int main(int argc, char const *argv[]) {
         output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
         std::string out_filename = output.str();
 
-        double zoom = std::exp((1.0*i/ n_frames) * std::log(max_zoom));
+        double zoom = std::exp((1.0 * i / n_frames) * std::log(max_zoom));
 
         fractal fractal1(x, y);
         fractal1.set_max_iterations(iter);
@@ -79,8 +79,7 @@ int main(int argc, char const *argv[]) {
         auto grid = fractal1.run();
 
         scale_grid(grid);
-//        colormap *cmap = new colormap_basic_hot();
-        colormap *cmap = &colormap_3d_cosine::blue_yellow;
+        colormap cmap = read_colormap_from_string("threecolor");
         color_write_image(grid, cmap, out_filename, false);
 
 #pragma omp critical

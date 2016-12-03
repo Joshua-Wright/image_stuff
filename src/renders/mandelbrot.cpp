@@ -67,6 +67,6 @@ int main(int argc, char const *argv[]) {
 
     image_sanity_check(grid, true);
     scale_grid(grid);
-    colormap *cmap = read_colormap_from_string(config["color"]);
+    colormap cmap = read_colormap_from_string(config["color"]);
     color_write_image(grid, cmap, output);
 }

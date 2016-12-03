@@ -106,9 +106,6 @@ namespace image_utils {
         matrix<double> run();
     };
 
-    /** bounds is in the form {xmin, xmax, ymin, ymax} */
-    void check_bounds(const std::array<double, 4> &bounds);
-
     /** t on range [0,1]*/
     complex complex_circle(const complex center, const double r, const double t);
 }

@@ -31,8 +31,8 @@ namespace image_utils {
     };
     auto func_inv_lambda = [](const complex &z, const complex &c) { return 1.0 / (c * (c - 1.0)); };
 
-    template<typename T>
-    double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const T func = func_standard) {
+    template<typename Func>
+    double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const Func func = func_standard) {
         for (size_t i = 0; i < max_iterations; i++) {
             z = func(z, c);
             if (norm(z) > max_iterations * max_iterations) {
@@ -71,15 +71,6 @@ namespace image_utils {
     complex complex_circle(const complex center, const double r, const double t) {
         complex pos(std::cos(2 * PI * t), std::sin(2 * PI * t));
         return center + r * pos;
-    }
-
-    void check_bounds(const std::array<double, 4> &bounds) {
-        using std::runtime_error;
-        if (bounds[1] <= bounds[0]) {
-            throw runtime_error("xmin must be less than xmax");
-        } else if (bounds[3] <= bounds[2]) {
-            throw runtime_error("ymin must be less than ymax");
-        }
     }
 
     double fractal::iterate_cell(const complex pos) {

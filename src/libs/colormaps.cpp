@@ -6,7 +6,7 @@
 
 namespace image_utils {
 
-    RGB colormap_basic_hot::get_rgb(const double x) const {
+    RGB colormap_basic_hot(const double x) {
         /* expects 0 <= x <= 1 */
         double d = x * 255;
         RGB pix;
@@ -35,9 +35,7 @@ namespace image_utils {
         return pix;
     }
 
-    colormap_basic_hot colormap_basic_hot::map = colormap_basic_hot();
-
-    RGB colormap_grayscale::get_rgb(const double x) const {
+    RGB colormap_grayscale(const double x) {
         RGB pix;
         pix.r = (unsigned char) (256 * x);
         pix.g = pix.r;
@@ -47,7 +45,7 @@ namespace image_utils {
 
 
     void grayscale_to_rgb(const matrix<double> &in_double,
-                          image_RGB &out_rgb, colormap *fun) {
+                          image_RGB &out_rgb, const colormap &fun) {
 
         if (in_double.x() != out_rgb.x() || in_double.y() != out_rgb.y()) {
             throw std::runtime_error("Image dimensions must be the same!");
@@ -56,13 +54,18 @@ namespace image_utils {
         const double *d = in_double.cbegin();
         RGB *px = out_rgb.begin();
         while (d < in_double.end()) {
-            *px = fun->get_rgb(*d);
+            *px = fun.get_rgb(*d);
             ++d;
             ++px;
         }
     }
 
-    RGB colormap_threecolor::get_rgb(const double x) const {
+    unsigned char map_func(double x) {
+        x = std::fabs(std::fmod(x, 1.0));
+        return (unsigned char) std::max(256 * (1 - pow(3 * (x - 1.5 / 2.0), 2)), 0.0);
+    }
+
+    RGB colormap_threecolor(const double x) {
         RGB pix;
         pix.r = map_func(x);
         pix.g = map_func(x + 1.0 / 3.0);
@@ -70,63 +73,13 @@ namespace image_utils {
         return pix;
     }
 
-    unsigned char colormap_threecolor::map_func(double x) const {
-        x = std::fabs(std::fmod(x, 1.0));
-        return (unsigned char) std::max(256 * (1 - pow(3 * (x - 1.5 / 2.0), 2)), 0.0);
-    }
-
-    RGB colormap_offset_waves::get_rgb(const double x) const {
+    RGB colormap_offset_waves::operator()(const double x) const {
         RGB pix;
-        pix.r = (unsigned char) (255 * (*w)(x));
-        pix.g = (unsigned char) (255 * (*w)(x + 1.0 / 3.0));
-        pix.b = (unsigned char) (255 * (*w)(x + 2.0 / 3.0));
+        pix.r = (unsigned char) (255 * w(x));
+        pix.g = (unsigned char) (255 * w(x + 1.0 / 3.0));
+        pix.b = (unsigned char) (255 * w(x + 2.0 / 3.0));
         return pix;
     }
-
-    RGB colormap_gradient::get_rgb(const double x) const {
-        double t = x * max_t; /*we need to modify this, so copy it*/
-        /*assume that 0<=x<1*/
-        size_t idx = 0;
-
-        /*find the line where this color is*/
-        while (t > l[idx]) {
-            t -= l[idx];
-            ++idx;
-        }
-
-        /*find the color*/
-        containers::vect<double, 3> color = (t / l[idx]) * n[idx] + p[idx];
-        RGB out;
-        out.r = (unsigned char) color[0];
-        out.g = (unsigned char) color[1];
-        out.b = (unsigned char) color[2];
-        return out;
-    }
-
-    colormap_gradient::colormap_gradient(const double &r, const double &g, const double &b) {
-        containers::vect<double, 3> cur{r, g, b};
-        p.push_back(cur);
-    }
-
-    colormap_gradient &colormap_gradient::add_color(const double &r, const double &g, const double &b,
-                                                    const double &t) {
-
-        containers::vect<double, 3> cur{r, g, b};
-        n.push_back(cur - p.back());
-        p.push_back(cur);
-        l.push_back(t);
-        max_t = std::accumulate(l.begin(), l.end(), 0.0);
-        return *this;
-    }
-
-
-    colormap_gradient colormap_gradient::blue_yellow_gradient = colormap_gradient
-            (0, 7, 100)
-            .add_color(32, 107, 203, 0.16)
-            .add_color(237, 255, 255, 0.42)
-            .add_color(255, 170, 0, 0.625)
-            .add_color(0, 2, 0, 0.8575)
-            .add_color(0, 7, 100, 1);
 
     colormap_3d_cosine::colormap_3d_cosine(const vec3 &a, const vec3 &b, const vec3 &c, const vec3 &d) : a(a), b(b), c(c), d(d) {}
 
@@ -139,7 +92,7 @@ namespace image_utils {
         };
     }
 
-    RGB colormap_3d_cosine::get_rgb(const double x) const {
+    RGB colormap_3d_cosine::operator()(const double x) const {
         vec3 color = 256.0 * (a + b * cos(c * x * 64 + d));
         return {
                 (unsigned char) color[0],
@@ -148,27 +101,7 @@ namespace image_utils {
         };
     }
 
-    colormap_3d_cosine colormap_3d_cosine::blue_yellow = colormap_3d_cosine(
-            {0.5, 0.5, 0.5},
-            {0.5, 0.5, 0.5},
-            {0.15, 0.15, 0.15},
-            {3.0, 3.6, 4.0}
-    );
-
-    colormap_simple_gradient::colormap_simple_gradient(vec3 start, vec3 end) : start(start), end(end) {}
-
-    RGB colormap_simple_gradient::get_rgb(const double x) const {
-        vec3 color = start + x * (end - start);
-        return {
-                (unsigned char) color[0],
-                (unsigned char) color[1],
-                (unsigned char) color[2]
-        };
-    }
-
-    colormap_simple_gradient colormap_simple_gradient::hsv_ish = colormap_simple_gradient({0, 0, 255}, {255, 0, 0});
-
-    RGB colormap_rainbow::get_rgb(const double x) const {
+    RGB colormap_rainbow(const double x) {
         // https://en.wikibooks.org/wiki/Color_Theory/Color_gradient#How_to_use_color_gradients_in_computer_programs
         // here are some my modification but the main code is the same
         // as in Witold J.Janik code
@@ -227,42 +160,42 @@ namespace image_utils {
         return {R, G, B};
     }
 
-    colormap_rainbow colormap_rainbow::map = colormap_rainbow();
 
-
-    const std::map<std::string, colormap *> default_colormaps{
-            {"hot",     &colormap_basic_hot::map},
-            {"rainbow", &colormap_rainbow::map},
+    const std::map<std::string, std::function<RGB(const double)>> default_colormaps{
+            {"hot",               &colormap_basic_hot},
+            {"rainbow",           &colormap_rainbow},
+            {"gray",              &colormap_grayscale},
+            {"threecolor",        &colormap_threecolor},
+            {"sine",              colormap_offset_waves(wave(wave::SINE))},
+            {"cubic_blue_yellow", colormap_interpolant(
+                    {
+                            {0.0,    {0,   7,   100}},
+                            {0.16,   {32,  107, 203}},
+                            {0.42,   {237, 255, 255}},
+                            {0.6425, {255, 170, 0}},
+                            {0.8575, {0,   2,   0}},
+                            {1.0,    {0,   7,   100}},
+                    })
+            },
+            {"3d-cosine",         colormap_3d_cosine(
+                    {0.5, 0.5, 0.5},
+                    {0.5, 0.5, 0.5},
+                    {0.15, 0.15, 0.15},
+                    {3.0, 3.6, 4.0}
+            )},
     };
 
-    colormap *read_colormap_from_string(const std::string &spec) {
+    colormap read_colormap_from_string(const std::string &spec, const size_t steps) {
         std::istringstream iss(spec);
         std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                         std::istream_iterator<std::string>{}};
         auto it = default_colormaps.find(tokens[0]);
         if (it != default_colormaps.end()) {
-            return it->second;
+            return colormap(it->second, steps);
         }
-
-        if (spec == "cubic-blue-yellow") {
-            return new colormap_interpolant(
-                    {{0.0,    {0,   7,   100}},
-                     {0.16,   {32,  107, 203}},
-                     {0.42,   {237, 255, 255}},
-                     {0.6425, {255, 170, 0}},
-                     {0.8575, {0,   2,   0}},
-                     {1.0,    {0,   7,   100}},
-                    });
-        }
-
-        // todo other colormaps
 
         // default
-        return &colormap_basic_hot::map;
-    }
-
-    RGB colormap_interpolant::get_rgb(const double x) const {
-        return {r(x), g(x), b(x)};
+        return colormap(&colormap_basic_hot, steps);
     }
 
     colormap_interpolant::colormap_interpolant(std::vector<std::pair<double, vec3>> xps) {
@@ -280,5 +213,22 @@ namespace image_utils {
         b = cubic_interp(0, 255, xs, yb);
     }
 
+    RGB colormap_interpolant::operator()(const double x) const {
+        /*these are properly clamped in the interpolant class itself*/
+        return {(unsigned char) r(x), (unsigned char) g(x), (unsigned char) b(x)};
+    }
 
+    RGB colormap::get_rgb(double x) const {
+        if (x < 0) {
+            x = -x;
+        }
+        if (x >= 1) {
+            x = floor(x);
+        }
+        return color_data[x * color_data.size()];
+    }
+
+    colormap::colormap(const std::vector<RGB> &color_data) : color_data(color_data) {}
+
+    colormap::colormap() {}
 }

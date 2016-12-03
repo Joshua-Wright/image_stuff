@@ -286,3 +286,5 @@ double image_utils::wave::operator()(const double &x) const {
     }
 }
 
+image_utils::wave::wave(image_utils::wave::wave_type type) : type(type) {}
+

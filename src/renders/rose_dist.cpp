@@ -35,7 +35,7 @@ int main(int argc, char const *argv[]) {
         config.find("-h") != config.end()) {
         /*help text*/
         std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
-        << std::endl;
+                  << std::endl;
         std::cout << std::endl;
         int pw = 20; /*parameter width*/
         int dw = 80 - pw - 10; /*description width*/
@@ -73,7 +73,7 @@ int main(int argc, char const *argv[]) {
 //    colormap_basic_hot map;
 //    color_write_image(grid, &map, output);
 
-    colormap *cmap = &colormap_gradient::blue_yellow_gradient;
+    colormap cmap = read_colormap_from_string("threecolor");
 
     color_write_image(grid, cmap, output);
     return 0;

@@ -17,15 +17,18 @@ namespace image_utils {
     class wave {
 
         void *data;
+    public:
+
         enum wave_type {
             NOOP, SINE, TRIANGLE, SAWTOOTH, SQUARE, FOURIER_SQUARE
         };
-        wave_type type;
+        wave(wave_type type);
 
-    public:
         wave(const std::string &spec);
 
         double operator()(const double &x) const;
+    private:
+        wave_type type;
     };
 
 
@@ -34,7 +37,7 @@ namespace image_utils {
         virtual double operator()(const double &x,
                                   const double &y) const = 0;
 
-        virtual ~wave_2d() { };
+        virtual ~wave_2d() {};
     };
 
     class distance_wave : public wave_2d {
@@ -75,7 +78,7 @@ namespace image_utils {
                                                 C1_y1(_C1_y1),
                                                 C2_0(_C2_0),
                                                 C2_x1(_C2_x1),
-                                                C2_y1(_C2_y1) { }
+                                                C2_y1(_C2_y1) {}
 
             double dist2(const double x, const double y) const {
                 return C1_0

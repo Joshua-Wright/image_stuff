@@ -7,47 +7,13 @@
 
 #include <map>
 #include "types.h"
+#include "fractal_common.h"
 
 namespace image_utils {
 
-    class fractal {
+    class fractal_multithread {
     public:
-        enum polynomial_t {
-            STANDARD,
-            CUBIC,
-            QUADRATIC_RATIONAL,
-            INV_C,
-            INV_C_PARABOLA,
-            LAMBDA,
-            INV_LAMBDA,
-        };
-        const std::map<std::string, polynomial_t> names{
-                {"standard",           STANDARD},
-                {"cubic",              CUBIC},
-                {"inv-c",              INV_C},
-                {"quadratic-rational", QUADRATIC_RATIONAL},
-                {"inv-c-parabola",     INV_C_PARABOLA},
-                {"lambda",             LAMBDA},
-                {"inv-lambda",         INV_LAMBDA},
-        };
     private:
-
-        struct line {
-            vec_ull start_point;
-            vec_ull end_point;
-        };
-
-        struct rectangle {
-            // bounds are inclusive
-            // uint16_t so that the whole struct fits in a single word
-            uint16_t xmin, xmax, ymin, ymax;
-            rectangle();
-
-            rectangle(const uint16_t x_min, const uint16_t x_max,
-                      const uint16_t y_min, const uint16_t y_max);
-
-            std::array<fractal::line, 4> get_sides();
-        };
 
         struct split_rectangle {
             // basically an option type holding either 4 rectangles or nothing
@@ -79,7 +45,7 @@ namespace image_utils {
 
     public:
 
-        fractal(const size_t w, const size_t h);
+        fractal_multithread(const size_t w, const size_t h);
 
         void set_max_iterations(size_t max_iterations);
 

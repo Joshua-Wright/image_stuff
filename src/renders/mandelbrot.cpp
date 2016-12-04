@@ -9,7 +9,7 @@
 #include "colormaps.h"
 #include "generators.h"
 #include "io.h"
-#include "fractal.h"
+#include "fractal_multithread.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
@@ -53,7 +53,7 @@ int main(int argc, char const *argv[]) {
     const double mul = std::stod(config["mul"]);
     vec2 center{std::stod(config["r"]), std::stod(config["i"])};
 
-    fractal fractal1(x, y);
+    fractal_multithread fractal1(x, y);
     fractal1.set_max_iterations(iter);
     fractal1.set_is_julia(is_julia);
     fractal1.set_c(c);

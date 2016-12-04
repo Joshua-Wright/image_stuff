@@ -8,25 +8,27 @@
 
 namespace image_utils {
 
+    typedef std::function<RGB(double)> colormap_func;
+
     class colormap;
 
     colormap read_colormap_from_string(const std::string &spec, const size_t steps = 2048);
 
-    void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb, const colormap &fun);
+    void grayscale_to_rgb(const matrix<double> &in_double, image_RGB &out_rgb, const colormap_func &fun);
 
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
 
     class colormap {
     public:
-        typedef std::function<RGB(double)> colormap_func;
         std::vector<RGB> color_data;
+        bool black_zero = true;
 
         colormap();
 
         colormap(const std::vector<RGB> &color_data);
 
-        RGB get_rgb(double x) const;
+        RGB operator()(double x) const;
 
         colormap(colormap_func func, const size_t steps) : color_data(steps) {
             for (size_t i = 0; i < steps; i++) {

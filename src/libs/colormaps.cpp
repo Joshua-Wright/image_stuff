@@ -1,6 +1,7 @@
 // (c) Copyright 2016 Josh Wright
 #include <iterator>
 #include <map>
+#include <util/debug.h>
 #include "colormaps.h"
 #include "util/matrix.h"
 
@@ -45,7 +46,7 @@ namespace image_utils {
 
 
     void grayscale_to_rgb(const matrix<double> &in_double,
-                          image_RGB &out_rgb, const colormap &fun) {
+                          image_RGB &out_rgb, const colormap_func &fun) {
 
         if (in_double.x() != out_rgb.x() || in_double.y() != out_rgb.y()) {
             throw std::runtime_error("Image dimensions must be the same!");
@@ -54,7 +55,7 @@ namespace image_utils {
         const double *d = in_double.cbegin();
         RGB *px = out_rgb.begin();
         while (d < in_double.end()) {
-            *px = fun.get_rgb(*d);
+            *px = fun(*d);
             ++d;
             ++px;
         }
@@ -105,10 +106,6 @@ namespace image_utils {
         // https://en.wikibooks.org/wiki/Color_Theory/Color_gradient#How_to_use_color_gradients_in_computer_programs
         // here are some my modification but the main code is the same
         // as in Witold J.Janik code
-
-        if (x == 0) {
-            return {0, 0, 0};
-        }
 
         unsigned char R = 0, G = 0, B = 0;// byte
         int nmax = 6;// number of color bars
@@ -218,14 +215,23 @@ namespace image_utils {
         return {(unsigned char) r(x), (unsigned char) g(x), (unsigned char) b(x)};
     }
 
-    RGB colormap::get_rgb(double x) const {
+    RGB colormap::operator()(double x) const {
+        if (black_zero && x == 0.0) {
+            return {0, 0, 0};
+        }
         if (x < 0) {
             x = -x;
         }
         if (x >= 1) {
-            x = floor(x);
+            x = fmod(x, 1);
         }
-        return color_data[x * color_data.size()];
+        size_t idx = (size_t) (x * color_data.size());
+        // final range check because it seems that no matter what, NaN's will always do weird things
+        if (idx < color_data.size()) {
+            return color_data[idx];
+        } else {
+            return color_data.front();
+        }
     }
 
     colormap::colormap(const std::vector<RGB> &color_data) : color_data(color_data) {}

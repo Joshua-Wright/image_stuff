@@ -11,7 +11,7 @@
 #include "generators.h"
 #include "debug.h"
 #include "io.h"
-#include "fractal.h"
+#include "fractal_multithread.h"
 
 
 int main(int argc, char const *argv[]) {
@@ -67,7 +67,7 @@ int main(int argc, char const *argv[]) {
 
         double zoom = std::exp((1.0 * i / n_frames) * std::log(max_zoom));
 
-        fractal fractal1(x, y);
+        fractal_multithread fractal1(x, y);
         fractal1.set_max_iterations(iter);
         fractal1.set_is_julia(false);
         fractal1.set_zoom(center, zoom);

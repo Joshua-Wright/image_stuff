@@ -45,8 +45,7 @@ namespace image_utils {
         }
     }
 
-//    void color_write_image(matrix<double> &grid, colormap_v1 *cmap, const std::string &output_filename, bool write_save) {
-    void color_write_image(matrix<double> &grid, const colormap &cmap, const std::string &output_filename, bool write_save) {
+    void color_write_image(matrix<double> &grid, const colormap_func &cmap, const std::string &output_filename, bool write_save) {
         /* modifies argument! */
         scale_grid(grid);
         image_RGB color_image(grid.x(), grid.y());

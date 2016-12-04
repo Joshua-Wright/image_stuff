@@ -2274,7 +2274,7 @@ void lodepng_compress_settings_init(LodePNGCompressSettings* settings)
 {
   /*compress with dynamic huffman tree (not in the mathematical sense, just not the predefined one)*/
   settings->btype = 2;
-  settings->use_lz77 = 1;
+  settings->use_lz77 = 0;
   settings->windowsize = DEFAULT_WINDOWSIZE;
   settings->minmatch = 3;
   settings->nicematch = 128;
@@ -2285,7 +2285,7 @@ void lodepng_compress_settings_init(LodePNGCompressSettings* settings)
   settings->custom_context = 0;
 }
 
-const LodePNGCompressSettings lodepng_default_compress_settings = {2, 1, DEFAULT_WINDOWSIZE, 3, 128, 1, 0, 0, 0};
+const LodePNGCompressSettings lodepng_default_compress_settings = {2, 0, DEFAULT_WINDOWSIZE, 3, 128, 1, 0, 0, 0};
 
 
 #endif /*LODEPNG_COMPILE_ENCODER*/

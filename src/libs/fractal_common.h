@@ -66,6 +66,11 @@ namespace image_utils {
         return 0.0;
     }
 
+    void sine_transform(matrix<double> &in, const double multiplier = 1, const double rel_phase = 0, bool preserve_zero = true);
+    void log_transform(matrix<double> &in, const double multiplier = 1);
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
 
     struct line {
         vec_ull start_point;

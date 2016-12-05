@@ -137,12 +137,9 @@ namespace image_utils {
         }
 
         if (do_sine_transform) {
-#pragma omp parallel for schedule(static) collapse(2)
-            for (size_t i = 0; i < grid.x(); ++i) {
-                for (size_t j = 0; j < grid.y(); ++j) {
-                    grid(i, j) = pow(sin(log2(iterations(i, j) + 1) * PI / 4 * mul), 2);
-                }
-            }
+            grid = iterations;
+            log_transform(iterations);
+            sine_transform(grid, mul);
         } else {
 #pragma omp parallel for schedule(static) collapse(2)
             for (size_t i = 0; i < grid.x(); ++i) {

@@ -60,6 +60,30 @@ int main(int argc, char const *argv[]) {
     cmap.black_zero = true;
 
     wave sinewave(wave::SINE);
+    fractal_singlethread fractal1(x, y);
+    fractal1.max_iterations = iter;
+    fractal1.is_julia = false;
+//    complex c = complex_circle(center, 0.015, 3.0 * t);
+//    fractal1.c = c;
+    fractal1.mul = 3;
+    fractal1.smooth = true;
+    fractal1.do_grid = false;
+    fractal1.do_sine_transform = false;
+
+//    fractal1.set_zoom(vec2{1.8, 0.0}, 0.6);
+//#pragma clang diagnostic push
+//#pragma ide diagnostic ignored "IncompatibleTypes"
+//    fractal1.polynomial = func_inv_c;
+//#pragma clang diagnostic pop
+    fractal1.set_zoom(vec2{0.0, 0.0}, 1.5);
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "IncompatibleTypes"
+    fractal1.polynomial = func_quadratic_rational;
+#pragma clang diagnostic pop
+
+
+    matrix<double> grid1 = fractal1.run();
+    log_transform(grid1);
 
     size_t progress = 0;
 #pragma omp parallel for schedule(static)
@@ -71,32 +95,15 @@ int main(int argc, char const *argv[]) {
         output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
         std::string out_filename = output.str();
 
-        complex c = complex_circle(center, 0.015, 3.0 * t);
-
-        fractal_singlethread fractal1(x, y);
-        fractal1.max_iterations = iter;
-        fractal1.is_julia = false;
-        fractal1.c = c;
-        fractal1.set_zoom(vec2{1.8, 0.0}, 0.6);
-        fractal1.smooth = true;
-        fractal1.do_grid = false;
-//        fractal1.mul = 5 * sinewave(t);
-        fractal1.mul = 3;
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "IncompatibleTypes"
-//        fractal1.polynomial = func_inv_c;
-        fractal1.polynomial = func_standard;
-//        fractal1.polynomial =
-//                [t, sinewave](const complex &z, const complex &c) {
-//                    return std::pow(z, 2) + std::pow(c - 1.0, -1.5 + 0.5 * sinewave(3 * t));
-//                };
-#pragma clang diagnostic pop
-
-        auto grid = fractal1.run();
+//        matrix<double> grid2(grid.size(), grid.size());
+        matrix<double> grid(0, 0);
+        grid = grid1;
+//        grid2 += t;
+        sine_transform(grid, 1 + 0.3 * sinewave(t), t, true);
 
         scale_grid(grid);
-        color_write_image(grid, [t, cmap](double x1) { return cmap(x1, t); }, out_filename, false);
-//        color_write_image(grid, cmap, out_filename, false);
+//        color_write_image(grid, [t, cmap](double x1) { return cmap(x1, t); }, out_filename, false);
+        color_write_image(grid, cmap, out_filename, false);
 
         std::cout << "rendered: \t" << progress << "\t/" << n_frames << std::endl;
         ++progress;

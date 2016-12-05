@@ -28,6 +28,9 @@ int main(int argc, char const *argv[]) {
     config["folder"] = "fractal_frames";
     config["x"] = "500";
     config["y"] = "500";
+    config["x"] = "1280";
+    config["y"] = "720";
+//    config["y"] = "1280";
     config["xa"] = "-2";
     config["xb"] = "2";
     config["ya"] = "-2";
@@ -53,8 +56,8 @@ int main(int argc, char const *argv[]) {
     complex center(std::stod(config["cr"]), std::stod(config["ci"]));
 
     // TODO read from arg
-    colormap cmap = read_colormap_from_string("hot");
-    cmap.black_zero = false;
+    colormap cmap = read_colormap_from_string("rainbow");
+    cmap.black_zero = true;
 
     wave sinewave(wave::SINE);
 
@@ -70,16 +73,6 @@ int main(int argc, char const *argv[]) {
 
         complex c = complex_circle(center, 0.015, 3.0 * t);
 
-//        fractal_multithread fractal1(x, y);
-//        fractal1.set_max_iterations(iter);
-//        fractal1.set_is_julia(true);
-//        fractal1.set_c(c);
-//        fractal1.set_smooth(true);
-//        fractal1.set_do_grid(false);
-
-//        mandelbrot_polynomial_t poly_func =
-//                [t](const complex &z, const complex &c) { return std::pow(z, 2) + std::pow(c - 1.0, 1 + 0.1 * sinewave(t)); };
-
         fractal_singlethread fractal1(x, y);
         fractal1.max_iterations = iter;
         fractal1.is_julia = false;
@@ -87,26 +80,26 @@ int main(int argc, char const *argv[]) {
         fractal1.set_zoom(vec2{1.8, 0.0}, 0.6);
         fractal1.smooth = true;
         fractal1.do_grid = false;
-        fractal1.mul = 5 + sinewave(4 * t) / 10;
+//        fractal1.mul = 5 * sinewave(t);
+        fractal1.mul = 3;
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "IncompatibleTypes"
-        fractal1.polynomial =
-                [t, sinewave](const complex &z, const complex &c) {
-                    return std::pow(z, 2) + std::pow(c - 1.0, -1.5 + 0.5 * sinewave(3*t));
-                };
+//        fractal1.polynomial = func_inv_c;
+        fractal1.polynomial = func_standard;
+//        fractal1.polynomial =
+//                [t, sinewave](const complex &z, const complex &c) {
+//                    return std::pow(z, 2) + std::pow(c - 1.0, -1.5 + 0.5 * sinewave(3 * t));
+//                };
 #pragma clang diagnostic pop
 
         auto grid = fractal1.run();
 
         scale_grid(grid);
-//        color_write_image(grid, [i, n_frames, cmap](double x1) { return cmap(x1 * i * 1.0 / n_frames); }, out_filename, false);
-        color_write_image(grid, cmap, out_filename, false);
+        color_write_image(grid, [t, cmap](double x1) { return cmap(x1, t); }, out_filename, false);
+//        color_write_image(grid, cmap, out_filename, false);
 
-//#pragma omp critical
-//        {
         std::cout << "rendered: \t" << progress << "\t/" << n_frames << std::endl;
         ++progress;
-//        }
     }
 
     std::cout << "Done! Render using:" << std::endl;

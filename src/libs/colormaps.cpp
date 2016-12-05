@@ -2,6 +2,7 @@
 #include <iterator>
 #include <map>
 #include <util/debug.h>
+#include <util/linear_interp.h>
 #include "colormaps.h"
 #include "util/matrix.h"
 
@@ -215,23 +216,37 @@ namespace image_utils {
         return {(unsigned char) r(x), (unsigned char) g(x), (unsigned char) b(x)};
     }
 
-    RGB colormap::operator()(double x) const {
+    RGB colormap::operator()(double x, double offset) const {
+        // intentionally check zero before offset
         if (black_zero && x == 0.0) {
             return {0, 0, 0};
         }
+
+        x += offset;
+        // normalize double
         if (x < 0) {
             x = -x;
         }
         if (x >= 1) {
             x = fmod(x, 1);
         }
+        // get index
         size_t idx = (size_t) (x * color_data.size());
-        // final range check because it seems that no matter what, NaN's will always do weird things
-        if (idx < color_data.size()) {
-            return color_data[idx];
-        } else {
+        double t = (x * color_data.size()) - int(x * color_data.size());
+
+        // index edge cases
+        if (idx == 0) {
             return color_data.front();
         }
+        if (idx == color_data.size() - 1) {
+            return color_data.back();
+        }
+        if (idx >= color_data.size()) { // nan value
+            return {255, 0, 0};
+        }
+        RGB left = color_data[idx];
+        RGB right = color_data[idx + 1];
+        return interp_color(t, left, right);
     }
 
     colormap::colormap(const std::vector<RGB> &color_data) : color_data(color_data) {}

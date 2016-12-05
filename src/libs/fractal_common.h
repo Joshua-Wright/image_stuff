@@ -4,6 +4,7 @@
 #include "types.h"
 #include <map>
 #include <functional>
+#include <util/debug.h>
 
 
 namespace image_utils {
@@ -51,11 +52,12 @@ namespace image_utils {
 
     template<typename Func>
     double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const Func func = func_standard) {
+        const double cap = max_iterations * max_iterations;
         for (size_t i = 0; i < max_iterations; i++) {
             z = func(z, c);
-            if (norm(z) > max_iterations * max_iterations) {
+            if (norm(z) > cap) {
                 if (smooth) {
-                    return i - log2(log2(norm(z))) + 4.0;
+                    return i - log2(log2(norm(z) + 1) + 1) + 4.0;
                 } else {
                     return i;
                 }

@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
     /*output*/
     unordered_map<string, string> config{
             {"output", "output.png"},
-            {"x",      "500"},
+            {"x",      "800"},
             {"y",      "500"},
             {"cr",     "-0.7269"},
             {"ci",     "0.1889"},

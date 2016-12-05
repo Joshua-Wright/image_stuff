@@ -47,6 +47,7 @@ namespace image_utils {
         // handle lines containing only a single pixel
         const vec_ull diff = ((start - end) != vec_ull{0, 0}) ? (end - start).unitV() : vec_ull{0, 0};
         const size_t length = (end - start).norm();
+        bool out = true;
 
         for (size_t i = 0; i <= length; i++) {
             vec_ull pos = start + diff * i;
@@ -59,10 +60,10 @@ namespace image_utils {
                 iterations(pos) = iterate_cell(complex_pos);
             }
             if (iterations(pos) != iterations(start)) {
-                return false;
+                out = false;
             }
         }
-        return true;
+        return out;
     }
 
     fractal_multithread::split_rectangle fractal_multithread::process_rectangle(rectangle r) {
@@ -74,8 +75,17 @@ namespace image_utils {
         }
         size_t shortest_edge = std::min(r.xmax - r.xmin, r.ymax - r.ymin);
         size_t longest_bound = std::max(iterations.x(), iterations.y());
-        // todo improve magic number?
-        if (edges_equal && shortest_edge < longest_bound / 2) {
+        if (!edges_equal && shortest_edge > 1) {
+            // must be careful how we round up and down because rectangles are inclusive on all bounds
+            return {true,
+                    {
+                            rectangle(r.xmin, (r.xmin + r.xmax) / 2, r.ymin, (r.ymin + r.ymax) / 2),
+                            rectangle((r.xmin + r.xmax) / 2, r.xmax, r.ymin, (r.ymin + r.ymax) / 2),
+                            rectangle(r.xmin, (r.xmin + r.xmax) / 2, (r.ymin + r.ymax) / 2, r.ymax),
+                            rectangle((r.xmin + r.xmax) / 2, r.xmax, (r.ymin + r.ymax) / 2, r.ymax),
+                    },
+            };
+        } else if (edges_equal /*&& shortest_edge < longest_bound / 2*/) {
             double iter_fill = iterations(r.xmin, r.ymin);
             for (size_t i = r.xmin; i <= r.xmax; i++) {
                 for (size_t j = r.ymin; j <= r.ymax; j++) {
@@ -90,16 +100,6 @@ namespace image_utils {
                     grid_mask(i, r.ymin) = true;
                 }
             }
-        } else if (!edges_equal && shortest_edge > 1) {
-            // must be careful how we round up and down because rectangles are inclusive on all bounds
-            return {true,
-                    {
-                            rectangle(r.xmin, (r.xmin + r.xmax) / 2, r.ymin, (r.ymin + r.ymax) / 2),
-                            rectangle((r.xmin + r.xmax) / 2, r.xmax, r.ymin, (r.ymin + r.ymax) / 2),
-                            rectangle(r.xmin, (r.xmin + r.xmax) / 2, (r.ymin + r.ymax) / 2, r.ymax),
-                            rectangle((r.xmin + r.xmax) / 2, r.xmax, (r.ymin + r.ymax) / 2, r.ymax),
-                    },
-            };
         }
         return {false, {}};
     }

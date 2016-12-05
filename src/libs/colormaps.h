@@ -28,7 +28,7 @@ namespace image_utils {
 
         colormap(const std::vector<RGB> &color_data);
 
-        RGB operator()(double x) const;
+        RGB operator()(double x, double offset = 0) const;
 
         colormap(colormap_func func, const size_t steps) : color_data(steps) {
             for (size_t i = 0; i < steps; i++) {

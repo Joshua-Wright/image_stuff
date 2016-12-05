@@ -70,6 +70,7 @@ namespace image_utils {
         // handle lines containing only a single pixel
         const vec_ull diff = (start != end) ? (end - start).unitV() : vec_ull{0, 0};
         const size_t length = (end - start).norm();
+        bool out = true;
 
         for (size_t i = 0; i <= length; i++) {
             vec_ull pos = start + diff * i;
@@ -82,10 +83,10 @@ namespace image_utils {
                 iterations(pos) = iterate_cell(complex_pos);
             }
             if (iterations(pos) != iterations(start)) {
-                return false;
+                out = false;
             }
         }
-        return true;
+        return out;
     }
 
     void fractal_singlethread::process_rectangle(const rectangle &r) {

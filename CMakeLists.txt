@@ -18,11 +18,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -fopenmp")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 
 
 # find src/libs/ -type f | copy
@@ -51,7 +51,7 @@ set(LIB_FILES
         src/libs/util/cubic_interp.h
         src/libs/colormaps.h
         src/libs/filters.h
-        src/libs/fractal_singlethread.cpp src/libs/fractal_singlethread.h src/libs/fractal_common.h src/libs/fractal_common.cpp)
+        src/libs/fractal_singlethread.cpp src/libs/fractal_singlethread.h src/libs/fractal_common.h src/libs/fractal_common.cpp src/libs/util/linear_interp.h src/libs/util/linear_interp.cpp)
 
 add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
 

@@ -47,13 +47,17 @@ set(LIB_FILES
         src/libs/util/matrix.h
         src/libs/util/arg_parser.h
         src/libs/util/arg_parser.cpp
-        src/libs/util/cubic_interp.cpp
+        src/libs/util/test_cubic_interp.cpp
         src/libs/util/cubic_interp.h
         src/libs/colormaps.h
         src/libs/filters.h
-        src/libs/fractal_singlethread.cpp src/libs/fractal_singlethread.h src/libs/fractal_common.h src/libs/fractal_common.cpp src/libs/util/linear_interp.h src/libs/util/linear_interp.cpp)
-
-add_executable(test_generators ${LIB_FILES} src/tests/test_generators.cpp)
+        src/libs/fractal_singlethread.cpp
+        src/libs/fractal_singlethread.h
+        src/libs/fractal_common.h
+        src/libs/fractal_common.cpp
+        src/libs/util/linear_interp.h
+        src/libs/util/linear_interp.cpp
+        )
 
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
@@ -82,3 +86,10 @@ add_executable(fractal_animation ${LIB_FILES} src/renders/fractal_animation.cpp)
 add_executable(zoom ${LIB_FILES} src/renders/zoom.cpp)
 
 add_executable(fractal_cell_test ${LIB_FILES} src/tests/fractal_cell_test.cpp)
+
+
+enable_testing()
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+add_executable(gtest ${LIB_FILES} src/tests/unit_tests/all_tests.cpp)
+target_link_libraries(gtest ${GTEST_BOTH_LIBRARIES})

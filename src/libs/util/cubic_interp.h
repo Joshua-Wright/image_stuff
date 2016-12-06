@@ -2,7 +2,6 @@
 #ifndef CONTAINERS_CUBIC_INTERPOLANT_H
 #define CONTAINERS_CUBIC_INTERPOLANT_H
 
-
 #include <vector>
 
 class cubic_interp {

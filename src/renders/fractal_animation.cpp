@@ -28,15 +28,17 @@ int main(int argc, char const *argv[]) {
     config["folder"] = "fractal_frames";
     config["x"] = "500";
     config["y"] = "500";
-    config["x"] = "1280";
-    config["y"] = "720";
-//    config["y"] = "1280";
+//    config["x"] = "1280";
+//    config["y"] = "720";
+//    config["x"] = "1920";
+//    config["y"] = "1080";
     config["xa"] = "-2";
     config["xb"] = "2";
     config["ya"] = "-2";
     config["yb"] = "2";
     config["cr"] = "-0.7754659321544456";
     config["ci"] = "0.21015827865930042";
+//    config["n_frames"] = "400";
     config["n_frames"] = "200";
     config["iter"] = "100";
     containers::parse_args(config, argc, argv);
@@ -55,7 +57,6 @@ int main(int argc, char const *argv[]) {
 
     complex center(std::stod(config["cr"]), std::stod(config["ci"]));
 
-    // TODO read from arg
     colormap cmap = read_colormap_from_string("rainbow");
     cmap.black_zero = true;
 
@@ -63,30 +64,28 @@ int main(int argc, char const *argv[]) {
     fractal_singlethread fractal1(x, y);
     fractal1.max_iterations = iter;
     fractal1.is_julia = false;
-//    complex c = complex_circle(center, 0.015, 3.0 * t);
-//    fractal1.c = c;
     fractal1.mul = 3;
     fractal1.smooth = true;
     fractal1.do_grid = false;
     fractal1.do_sine_transform = false;
 
-//    fractal1.set_zoom(vec2{1.8, 0.0}, 0.6);
-//#pragma clang diagnostic push
-//#pragma ide diagnostic ignored "IncompatibleTypes"
-//    fractal1.polynomial = func_inv_c;
-//#pragma clang diagnostic pop
-    fractal1.set_zoom(vec2{0.0, 0.0}, 1.5);
+//    fractal1.set_zoom(vec2{2.2, 0.0}, 1.2);
+//    fractal1.polynomial = INV_C;
+
+    fractal1.set_zoom(vec2{0.0, 0.0}, 1);
+    fractal1.polynomial = CUSTOM;
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "IncompatibleTypes"
-    fractal1.polynomial = func_quadratic_rational;
+    fractal1.custom_polynomial = [](complex z, complex c) { return std::pow(z, 3) + c; };
 #pragma clang diagnostic pop
-
 
     matrix<double> grid1 = fractal1.run();
     log_transform(grid1);
 
+    matrix<double> grid(grid1.x(), grid1.y());
+
     size_t progress = 0;
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static) private(grid)
     for (size_t i = 0; i < n_frames + 1; i++) {
 
         double t = 1.0 * i / n_frames;
@@ -95,11 +94,15 @@ int main(int argc, char const *argv[]) {
         output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
         std::string out_filename = output.str();
 
-//        matrix<double> grid2(grid.size(), grid.size());
-        matrix<double> grid(0, 0);
+//        matrix<double> grid(0, 0);
+        if (grid.x() != grid1.x()) {
+            grid = grid1;
+        }
+        std::copy(grid1.begin(), grid1.end(), grid.begin());
         grid = grid1;
 //        grid2 += t;
-        sine_transform(grid, 1 + 0.3 * sinewave(t), t, true);
+//        sine_transform(grid, 1 + 0.3 * sinewave(t), t, true);
+        sine_transform(grid, 2, t, true);
 
         scale_grid(grid);
 //        color_write_image(grid, [t, cmap](double x1) { return cmap(x1, t); }, out_filename, false);

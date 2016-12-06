@@ -31,6 +31,8 @@ namespace containers {
         func_alloc alloc;
         func_free dealloc;
 
+        matrix() : width(0), height(0), _data(nullptr), alloc(nullptr), dealloc(nullptr) {};
+
         matrix(const std::size_t x, const std::size_t y,
                const T initial_value = T()) : width(x), height(y),
                                               _data(new T[width * height]),
@@ -53,11 +55,11 @@ namespace containers {
 
 
         ~matrix() {
-      if (dealloc == nullptr) {
-        delete[] _data;
-      } else {
-        dealloc(_data);
-      }
+            if (dealloc == nullptr) {
+                delete[] _data;
+            } else {
+                dealloc(_data);
+            }
         }
 
         matrix &operator=(const matrix<T> &lhs) {

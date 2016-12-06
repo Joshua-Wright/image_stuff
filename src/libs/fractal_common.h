@@ -37,6 +37,7 @@ namespace image_utils {
         INV_C_PARABOLA,
         LAMBDA,
         INV_LAMBDA,
+        CUSTOM,
     };
     const std::map<std::string, polynomial_t> names{
             {"standard",           STANDARD},
@@ -48,7 +49,8 @@ namespace image_utils {
             {"inv-lambda",         INV_LAMBDA},
     };
 
-    double fractal_cell(complex z, const complex &c, const size_t m, const bool s, const polynomial_t poly);
+    double fractal_cell(complex z, const complex &c, const size_t m, const bool s, const polynomial_t poly,
+                        mandelbrot_polynomial_t custom = func_standard);
 
     template<typename Func>
     double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const Func func = func_standard) {
@@ -68,6 +70,60 @@ namespace image_utils {
 
     void sine_transform(matrix<double> &in, const double multiplier = 1, const double rel_phase = 0, bool preserve_zero = true);
     void log_transform(matrix<double> &in, const double multiplier = 1);
+
+    /** t on range [0,1]*/
+    complex complex_circle(const complex center, const double r, const double t);
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+
+    class line;
+
+    class rectangle;
+
+    class split_rectangle;
+
+    class rectangle_stack;
+
+    class fractal_base {
+    public:
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "IncompatibleTypes"
+        mandelbrot_polynomial_t custom_polynomial = func_standard;
+#pragma clang diagnostic pop
+        polynomial_t polynomial = STANDARD;
+        matrix<double> iterations;
+        matrix<bool> grid_mask;
+        size_t max_iterations = 512;
+        double pixel_width_x;
+        double pixel_width_y;
+        bool do_grid = false;
+        bool is_julia = false;
+        bool smooth = false;
+        bool do_sine_transform = true;
+        bool subsample = false;
+        double mul = 1;
+        complex c = complex(0.0, 0);
+
+    public:
+
+        fractal_base(const size_t w, const size_t h);
+
+        double iterate_cell(const complex pos);
+
+        bool process_line(const line &l);
+
+        void set_zoom(vec2 center, double zoom);
+
+        void set_polynomial(const std::string &name);
+
+        split_rectangle process_rectangle(rectangle r);
+
+    protected:
+        vec4 bounds{-2, 2, -2, 2};
+    };
+
+
 
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
@@ -107,6 +163,12 @@ namespace image_utils {
                     }
             };
         };
+    };
+
+    struct split_rectangle {
+        // basically an option type holding either 4 rectangles or nothing
+        bool did_split;
+        rectangle rectangles[4];
     };
 
     class rectangle_stack : public std::vector<rectangle> {

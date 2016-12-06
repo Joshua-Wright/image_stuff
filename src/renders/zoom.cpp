@@ -68,14 +68,16 @@ int main(int argc, char const *argv[]) {
         double zoom = std::exp((1.0 * i / n_frames) * std::log(max_zoom));
 
         fractal_multithread fractal1(x, y);
-        fractal1.set_max_iterations(iter);
-        fractal1.set_is_julia(false);
+
         fractal1.set_zoom(center, zoom);
-        fractal1.set_smooth(true);
-        // videos look just horrible without subsampling
-        fractal1.set_subsample(true);
-        fractal1.set_subsample(true);
-        fractal1.set_do_grid(false);
+
+        fractal1.max_iterations = iter;
+        fractal1.is_julia = false;
+        fractal1.smooth = true;
+        fractal1.subsample = true;
+        fractal1.subsample = true;
+        fractal1.do_grid = false;
+
         auto grid = fractal1.run();
 
         scale_grid(grid);

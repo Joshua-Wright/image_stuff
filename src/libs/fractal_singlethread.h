@@ -8,41 +8,11 @@
 
 namespace image_utils {
 
-
-    class fractal_singlethread {
-
-        vec4 bounds{-2, 2, -2, 2};
-
+    class fractal_singlethread : public fractal_base {
         rectangle_stack stack = rectangle_stack(256);
-
-        void process_rectangle(const rectangle &r);
-
-        bool process_line(const line &l);
-
-        double iterate_cell(const complex pos);
-
     public:
-//        mandelbrot_polynomial_t polynomial = func_standard;
-        mandelbrot_polynomial_t polynomial;
-        matrix<double> iterations;
-        size_t max_iterations = 512;
-        double pixel_width_x;
-        double pixel_width_y;
-        bool do_grid = false;
-        bool is_julia = false;
-        bool smooth = false;
-        bool do_sine_transform = true;
-        bool subsample = false;
-        double mul = 1;
-        complex c = complex(0.0, 0);
-
-
         fractal_singlethread(const size_t w, const size_t h);
-
-        void set_zoom(vec2 center, double zoom);
-
         matrix<double> run();
-
     };
 }
 

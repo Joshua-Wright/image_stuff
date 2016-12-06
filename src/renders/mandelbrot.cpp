@@ -54,15 +54,17 @@ int main(int argc, char const *argv[]) {
     vec2 center{std::stod(config["r"]), std::stod(config["i"])};
 
     fractal_multithread fractal1(x, y);
-    fractal1.set_max_iterations(iter);
-    fractal1.set_is_julia(is_julia);
-    fractal1.set_c(c);
+
     fractal1.set_zoom(center, zoom);
-    fractal1.set_subsample(subsample);
-    fractal1.set_smooth(smooth);
-    fractal1.set_do_grid(do_grid);
     fractal1.set_polynomial(config["poly"]);
-    fractal1.set_mul(mul);
+
+    fractal1.max_iterations = iter;
+    fractal1.is_julia = is_julia;
+    fractal1.c = c;
+    fractal1.subsample = subsample;
+    fractal1.smooth = smooth;
+    fractal1.do_grid = do_grid;
+    fractal1.mul = mul;
     auto grid = fractal1.run();
 
     image_sanity_check(grid, true);

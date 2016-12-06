@@ -36,4 +36,6 @@ namespace image_utils {
         return grid;
     }
 
+    fractal_singlethread::fractal_singlethread() {}
+
 }

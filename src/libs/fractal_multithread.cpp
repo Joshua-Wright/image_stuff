@@ -72,6 +72,8 @@ namespace image_utils {
         return grid;
     }
 
-    fractal_multithread::fractal_multithread(const size_t w, const size_t h) : fractal_base(w, h) {};
+    fractal_multithread::fractal_multithread(const size_t w, const size_t h) : fractal_base(w, h) {}
+
+    fractal_multithread::fractal_multithread() {};
 
 }

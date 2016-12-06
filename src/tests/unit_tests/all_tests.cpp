@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 #include "test_cubic_interp.h"
+#include "FractalTest.h"
 
 
 int main(int argc, char **argv) {

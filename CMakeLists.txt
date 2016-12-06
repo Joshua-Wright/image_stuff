@@ -47,7 +47,7 @@ set(LIB_FILES
         src/libs/util/matrix.h
         src/libs/util/arg_parser.h
         src/libs/util/arg_parser.cpp
-        src/libs/util/test_cubic_interp.cpp
+        src/libs/util/cubic_interp.cpp
         src/libs/util/cubic_interp.h
         src/libs/colormaps.h
         src/libs/filters.h
@@ -91,5 +91,5 @@ add_executable(fractal_cell_test ${LIB_FILES} src/tests/fractal_cell_test.cpp)
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-add_executable(gtest ${LIB_FILES} src/tests/unit_tests/all_tests.cpp)
+add_executable(gtest ${LIB_FILES} src/tests/unit_tests/all_tests.cpp src/tests/unit_tests/FractalTest.h)
 target_link_libraries(gtest ${GTEST_BOTH_LIBRARIES})

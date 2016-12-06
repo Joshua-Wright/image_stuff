@@ -28,7 +28,7 @@ TEST(cubic, linear_interp) {
     );
 
     for (double x = 0.1; x < 2.9; x += 0.05) {
-        ASSERT_FLOAT_EQ(100 * x, interp(x)) << "linear interp " << x << " to " << 100 * x;
+        ASSERT_DOUBLE_EQ(100 * x, interp(x)) << "linear interp " << x << " to " << 100 * x;
     }
 }
 
@@ -51,6 +51,7 @@ TEST(cubic, clamp) {
 
 TEST(cubic, cubic) {
     srand(10);
+    const double max_error = 0.0001;
     const int max_coef = 200;
     const double a = rand() % max_coef;
     const double b = rand() % max_coef;
@@ -70,7 +71,7 @@ TEST(cubic, cubic) {
     cubic_interp interp(min, max, xs, ys);
 
     for (double x = -0.9 * xmax; x < 0.9 * xmax; x += 0.1) {
-        ASSERT_FLOAT_EQ(poly(x), interp(x))
+        ASSERT_NEAR(poly(x), interp(x), max_error)
                                     << "x = " << x << " -> "
                                     << a << "*x^3 + " << b << "*x^2 + " << c << "*x + " << d <<
                                     " = " << interp(x);

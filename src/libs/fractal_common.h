@@ -49,8 +49,11 @@ namespace image_utils {
             {"inv-lambda",         INV_LAMBDA},
     };
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "IncompatibleTypes"
     double fractal_cell(complex z, const complex &c, const size_t m, const bool s, const polynomial_t poly,
                         mandelbrot_polynomial_t custom = func_standard);
+#pragma clang diagnostic pop
 
     template<typename Func>
     double fractal_cell_(complex z, const complex &c, const size_t max_iterations, const bool smooth, const Func func = func_standard) {
@@ -107,6 +110,8 @@ namespace image_utils {
 
     public:
 
+        fractal_base();
+
         fractal_base(const size_t w, const size_t h);
 
         double iterate_cell(const complex pos);
@@ -118,6 +123,8 @@ namespace image_utils {
         void set_polynomial(const std::string &name);
 
         split_rectangle process_rectangle(rectangle r);
+
+        complex index_to_complex(const vec_ull &pos);
 
     protected:
         vec4 bounds{-2, 2, -2, 2};

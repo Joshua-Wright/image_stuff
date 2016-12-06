@@ -98,10 +98,7 @@ namespace image_utils {
             vec_ull pos = start + diff * i;
             if (iterations(pos) == NOT_DEFINED) {
                 // imaginary axis is different because it points opposite our +y axis
-                complex complex_pos(
-                        (pos[0] * 1.0 / iterations.x()) * (bounds[1] - bounds[0]) + bounds[0],
-                        bounds[3] - (pos[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2])
-                );
+                complex complex_pos = index_to_complex(pos);
                 iterations(pos) = iterate_cell(complex_pos);
             }
             if (iterations(pos) != iterations(start)) {
@@ -182,5 +179,15 @@ namespace image_utils {
                                                                  grid_mask(w, h, 0),
                                                                  pixel_width_x(2 / w),
                                                                  pixel_width_y(2 / h) {}
+
+    fractal_base::fractal_base() {}
+
+    complex fractal_base::index_to_complex(const vec_ull &pos) {
+        return complex(
+                (pos[0] * 1.0 / iterations.x()) * (bounds[1] - bounds[0]) + bounds[0],
+                bounds[3] - (pos[1] * 1.0 / iterations.y()) * (bounds[3] - bounds[2])
+        );
+    }
+
 };
 

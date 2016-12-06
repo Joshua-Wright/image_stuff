@@ -13,6 +13,7 @@ namespace image_utils {
 
     class fractal_multithread : public fractal_base {
     public:
+        fractal_multithread();
         fractal_multithread(const size_t w, const size_t h);
         matrix<double> run();
     };

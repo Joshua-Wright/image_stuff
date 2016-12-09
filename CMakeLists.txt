@@ -57,7 +57,7 @@ set(LIB_FILES
         src/libs/fractal_common.cpp
         src/libs/util/linear_interp.h
         src/libs/util/linear_interp.cpp
-        )
+        src/libs/fractal_animator.cpp src/libs/fractal_animator.h src/libs/fractal_animation_zoom.cpp src/libs/fractal_animation_zoom.h)
 
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)

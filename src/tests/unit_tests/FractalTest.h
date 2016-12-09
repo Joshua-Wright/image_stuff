@@ -44,12 +44,12 @@ protected:
         fractal.max_iterations = get<2>(param);
         fractal.smooth = get<3>(param);
         fractal.do_sine_transform = false;
-        grid = fractal.run();
+        fractal.run();
     }
 
 protected:
     FRACTAL_T fractal;
-    matrix<double> grid;
+//    matrix<double> grid;
 };
 
 INSTANTIATE_TEST_CASE_P_(
@@ -65,18 +65,18 @@ INSTANTIATE_TEST_CASE_P_(
 
 TEST_P_(FractalTest, RangeSanity) {
     const double inf = std::numeric_limits<double>::max();
-    for (size_t i = 0; i < grid.size(); i++) {
-        ASSERT_GE(inf, grid(i));
-        ASSERT_LE(0, grid(i));
-        ASSERT_FALSE(std::isnan(grid(i)));
+    for (size_t i = 0; i < fractal.iterations.size(); i++) {
+        ASSERT_GE(inf, fractal.iterations(i));
+        ASSERT_LE(0, fractal.iterations(i));
+        ASSERT_FALSE(std::isnan(fractal.iterations(i)));
     }
 }
 
 TEST_P_(FractalTest, CorrectValue) {
     const double err_thresh = 0.001;
     int fails = 0;
-    for (size_t i = 0; i < grid.x(); i++) {
-        for (size_t j = 0; j < grid.y(); j++) {
+    for (size_t i = 0; i < fractal.iterations.x(); i++) {
+        for (size_t j = 0; j < fractal.iterations.y(); j++) {
             complex c = fractal.index_to_complex(vec_ull{i, j});
             double iter = fractal_cell_(complex(0, 0), c, fractal.max_iterations, fractal.smooth, func_standard);
             // this works but finds a few bad pixels sometimes that are tolerable errors
@@ -84,13 +84,13 @@ TEST_P_(FractalTest, CorrectValue) {
 //            EXPECT_NEAR(iter, grid(i, j), err_thresh)
 //                                << "(" << i << "," << j << ") -> "
 //                                << c;
-            if (std::fabs(iter - grid(i, j)) > err_thresh) {
+            if (std::fabs(iter - fractal.iterations(i, j)) > err_thresh) {
                 fails++;
             }
         }
     }
     // tolerate a small number of failures
-    ASSERT_GE(grid.x() * grid.y() * 0.0001, fails);
+    ASSERT_GE(fractal.iterations.x() * fractal.iterations.y() * 0.0001, fails);
     ASSERT_GE(5, fails);
 }
 

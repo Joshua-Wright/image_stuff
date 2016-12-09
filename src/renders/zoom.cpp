@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <functional>
 #include <iomanip>
+#include <fractal_animation_zoom.h>
 #include "util/arg_parser.h"
 #include "colormaps.h"
 #include "generators.h"
@@ -35,7 +36,7 @@ int main(int argc, char const *argv[]) {
     config["i"] = " 0.131825904205330";
     config["n_frames"] = "50000";
 //    config["n_frames"] = "50000";
-    config["iter"] = "1024";
+    config["iter"] = "256";
     containers::parse_args(config, argc, argv);
 
     /*TODO: help screen*/
@@ -54,49 +55,23 @@ int main(int argc, char const *argv[]) {
 
     // beyond this, doubles aren't good enough
     const double max_zoom = 1e13;
-    /* todo: add support for long double and __float128 */
 
-    size_t progress = skip;
-    // don't need OpenMP here because the frames themselves are rendered in parallelg
-//#pragma omp parallel for schedule(dynamic)
-    for (size_t i = skip; i < n_frames; i++) {
 
-        std::stringstream output;
-        output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
-        std::string out_filename = output.str();
+    colormap cmap = read_colormap_from_string("hot");
+    cmap.black_zero = true;
 
-        double zoom = std::exp((1.0 * i / n_frames) * std::log(max_zoom));
+    auto animation_zoom = make_shared<fractal_animation_zoom>();
+    animation_zoom->x = x;
+    animation_zoom->y = y;
+    animation_zoom->center = center;
+    animation_zoom->cmap = cmap;
+    animation_zoom->max_zoom = max_zoom;
+    animation_zoom->iter = 2048;
 
-        fractal_multithread fractal1(x, y);
-
-        fractal1.set_zoom(center, zoom);
-
-        fractal1.max_iterations = iter;
-        fractal1.is_julia = false;
-        fractal1.smooth = true;
-        fractal1.subsample = true;
-        fractal1.subsample = true;
-        fractal1.do_grid = false;
-
-        auto grid = fractal1.run();
-
-        scale_grid(grid);
-        colormap cmap = read_colormap_from_string("threecolor");
-        color_write_image(grid, cmap, out_filename, false);
-
-#pragma omp critical
-        {
-            std::cout << "rendered: \t" << progress << "\t/" << n_frames
-                      << "\t file=" << out_filename << " zoom=" << zoom << std::endl;
-            ++progress;
-        }
-    }
-
-    std::cout << "Done! Render using:" << std::endl;
-    std::cout << "ffmpeg -framerate 60 -i "
-              << output_folder << "out_frame_%05d.png "
-              << output_folder << "output.mp4" << std::endl;
-
+    fractal_animator animator(animation_zoom);
+    animator.n_frames = 2;
+    animator.output_folder = output_folder;
+    animator.run();
 
     return 0;
 }

@@ -14,7 +14,7 @@ namespace image_utils {
 
         fractal_singlethread();
         fractal_singlethread(const size_t w, const size_t h);
-        matrix<double> run();
+        void run();
     };
 }
 

@@ -12,9 +12,8 @@
 
 namespace image_utils {
 
-    matrix<double> fractal_multithread::run() {
+    void fractal_multithread::run() {
         const size_t stack_size = iterations.x() * iterations.y();
-        matrix<double> grid(iterations.x(), iterations.y());
 
         std::vector<rectangle> rectange_stack;
         // four quadrants for starting
@@ -45,31 +44,23 @@ namespace image_utils {
         }
 
         if (do_sine_transform) {
-            grid = iterations;
+            iterations = iterations;
             log_transform(iterations);
-            sine_transform(grid, mul);
-        } else {
-#pragma omp parallel for schedule(static) collapse(2)
-            for (size_t i = 0; i < grid.x(); ++i) {
-                for (size_t j = 0; j < grid.y(); ++j) {
-                    grid(i, j) = iterations(i, j);
-                }
-            }
-
+            sine_transform(iterations, mul);
         }
+
         if (do_grid) {
             /*get max iteration (that was used) and use that*/
             double grid_color = *std::max_element(iterations.begin(), iterations.end());
 #pragma omp parallel for schedule(static) collapse(2)
-            for (size_t i = 0; i < grid.x(); ++i) {
-                for (size_t j = 0; j < grid.y(); ++j) {
+            for (size_t i = 0; i < iterations.x(); ++i) {
+                for (size_t j = 0; j < iterations.y(); ++j) {
                     if (grid_mask(i, j)) {
-                        grid(i, j) = grid_color;
+                        iterations(i, j) = grid_color;
                     }
                 }
             }
         }
-        return grid;
     }
 
     fractal_multithread::fractal_multithread(const size_t w, const size_t h) : fractal_base(w, h) {}

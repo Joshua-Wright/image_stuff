@@ -15,7 +15,7 @@ namespace image_utils {
     public:
         fractal_multithread();
         fractal_multithread(const size_t w, const size_t h);
-        matrix<double> run();
+        void run();
     };
 }
 #endif //IMAGE_STUFF_MANDELBROT_H

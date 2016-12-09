@@ -1,0 +1,55 @@
+// (c) Copyright 2016 Josh Wright
+#ifndef IMAGE_STUFF_FRACTAL_ANIMATION_H
+#define IMAGE_STUFF_FRACTAL_ANIMATION_H
+
+#include <omp.h>
+#include <iomanip>
+#include <memory>
+#include "util/debug.h"
+#include "types.h"
+#include "matrix.h"
+#include "io.h"
+
+namespace image_utils {
+
+    using std::shared_ptr;
+    using std::make_shared;
+
+    struct worker;
+    struct animation;
+    typedef shared_ptr<worker> worker_ref;
+    typedef shared_ptr<animation> animation_ref;
+
+    struct worker {
+        // declare these here to make sure their memory never needs to be re-allocated
+        double t = 0; // input
+        image_RGB color_image; // output
+        worker(const size_t x, const size_t y);
+
+        virtual void render() = 0;
+    };
+
+    struct animation {
+        virtual worker_ref get_worker() = 0;
+        virtual ~animation();;
+    };
+
+    class fractal_animator {
+    protected:
+        std::vector<worker_ref> threads;
+        animation_ref animation;
+    public:
+
+        std::string out_filename_prefix = "out_frame_";
+        std::string output_folder = "fractal_frames";
+        size_t n_frames = 200;
+        size_t progress = 0;
+
+        fractal_animator(animation_ref animation);
+
+        void run();
+
+    };
+
+};
+#endif //IMAGE_STUFF_FRACTAL_ANIMATION_H

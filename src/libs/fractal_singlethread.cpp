@@ -6,11 +6,10 @@ namespace image_utils {
 
     fractal_singlethread::fractal_singlethread(const size_t w, const size_t h) : fractal_base(w, h) {}
 
-    matrix<double> fractal_singlethread::run() {
+    void fractal_singlethread::run() {
         std::fill(iterations.begin(), iterations.end(), NOT_DEFINED);
         pixel_width_x = 2 / iterations.x();
         pixel_width_y = 2 / iterations.y();
-        matrix<double> grid(iterations.x(), iterations.y(), 0);
         stack.push_back(rectangle(0, iterations.x() / 2, 0, iterations.y() / 2));
         stack.push_back(rectangle(iterations.x() / 2, iterations.x() - 1, 0, iterations.y() / 2));
         stack.push_back(rectangle(0, iterations.x() / 2, iterations.y() / 2, iterations.y() - 1));
@@ -27,13 +26,9 @@ namespace image_utils {
             }
         }
         if (do_sine_transform) {
-            grid = iterations;
             log_transform(iterations);
-            sine_transform(grid, mul);
-        } else {
-            grid = iterations;
+            sine_transform(iterations, mul);
         }
-        return grid;
     }
 
     fractal_singlethread::fractal_singlethread() {}

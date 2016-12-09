@@ -65,10 +65,10 @@ int main(int argc, char const *argv[]) {
     fractal1.smooth = smooth;
     fractal1.do_grid = do_grid;
     fractal1.mul = mul;
-    auto grid = fractal1.run();
+    fractal1.run();
 
-    image_sanity_check(grid, true);
-    scale_grid(grid);
+    image_sanity_check(fractal1.iterations, true);
+    scale_grid(fractal1.iterations);
     colormap cmap = read_colormap_from_string(config["color"]);
-    color_write_image(grid, cmap, output);
+    color_write_image(fractal1.iterations, cmap, output);
 }

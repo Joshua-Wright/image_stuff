@@ -31,9 +31,9 @@ set(LIB_FILES
         src/libs/types.h
         src/libs/generators.h
         src/libs/generators.cpp
-        src/libs/fractal_multithread.h
+        src/libs/fractal/fractal_multithread.h
         src/libs/expand_pixels.cpp
-        src/libs/fractal_multithread.cpp
+        src/libs/fractal/fractal_multithread.cpp
         src/libs/expand_pixels.h
         src/libs/colormaps.cpp
         src/libs/filters.cpp
@@ -51,13 +51,13 @@ set(LIB_FILES
         src/libs/util/cubic_interp.h
         src/libs/colormaps.h
         src/libs/filters.h
-        src/libs/fractal_singlethread.cpp
-        src/libs/fractal_singlethread.h
-        src/libs/fractal_common.h
-        src/libs/fractal_common.cpp
+        src/libs/fractal/fractal_singlethread.cpp
+        src/libs/fractal/fractal_singlethread.h
+        src/libs/fractal/fractal_common.h
+        src/libs/fractal/fractal_common.cpp
         src/libs/util/linear_interp.h
         src/libs/util/linear_interp.cpp
-        src/libs/fractal_animator.cpp src/libs/fractal_animator.h src/libs/fractal_animation_zoom.cpp src/libs/fractal_animation_zoom.h)
+        src/libs/fractal/fractal_animator.cpp src/libs/fractal/fractal_animator.h src/libs/fractal/fractal_animation_zoom.cpp src/libs/fractal/fractal_animation_zoom.h)
 
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)

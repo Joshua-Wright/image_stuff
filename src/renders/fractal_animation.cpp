@@ -7,13 +7,13 @@
 #include <unordered_map>
 #include <functional>
 #include <iomanip>
-#include <fractal_singlethread.h>
+#include <fractal/fractal_singlethread.h>
 #include "util/arg_parser.h"
 #include "colormaps.h"
 #include "generators.h"
 #include "debug.h"
 #include "io.h"
-#include "fractal_multithread.h"
+#include "fractal/fractal_multithread.h"
 
 
 int main(int argc, char const *argv[]) {
@@ -79,7 +79,8 @@ int main(int argc, char const *argv[]) {
     fractal1.custom_polynomial = [](complex z, complex c) { return std::pow(z, 3) + c; };
 #pragma clang diagnostic pop
 
-    matrix<double> grid1 = fractal1.run();
+    fractal1.run();
+    matrix<double> &grid1 = fractal1.iterations;
     log_transform(grid1);
 
     matrix<double> grid(grid1.x(), grid1.y());

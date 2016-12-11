@@ -9,7 +9,7 @@
 #include "colormaps.h"
 #include "generators.h"
 #include "io.h"
-#include "fractal_multithread.h"
+#include "fractal/fractal_multithread.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;

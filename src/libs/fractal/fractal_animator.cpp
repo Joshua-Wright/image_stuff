@@ -15,14 +15,13 @@ namespace image_utils {
 #pragma omp parallel for schedule(static,1)
         for (size_t i = 0; i < n_frames; i++) {
             const double t = i * 1.0 / n_frames;
-            worker_ref worker = threads[omp_get_thread_num()];
-            worker->t = t;
-            worker->render();
+            worker_ref &worker = threads[omp_get_thread_num()];
+            worker->render(t);
 
             std::stringstream output;
             output << output_folder << out_filename_prefix << std::setfill('0') << std::setw(5) << i << ".png";
 
-            write_image(worker->color_image, output.str());
+            write_image(worker->get_color_image(), output.str());
 
             std::cout << "rendered: \t" << progress << "\t/" << n_frames << std::endl;
             ++progress;
@@ -34,7 +33,7 @@ namespace image_utils {
                   << output_folder << "output.mp4" << std::endl;
     }
 
-    worker::worker(const size_t x, const size_t y) : color_image(x, y, {0, 0, 0}) {
+    worker::worker(const size_t x, const size_t y) {
     }
 
     animation::~animation() {}

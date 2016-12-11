@@ -9,14 +9,14 @@
 #include "colormaps.h"
 #include "generators.h"
 #include "io.h"
-#include "fractal_multithread.h"
+#include "fractal/fractal_multithread.h"
 #include "types.h"
 #include <complex>
 #include <cmath>
 #include <stack>
 #include <thread>
 #include <vector>
-#include "fractal_multithread.h"
+#include "fractal/fractal_multithread.h"
 #include "util/debug.h"
 #include "util/vect.h"
 #include "types.h"

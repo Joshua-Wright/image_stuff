@@ -6,13 +6,13 @@
 #include <unordered_map>
 #include <functional>
 #include <iomanip>
-#include <fractal_animation_zoom.h>
+#include <fractal/fractal_animation_zoom.h>
 #include "util/arg_parser.h"
 #include "colormaps.h"
 #include "generators.h"
 #include "debug.h"
 #include "io.h"
-#include "fractal_multithread.h"
+#include "fractal/fractal_multithread.h"
 
 
 int main(int argc, char const *argv[]) {

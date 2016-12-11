@@ -4,7 +4,7 @@
 namespace image_utils {
 
 
-    void fractal_animation_zoom::animation_worker::render() {
+    void fractal_animation_zoom::animation_worker::render(double t) {
         double zoom = std::exp(t * std::log(p.max_zoom));
 
         std::fill(fractal.iterations.begin(), fractal.iterations.end(), -1.0);
@@ -29,7 +29,11 @@ namespace image_utils {
     }
 
     fractal_animation_zoom::animation_worker::animation_worker(const fractal_animation_zoom &parent)
-            : worker(parent.x, parent.y), p(parent), fractal(parent.x, parent.y) {}
+            : worker(parent.x, parent.y), p(parent), fractal(parent.x, parent.y), color_image(parent.x, parent.y, {0, 0, 0}) {}
+
+    image_RGB &fractal_animation_zoom::animation_worker::get_color_image() {
+        return color_image;
+    }
 
     worker_ref fractal_animation_zoom::get_worker() {
         return make_shared<animation_worker>(*this);

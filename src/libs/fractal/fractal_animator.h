@@ -21,17 +21,16 @@ namespace image_utils {
     typedef shared_ptr<animation> animation_ref;
 
     struct worker {
-        // declare these here to make sure their memory never needs to be re-allocated
-        double t = 0; // input
-        image_RGB color_image; // output
         worker(const size_t x, const size_t y);
 
-        virtual void render() = 0;
+        virtual void render(double t) = 0;
+
+        virtual image_RGB &get_color_image() = 0;
     };
 
     struct animation {
         virtual worker_ref get_worker() = 0;
-        virtual ~animation();;
+        virtual ~animation();
     };
 
     class fractal_animator {

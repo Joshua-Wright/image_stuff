@@ -13,62 +13,44 @@
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
-    using image_utils::matrix;
-    using std::cout;
-    using std::endl;
-    using std::unordered_map;
-    using std::string;
+    arg_parser args(argc, argv);
 
-    /*output*/
-    unordered_map<string, string> config{
-            {"output", "output.png"},
-            {"x",      "800"},
-            {"y",      "500"},
-            {"cr",     "-0.7269"},
-            {"ci",     "0.1889"},
-            {"r",      "0"},
-            {"i",      "0"},
-            {"zoom",   "1"},
-            {"mul",    "1"},
-            {"iter",   "100"},
-            {"poly",   "std"},
-            {"color",  "hot"},
-    };
+    fractal_multithread fractal(
+            args.read<size_t>("x", 800),
+            args.read<size_t>("y", 500)
+    );
 
-    containers::parse_args(config, argc, argv);
+    fractal.set_zoom(
+            vec2{
+                    args.read<double>("r", 0),
+                    args.read<double>("i", 0),
+            },
+            args.read<double>("zoom", 1)
+    );
 
-    /*TODO: help screen*/
+    fractal.set_polynomial(args.read<std::string>("poly", "standard"));
 
-    const bool smooth = config.find("smooth") != config.end();
-    const bool do_grid = config.find("grid") != config.end();
-    const bool is_julia = config.find("julia") != config.end();
-    const bool subsample = config.find("subsample") != config.end();
+    fractal.c = complex(
+            args.read<double>("cr", -0.7269),
+            args.read<double>("ci", 0.1889)
+    );
 
-    std::string output(config["output"]);
-    const size_t x = std::stoull(config["x"]);
-    const size_t y = std::stoull(config["y"]);
-    const size_t iter = std::stoull(config["iter"]);
-    complex c(std::stod(config["cr"]), std::stod(config["ci"]));
-    const double zoom = std::stod(config["zoom"]);
-    const double mul = std::stod(config["mul"]);
-    vec2 center{std::stod(config["r"]), std::stod(config["i"])};
+    args.read_bool(fractal.subsample, "subsample");
+    args.read_bool(fractal.smooth, "smooth");
+    args.read_bool(fractal.do_grid, "do_grid");
+    args.read_bool(fractal.is_julia, "julia");
 
-    fractal_multithread fractal1(x, y);
+    args.read_into(fractal.max_iterations, "iter", 256);
+    args.read_into(fractal.mul, "mul", 1.0);
 
-    fractal1.set_zoom(center, zoom);
-    fractal1.set_polynomial(config["poly"]);
+    fractal.run();
 
-    fractal1.max_iterations = iter;
-    fractal1.is_julia = is_julia;
-    fractal1.c = c;
-    fractal1.subsample = subsample;
-    fractal1.smooth = smooth;
-    fractal1.do_grid = do_grid;
-    fractal1.mul = mul;
-    fractal1.run();
+    image_sanity_check(fractal.iterations, true);
+    scale_grid(fractal.iterations);
 
-    image_sanity_check(fractal1.iterations, true);
-    scale_grid(fractal1.iterations);
-    colormap cmap = read_colormap_from_string(config["color"]);
-    color_write_image(fractal1.iterations, cmap, output);
+    color_write_image(
+            fractal.iterations,
+            read_colormap_from_string(args.read<std::string>("color", "hot")),
+            args.read<std::string>("output", "output.png")
+    );
 }

@@ -85,6 +85,8 @@ add_executable(mandelbrot ${LIB_FILES} src/renders/mandelbrot.cpp)
 add_executable(fractal_animation ${LIB_FILES} src/renders/fractal_animation.cpp)
 add_executable(zoom ${LIB_FILES} src/renders/zoom.cpp)
 
+add_executable(colormap_demo ${LIB_FILES} src/renders/colormap_demo.cpp)
+
 add_executable(fractal_cell_test ${LIB_FILES} src/tests/fractal_cell_test.cpp)
 
 

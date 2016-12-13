@@ -11,12 +11,6 @@
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
-    using image_utils::matrix;
-    using std::cout;
-    using std::endl;
-    using std::unordered_map;
-    using std::string;
-
     help_printer(argc, argv, {
             {"x, y",      "width, height"},
             {"n_frames",  "nubmer of frames to render"},

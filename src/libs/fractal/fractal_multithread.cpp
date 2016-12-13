@@ -65,6 +65,8 @@ namespace image_utils {
 
     fractal_multithread::fractal_multithread(const size_t w, const size_t h) : fractal_base(w, h) {}
 
-    fractal_multithread::fractal_multithread() {};
+    fractal_multithread::fractal_multithread() {}
+
+    fractal_multithread::fractal_multithread(const fractal_multithread &rhs) : fractal_base(rhs) {};
 
 }

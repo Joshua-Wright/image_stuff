@@ -5,12 +5,13 @@
 #include <string>
 #include <sstream>
 #include <functional>
+#include <vector>
 
 void parse_args(std::unordered_map<std::string, std::stringstream> &config,
                 const int argc, const char **argv);
 
 class arg_parser {
-    std::unordered_map<std::string, std::stringstream> config;
+    std::unordered_map<std::string, std::string> config;
 
 public:
     arg_parser(const int argc, const char **argv);
@@ -19,7 +20,7 @@ public:
     T read(const std::string &argname, T def = T()) const {
         auto it = config.find(argname);
         if (it != config.end()) {
-            std::stringstream ss2(it->second.str());
+            std::stringstream ss2(it->second);
             ss2 >> def;
         }
         return def;
@@ -37,7 +38,7 @@ public:
     void read_into(T &val, const std::string &argname, U def = U()) const {
         auto it = config.find(argname);
         if (it != config.end()) {
-            std::stringstream ss2(it->second.str());
+            std::stringstream ss2(it->second);
             ss2 >> val;
         } else {
             val = def;
@@ -47,6 +48,10 @@ public:
     void read_bool(bool &val, const std::string &argname) const;
 
 };
+
+
+void help_printer(const int argc, const char **argv, const std::vector<std::pair<std::string, std::string>> &helps,
+                  int column_gap = 4, int parameter_column_width = 20);
 
 namespace containers {
     /* deprecated */

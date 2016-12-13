@@ -7,16 +7,23 @@
 #include "fractal_multithread.h"
 
 namespace image_utils {
-    struct fractal_animation_zoom : animation {
-        size_t x, y;
-        colormap cmap;
-        vec2 center;
-        size_t iter;
-        double max_zoom;
+    class fractal_animation_zoom : public animation {
+    public:
+        fractal_singlethread prototype;
+        vec2 center = vec2{-0.743643887037151, -0.743643887037151};
+        double max_zoom = 1e12;
+        colormap cmap = read_colormap_from_string("hot");
 
+        fractal_animation_zoom(size_t x, size_t y);
+
+        worker_ref get_worker() override;
+
+        ~fractal_animation_zoom() override;
+
+    private:
         struct animation_worker : worker {
             const fractal_animation_zoom &p;
-            fractal_multithread fractal;
+            fractal_singlethread fractal;
             image_RGB color_image;
             animation_worker(const fractal_animation_zoom &parent);
 
@@ -24,10 +31,6 @@ namespace image_utils {
 
             image_RGB &get_color_image() override;
         };
-
-        worker_ref get_worker() override;
-
-        ~fractal_animation_zoom() override;
 
     };
 

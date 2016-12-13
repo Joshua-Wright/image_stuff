@@ -189,5 +189,21 @@ namespace image_utils {
         );
     }
 
+    fractal_base::fractal_base(const fractal_base &rhs)
+            : iterations(rhs.iterations),
+              grid_mask(rhs.grid_mask),
+              pixel_width_x(rhs.pixel_width_x),
+              pixel_width_y(rhs.pixel_width_y),
+              custom_polynomial(rhs.custom_polynomial),
+              polynomial(rhs.polynomial),
+              max_iterations(rhs.max_iterations),
+              do_grid(rhs.do_grid),
+              is_julia(rhs.is_julia),
+              smooth(rhs.smooth),
+              do_sine_transform(rhs.do_sine_transform),
+              subsample(rhs.subsample),
+              mul(rhs.mul),
+              c(rhs.c) {}
+
 };
 

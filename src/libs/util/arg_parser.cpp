@@ -1,4 +1,6 @@
 // (c) Copyright 2016 Josh Wright
+#include <iostream>
+#include <iomanip>
 #include "arg_parser.h"
 
 namespace containers {
@@ -48,8 +50,47 @@ void parse_args(std::unordered_map<std::string, std::stringstream> &config,
     }
 }
 
+void help_printer(const int argc, const char **argv, const std::vector<std::pair<std::string, std::string>> &helps,
+                  int column_gap, int parameter_column_width) {
+    using std::cout;
+    using std::endl;
+    using std::setw;
+
+    bool print = false;
+    if (argc < 2) {
+        print = true;
+    } else {
+        for (int i = 0; i < argc; i++) {
+            std::string arg = argv[i];
+            if (arg == "-h" || arg == "--help") {
+                print = true;
+                break;
+            }
+        }
+    }
+
+    if (print) {
+        cout << "usage: " << argv[0] << "<key1>=<value1> <key2>=<value2> ..." << endl;
+
+        cout << setw(parameter_column_width) << "key:";
+        cout << setw(column_gap) << "";
+        cout << "value:";
+        cout << endl;
+
+        // TODO automatically determine width
+        // TODO wrap after maximum width
+        for (auto p : helps) {
+            cout << setw(parameter_column_width) << p.first;
+            cout << setw(column_gap) << "";
+            cout << p.second;
+            cout << endl;
+        }
+        exit(1);
+    }
+}
+
 arg_parser::arg_parser(const int argc, const char **argv) {
-    parse_args(config, argc, argv);
+    containers::parse_args(config, argc, argv);
 
 }
 

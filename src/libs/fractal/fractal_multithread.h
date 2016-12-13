@@ -15,6 +15,7 @@ namespace image_utils {
     public:
         fractal_multithread();
         fractal_multithread(const size_t w, const size_t h);
+        fractal_multithread(const fractal_multithread &rhs);
         void run();
     };
 }

@@ -13,7 +13,7 @@ namespace image_utils {
     void fractal_animator::run() {
 //        TODO log metadata about each frame
 #pragma omp parallel for schedule(static,1)
-        for (size_t i = 0; i < n_frames; i++) {
+        for (size_t i = progress; i < n_frames; i++) {
             const double t = i * 1.0 / n_frames;
             worker_ref &worker = threads[omp_get_thread_num()];
             worker->render(t);
@@ -33,8 +33,7 @@ namespace image_utils {
                   << output_folder << "output.mp4" << std::endl;
     }
 
-    worker::worker(const size_t x, const size_t y) {
-    }
+    worker::worker() {}
 
     animation::~animation() {}
 };

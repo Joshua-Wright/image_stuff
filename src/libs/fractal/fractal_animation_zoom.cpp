@@ -11,12 +11,6 @@ namespace image_utils {
         std::fill(color_image.begin(), color_image.end(), RGB{0, 0, 0});
 
         fractal.set_zoom(p.center, zoom);
-        fractal.max_iterations = p.iter;
-        fractal.is_julia = false;
-        fractal.smooth = true;
-        fractal.subsample = false;
-        fractal.do_grid = false;
-        fractal.do_sine_transform = false;
         fractal.run();
 
         log_transform(fractal.iterations);
@@ -29,7 +23,10 @@ namespace image_utils {
     }
 
     fractal_animation_zoom::animation_worker::animation_worker(const fractal_animation_zoom &parent)
-            : worker(parent.x, parent.y), p(parent), fractal(parent.x, parent.y), color_image(parent.x, parent.y, {0, 0, 0}) {}
+            : worker(),
+              p(parent),
+              fractal(parent.prototype),
+              color_image(parent.prototype.iterations.x(), parent.prototype.iterations.y(), {0, 0, 0}) {}
 
     image_RGB &fractal_animation_zoom::animation_worker::get_color_image() {
         return color_image;
@@ -41,4 +38,6 @@ namespace image_utils {
 
     fractal_animation_zoom::~fractal_animation_zoom() {
     }
+
+    fractal_animation_zoom::fractal_animation_zoom(size_t x, size_t y) : prototype(x, y) {}
 };

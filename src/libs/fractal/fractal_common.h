@@ -114,6 +114,8 @@ namespace image_utils {
 
         fractal_base(const size_t w, const size_t h);
 
+        fractal_base(const fractal_base &rhs);
+
         double iterate_cell(const complex pos);
 
         bool process_line(const line &l);

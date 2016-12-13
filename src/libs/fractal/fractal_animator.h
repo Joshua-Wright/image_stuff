@@ -21,7 +21,7 @@ namespace image_utils {
     typedef shared_ptr<animation> animation_ref;
 
     struct worker {
-        worker(const size_t x, const size_t y);
+        worker();
 
         virtual void render(double t) = 0;
 

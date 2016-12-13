@@ -33,4 +33,8 @@ namespace image_utils {
 
     fractal_singlethread::fractal_singlethread() {}
 
+    fractal_singlethread::fractal_singlethread(const fractal_singlethread &rhs)
+    // stack should always be empty when not running, so actually copying it is probably overkill
+            : fractal_base(rhs), stack(rhs.stack) {}
+
 }

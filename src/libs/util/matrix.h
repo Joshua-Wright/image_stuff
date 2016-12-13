@@ -49,6 +49,7 @@ namespace containers {
         }
 
         matrix(const matrix<T> &lhs) : width(lhs.width), height(lhs.height),
+                                       alloc(lhs.alloc), dealloc(lhs.dealloc),
                                        _data(new T[width * height]) {
             std::copy_n(lhs._data, width * height, _data);
         }

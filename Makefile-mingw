@@ -1,0 +1,38 @@
+VPATH   := $(shell find src -type d)
+SOURCES := $(shell find src/ -type f -name '*.cpp')
+OBJECTS := $(SOURCES:.cpp=.o)
+CFLAGS  := --std=gnu++14 -Wall -Wextra -lpthread -O3 -fopenmp -static -Wno-unknown-pragmas -Wno-reorder
+LDFLAGS := -lpthread
+CXX     := /usr/bin/x86_64-w64-mingw32-g++
+INC     := -Isrc/libs -Isrc/libs/fractal -Isrc/libs/util
+
+BASE := \
+	linear_interp.o \
+	cubic_interp.o \
+	lodepng.o \
+	lodepng.o \
+	arg_parser.o \
+	colormaps.o \
+	filters.o \
+	generators.o \
+	io.o
+
+BASE_FRACTAL := \
+	downsampling_fractal_animation.o \
+	fractal_animation_zoom.o \
+	fractal_animator.o \
+	fractal_common.o \
+	fractal_multithread.o \
+	fractal_singlethread.o
+
+%.o: %.cpp
+	$(CXX) $(CFLAGS) $(INC) $^ -c -o $@
+
+mandelbrot.exe: mandelbrot.o $(BASE) $(BASE_FRACTAL)
+	$(CXX) $(CFLAGS) $(INC) -o mandelbrot.exe $^ $(LDFLAGS)
+
+zoom.exe: zoom.o $(BASE) $(BASE_FRACTAL)
+	$(CXX) $(CFLAGS) $(INC) -o zoom.exe $^ $(LDFLAGS)
+
+clean:
+	rm -f *.exe *.o

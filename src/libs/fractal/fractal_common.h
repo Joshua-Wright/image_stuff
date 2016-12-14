@@ -27,7 +27,7 @@ namespace image_utils {
         return z * (1.0 - z) - lambda;
 //        return lambda * z * (1.0 - z);
     };
-    auto func_inv_lambda = [](const complex &z, const complex &c) { return 1.0 / (c * (c - 1.0)); };
+    auto func_inv_lambda = [](const complex &z, const complex &c) { return 1.0 / (z * (c - 1.0)); };
 
     enum polynomial_t {
         STANDARD,

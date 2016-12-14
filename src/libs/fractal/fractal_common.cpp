@@ -145,7 +145,6 @@ namespace image_utils {
             edges_equal = edges_equal && res;
         }
         size_t shortest_edge = std::min(r.xmax - r.xmin, r.ymax - r.ymin);
-        size_t longest_bound = std::max(iterations.x(), iterations.y());
         if (!edges_equal && shortest_edge > 1) {
             // must be careful how we round up and down because rectangles are inclusive on all bounds
             return {true,

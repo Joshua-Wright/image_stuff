@@ -20,7 +20,7 @@ namespace image_utils {
         size_t xmin, xmax, ymin, ymax;
         vec_ull corners[4];
 
-        rectangle() { }
+        rectangle() {}
 
         rectangle(const size_t x_min, const size_t x_max,
                   const size_t y_min, const size_t y_max) : xmin(x_min), xmax(x_max),
@@ -48,6 +48,7 @@ namespace image_utils {
 #if DO_GRID
     void process_rectangle(const rectangle &r, const std::vector<vec_ull> &points, matrix<size_t> &grid_indexes, matrix<size_t> &mask) {
 #else
+
     void process_rectangle(const rectangle &r, const std::vector<vec_ull> &points, matrix<size_t> &grid_indexes) {
 #endif
         containers::vect<size_t, 4> corner_indexes;
@@ -63,8 +64,6 @@ namespace image_utils {
         bool corners_equal = corner_indexes[0] == corner_indexes[1] &&
                              corner_indexes[0] == corner_indexes[2] &&
                              corner_indexes[0] == corner_indexes[3];
-        size_t shortest_edge = std::min(r.xmax - r.xmin, r.ymax - r.ymin);
-        size_t longest_bound = std::max(grid_indexes.x(), grid_indexes.y());
         // todo improve magic number?
         if (corners_equal /*&& shortest_edge < longest_bound / 10*/) {
             size_t index_fill = grid_indexes(r.xmin, r.ymin);
@@ -194,7 +193,7 @@ namespace image_utils {
             int_points[i] = points[i].pos + points[i].velocity * time;
         }
 
-        rectangle starting_rect(0, size_x - 1, 0, size_y- 1);
+        rectangle starting_rect(0, size_x - 1, 0, size_y - 1);
         matrix<size_t> indexes(size_x, size_y, NOT_DEFINED);
 #if DO_GRID
         matrix<size_t> mask(indexes);
@@ -225,7 +224,6 @@ namespace image_utils {
         std::uniform_int_distribution<size_t> d_posx(0, in.x() - 1);
         std::uniform_int_distribution<size_t> d_posy(0, in.y() - 1);
         image_RGB out(in.x(), in.y());
-        typedef containers::vect<size_t, 2> vect;
         std::vector<vec2> points(n_points);
 #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < n_points; i++) {
@@ -235,7 +233,7 @@ namespace image_utils {
 #pragma omp parallel for schedule(static) collapse(2)
         for (size_t x = 0; x < in.x(); x++) {
             for (size_t y = 0; y < in.y(); y++) {
-                vec2 cur{x, y};
+                vec2 cur{double(x), double(y)};
                 vec2 min_point = points.front();
                 double min_dist = in.size(); /*default to large value*/
 

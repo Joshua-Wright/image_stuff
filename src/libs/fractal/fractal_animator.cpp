@@ -5,7 +5,7 @@ namespace image_utils {
 
     fractal_animator::fractal_animator(animation_ref animation) : animation(animation) {
         threads.reserve((unsigned long) omp_get_max_threads());
-        for (size_t i = 0; i < omp_get_max_threads(); i++) {
+        for (int i = 0; i < omp_get_max_threads(); i++) {
             threads.push_back(animation->get_worker());
         }
     }

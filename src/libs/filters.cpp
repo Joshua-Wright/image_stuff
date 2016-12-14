@@ -8,7 +8,7 @@ namespace image_utils {
     void gaussian_helper(const matrix<containers::vect<double, 3>> &in,
                          matrix<containers::vect<double, 3>> &out,
                          const size_t &x, const size_t &y) {
-        const size_t wid = 5;
+        const int wid = 5;
         containers::vect<double, 3> avg{0, 0, 0};
         size_t count = 0;
         for (int dx = -1 * wid; dx < wid; ++dx) {

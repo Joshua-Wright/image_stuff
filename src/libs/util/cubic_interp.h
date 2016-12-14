@@ -8,7 +8,7 @@ class cubic_interp {
     std::vector<double> xs, ys, ms;
     double ymin, ymax;
 
-    const double clamp(const double x) const;
+    double clamp(const double x) const;
 
 public:
 

@@ -76,7 +76,7 @@ double cubic_interp::operator()(const double x) const {
     ));
 }
 
-const double cubic_interp::clamp(const double x) const {
+double cubic_interp::clamp(const double x) const {
     if (x < ymin) { return ymin; }
     if (x > ymax) { return ymax; }
     return x;

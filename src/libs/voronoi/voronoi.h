@@ -12,33 +12,33 @@ namespace image_utils {
     class voronoi {
 
     public:
-        struct point {
-            vec_ull position;
-            RGB color;
-        };
         struct cell {
             double dist2;
             size_t point_index;
         };
 
     private:
-        std::vector<point> points;
+        std::vector<vec_ull> points;
         matrix<cell> grid;
 
         void calculate_distances();
 
-        void flood_out_new_point(const vec_ull &pos, const point &p);
+        void flood_out_new_point(const vec_ull &pos, const vec_ull &p);
 
     public:
         voronoi(const size_t x, const size_t y);
 
-        void calculate(const std::vector<point> &pts);
+        void calculate(const std::vector<vec_ull> &pts);
 
-        void add_point(const point &p);
+        void add_point(const vec_ull &p);
 
-        void into_image(image_RGB &img);
+        void into_image(image_RGB &img, const std::vector<RGB> &colors);
+
+        void into_image_averaging(image_RGB &img, const image_RGB &base);
 
     };
+
+    size_t closest_point(const vec_ull pos, const std::vector<vec_ull> &points);
 
 };
 

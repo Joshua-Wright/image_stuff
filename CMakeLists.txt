@@ -27,7 +27,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 # find src/libs/ -type f | copy
 set(LIB_FILES
-        src/libs/voronoi/voronoi_old.h
         src/libs/types.h
         src/libs/generators.h
         src/libs/generators.cpp
@@ -39,7 +38,6 @@ set(LIB_FILES
         src/libs/filters.cpp
         src/libs/io.cpp
         src/libs/io.h
-        src/libs/voronoi/voronoi_old.cpp
         src/libs/util/lodepng.cpp
         src/libs/util/lodepng.h
         src/libs/util/vect.h
@@ -78,7 +76,6 @@ target_link_libraries(fft_upscale_image fftw3_omp fftw3 m)
 add_executable(expand_pixels ${LIB_FILES} src/renders/expand_pixels.cpp)
 add_executable(gaussian_blur ${LIB_FILES} src/renders/gaussian_blur.cpp)
 
-add_executable(voronoi_animation ${LIB_FILES} src/renders/voronoi_animation.cpp)
 add_executable(voronoi_transform ${LIB_FILES} src/renders/voronoi_transform.cpp)
 
 add_executable(mandelbrot ${LIB_FILES} src/renders/mandelbrot.cpp)

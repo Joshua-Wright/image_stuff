@@ -46,6 +46,12 @@ namespace image_utils {
         unsigned char r;
         unsigned char g;
         unsigned char b;
+
+        bool operator==(const RGB &rhs) const {
+            return r == rhs.r &&
+                   g == rhs.g &&
+                   b == rhs.b;
+        }
     };
 
     struct RGBA : RGB {

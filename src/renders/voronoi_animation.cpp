@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "util/arg_parser.h"
 #include "io.h"
-#include "voronoi.h"
+#include "voronoi/voronoi_old.h"
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;

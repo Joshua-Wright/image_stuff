@@ -1,7 +1,7 @@
 // (c) Copyright 2015 Josh Wright
 #include <iostream>
 #include <iomanip>
-#include "voronoi.h"
+#include "voronoi/voronoi_old.h"
 #include "util/arg_parser.h"
 #include "io.h"
 

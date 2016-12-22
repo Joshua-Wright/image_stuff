@@ -27,7 +27,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 # find src/libs/ -type f | copy
 set(LIB_FILES
-        src/libs/voronoi.h
+        src/libs/voronoi/voronoi_old.h
         src/libs/types.h
         src/libs/generators.h
         src/libs/generators.cpp
@@ -39,7 +39,7 @@ set(LIB_FILES
         src/libs/filters.cpp
         src/libs/io.cpp
         src/libs/io.h
-        src/libs/voronoi.cpp
+        src/libs/voronoi/voronoi_old.cpp
         src/libs/util/lodepng.cpp
         src/libs/util/lodepng.h
         src/libs/util/vect.h
@@ -57,7 +57,7 @@ set(LIB_FILES
         src/libs/fractal/fractal_common.cpp
         src/libs/util/linear_interp.h
         src/libs/util/linear_interp.cpp
-        src/libs/fractal/fractal_animator.cpp src/libs/fractal/fractal_animator.h src/libs/fractal/fractal_animation_zoom.cpp src/libs/fractal/fractal_animation_zoom.h src/libs/fractal/downsampling_fractal_animation.cpp src/libs/fractal/downsampling_fractal_animation.h)
+        src/libs/fractal/fractal_animator.cpp src/libs/fractal/fractal_animator.h src/libs/fractal/fractal_animation_zoom.cpp src/libs/fractal/fractal_animation_zoom.h src/libs/fractal/downsampling_fractal_animation.cpp src/libs/fractal/downsampling_fractal_animation.h src/libs/voronoi/voronoi.cpp src/libs/voronoi/voronoi.h)
 
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
@@ -93,5 +93,5 @@ add_executable(fractal_cell_test ${LIB_FILES} src/tests/fractal_cell_test.cpp)
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-add_executable(gtest ${LIB_FILES} src/tests/unit_tests/all_tests.cpp)
+add_executable(gtest ${LIB_FILES} src/tests/unit_tests/all_tests.cpp src/tests/unit_tests/VoronoiTest.h)
 target_link_libraries(gtest ${GTEST_BOTH_LIBRARIES})

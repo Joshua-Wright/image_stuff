@@ -153,14 +153,18 @@ namespace containers {
 
         T &operator()(const std::size_t x, const std::size_t y) {
             if (x >= width || y >= height) {
-                throw std::out_of_range("out of range");
+                std::stringstream ss;
+                ss << "out of range: " << x << " >= " << width << " || " << y << " >= " << height;
+                throw std::out_of_range(ss.str());
             }
             return _data[y * width + x];
         }
 
         const T &operator()(const std::size_t x, const std::size_t y) const {
             if (x >= width || y >= height) {
-                throw std::out_of_range("out of range");
+                std::stringstream ss;
+                ss << "out of range: " << x << " >= " << width << " || " << y << " >= " << height;
+                throw std::out_of_range(ss.str());
             }
             return _data[y * width + x];
         }
@@ -175,14 +179,18 @@ namespace containers {
 
         T &operator()(std::size_t z) {
             if (z >= (width * height)) {
-                throw std::out_of_range("out of range");
+                std::stringstream ss;
+                ss << "out of range: " << z << " >= " << width << "*" << height << "(=" << (width * height) << ")";
+                throw std::out_of_range(ss.str());
             }
             return _data[z];
         }
 
         const T &operator()(std::size_t z) const {
             if (z >= (width * height)) {
-                throw std::out_of_range("out of range");
+                std::stringstream ss;
+                ss << "out of range: " << z << " >= " << width << "*" << height << "(=" << (width * height) << ")";
+                throw std::out_of_range(ss.str());
             }
             return _data[z];
         }

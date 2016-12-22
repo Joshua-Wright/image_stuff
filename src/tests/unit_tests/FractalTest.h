@@ -49,7 +49,6 @@ protected:
 
 protected:
     FRACTAL_T fractal;
-//    matrix<double> grid;
 };
 
 INSTANTIATE_TEST_CASE_P_(

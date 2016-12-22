@@ -5,7 +5,7 @@
 #include <iostream>
 #include <random>
 #include "util/debug.h"
-#include "voronoi.h"
+#include "voronoi_old.h"
 
 #ifndef DO_GRID
 #define DO_GRID 0

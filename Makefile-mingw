@@ -15,8 +15,9 @@ BASE := \
 	colormaps.o \
 	filters.o \
 	generators.o \
+	types.o \
+	image_difference.o \
 	io.o
-
 BASE_FRACTAL := \
 	downsampling_fractal_animation.o \
 	fractal_animation_zoom.o \
@@ -24,6 +25,9 @@ BASE_FRACTAL := \
 	fractal_common.o \
 	fractal_multithread.o \
 	fractal_singlethread.o
+BASE_VORONOI := \
+	iterative_filter.o \
+	voronoi.o
 
 %.o: %.cpp
 	$(CXX) $(CFLAGS) $(INC) $^ -c -o $@
@@ -33,6 +37,9 @@ mandelbrot.exe: mandelbrot.o $(BASE) $(BASE_FRACTAL)
 
 zoom.exe: zoom.o $(BASE) $(BASE_FRACTAL)
 	$(CXX) $(CFLAGS) $(INC) -o zoom.exe $^ $(LDFLAGS)
+
+voronoi_iterative.exe: voronoi_iterative.o $(BASE) $(BASE_VORONOI)
+	$(CXX) $(CFLAGS) $(INC) -o voronoi_iterative.exe $^ $(LDFLAGS)
 
 clean:
 	rm -f *.exe *.o

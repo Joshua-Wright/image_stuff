@@ -11,6 +11,8 @@ namespace image_utils {
 
     class voronoi {
 
+        friend double avg_sq_dist_same_size(const voronoi &voronoi1, const image_RGB &base);
+
     public:
         struct cell {
             double dist2;
@@ -18,7 +20,7 @@ namespace image_utils {
         };
 
     private:
-        std::vector<vec_ull> points;
+        std::vector<vec_ull> _points;
         matrix<cell> grid;
 
         void calculate_distances();
@@ -27,6 +29,8 @@ namespace image_utils {
 
     public:
         voronoi(const size_t x, const size_t y);
+        voronoi();
+        voronoi(const voronoi &rhs);
 
         void calculate(const std::vector<vec_ull> &pts);
 
@@ -35,6 +39,10 @@ namespace image_utils {
         void into_image(image_RGB &img, const std::vector<RGB> &colors);
 
         void into_image_averaging(image_RGB &img, const image_RGB &base);
+
+        std::vector<RGB> cell_average_colors(const image_RGB &base) const;
+
+        const std::vector<vec_ull> &points() const;
 
     };
 

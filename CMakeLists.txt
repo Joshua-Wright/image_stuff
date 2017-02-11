@@ -55,7 +55,7 @@ set(LIB_FILES
         src/libs/fractal/fractal_common.cpp
         src/libs/util/linear_interp.h
         src/libs/util/linear_interp.cpp
-        src/libs/fractal/fractal_animator.cpp src/libs/fractal/fractal_animator.h src/libs/fractal/fractal_animation_zoom.cpp src/libs/fractal/fractal_animation_zoom.h src/libs/fractal/downsampling_fractal_animation.cpp src/libs/fractal/downsampling_fractal_animation.h src/libs/voronoi/voronoi.cpp src/libs/voronoi/voronoi.h)
+        src/libs/fractal/fractal_animator.cpp src/libs/fractal/fractal_animator.h src/libs/fractal/fractal_animation_zoom.cpp src/libs/fractal/fractal_animation_zoom.h src/libs/fractal/downsampling_fractal_animation.cpp src/libs/fractal/downsampling_fractal_animation.h src/libs/voronoi/voronoi.cpp src/libs/voronoi/voronoi.h src/libs/image_difference.cpp src/libs/image_difference.h src/libs/voronoi/iterative_filter.cpp src/libs/voronoi/iterative_filter.h src/libs/types.cpp)
 
 add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
 add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
@@ -77,6 +77,7 @@ add_executable(expand_pixels ${LIB_FILES} src/renders/expand_pixels.cpp)
 add_executable(gaussian_blur ${LIB_FILES} src/renders/gaussian_blur.cpp)
 
 add_executable(voronoi_transform ${LIB_FILES} src/renders/voronoi_transform.cpp)
+add_executable(voronoi_iterative ${LIB_FILES} src/renders/voronoi_iterative.cpp)
 
 add_executable(mandelbrot ${LIB_FILES} src/renders/mandelbrot.cpp)
 add_executable(fractal_animation ${LIB_FILES} src/renders/fractal_animation.cpp)

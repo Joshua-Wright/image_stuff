@@ -703,7 +703,7 @@ unsigned char lodepng_chunk_private(const unsigned char* chunk);
 /*0: the chunk is unsafe to copy, 1: the chunk is safe to copy (see PNG standard)*/
 unsigned char lodepng_chunk_safetocopy(const unsigned char* chunk);
 
-/*get pointer to the data of the chunk, where the input points to the header of the chunk*/
+/*get pointer to the data of the chunk, where the input _points to the header of the chunk*/
 unsigned char* lodepng_chunk_data(unsigned char* chunk);
 const unsigned char* lodepng_chunk_data_const(const unsigned char* chunk);
 

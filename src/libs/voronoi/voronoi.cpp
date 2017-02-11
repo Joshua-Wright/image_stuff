@@ -76,14 +76,21 @@ namespace image_utils {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    voronoi::voronoi(const size_t x, const size_t y) : grid(x, y, {-1.0, NOT_DEFINED}) {}
+    voronoi::voronoi(const size_t x, const size_t y) : grid(x, y, cell{-1.0, NOT_DEFINED}) {}
+
+    voronoi::voronoi() : voronoi(0, 0) {}
+
+    voronoi::voronoi(const voronoi &rhs)
+            : grid(rhs.grid), _points(rhs._points) {}
 
     void voronoi::calculate(const std::vector<vec_ull> &pts) {
-        rectangle starting_rect(0, grid.x() - 1, 0, grid.y() - 1);
+        // reset the grid
+        std::fill(grid.begin(), grid.end(), cell{-1.0, NOT_DEFINED});
 
-        // calculate closest points efficiently
-        this->points = pts;
-        process_rectangle(starting_rect, this->points, this->grid);
+        // calculate closest _points efficiently
+        this->_points = pts;
+        rectangle starting_rect(0, grid.x() - 1, 0, grid.y() - 1);
+        process_rectangle(starting_rect, this->_points, this->grid);
 
         // don't bother calculating distances here because we check for them to be valid in add_point()
     }
@@ -92,7 +99,7 @@ namespace image_utils {
         for (size_t i = 0; i < grid.x(); i++) {
             for (size_t j = 0; j < grid.y(); j++) {
                 if (grid(i, j).dist2 == -1.0) {
-                    grid(i, j).dist2 = points[grid(i, j).point_index].dist2(vec_ull{i, j});
+                    grid(i, j).dist2 = _points[grid(i, j).point_index].dist2(vec_ull{i, j});
                 }
             }
         }
@@ -100,7 +107,7 @@ namespace image_utils {
 
     void voronoi::add_point(const vec_ull &p) {
         flood_out_new_point(p, p);
-        points.push_back(p);
+        _points.push_back(p);
     }
 
     void voronoi::flood_out_new_point(const vec_ull &pos, const vec_ull &p) {
@@ -114,7 +121,7 @@ namespace image_utils {
 
         // make sure cell has real distance
         if (grid(pos).dist2 == -1.0) {
-            grid(pos).dist2 = pos.dist2(points[grid(pos).point_index]);
+            grid(pos).dist2 = pos.dist2(_points[grid(pos).point_index]);
         }
 
         // if new point is closer, set new distance and recurse
@@ -122,7 +129,7 @@ namespace image_utils {
         if (grid(pos).dist2 > newdist) {
 
             grid(pos).dist2 = newdist;
-            grid(pos).point_index = points.size();
+            grid(pos).point_index = _points.size();
 
             // recurse on all adjacent cells
             // diagonals are important here to make sure that sharp angles are properly covered
@@ -142,34 +149,38 @@ namespace image_utils {
     }
 
     void voronoi::into_image_averaging(image_RGB &img, const image_RGB &base) {
-        assert_same_size(img, base);
+        auto color_averages = cell_average_colors(base);
+        // do the actual fill
+        into_image(img, color_averages);
+    }
+
+    std::vector<RGB> voronoi::cell_average_colors(const image_RGB &base) const {
+        assert_same_size(base, grid);
         // TODO use L*a*b* color space for averaging?
         struct pt_avg {
             vec3 total = vec3{0, 0, 0};
             size_t n_cells = 0;
         };
-        std::vector<pt_avg> point_totals(points.size());
+        std::vector<pt_avg> point_totals(_points.size());
 
         // totals for each point
         for (size_t i = 0; i < grid.x(); i++) {
             for (size_t j = 0; j < grid.y(); j++) {
-                point_totals[grid(i, j).point_index].total[0] += base(i, j).r;
-                point_totals[grid(i, j).point_index].total[1] += base(i, j).g;
-                point_totals[grid(i, j).point_index].total[2] += base(i, j).b;
+                point_totals[grid(i, j).point_index].total += RGB_to_vec3(base(i, j));
                 point_totals[grid(i, j).point_index].n_cells++;
             }
         }
 
         // divide by count to make average
-        std::vector<RGB> color_averages(points.size(), RGB{0, 0, 0});
-        for (size_t i = 0; i < points.size(); ++i) {
-            color_averages[i].r = (unsigned char) (point_totals[i].total[0] / point_totals[i].n_cells);
-            color_averages[i].g = (unsigned char) (point_totals[i].total[1] / point_totals[i].n_cells);
-            color_averages[i].b = (unsigned char) (point_totals[i].total[2] / point_totals[i].n_cells);
+        std::vector<RGB> color_averages(_points.size(), RGB{0, 0, 0});
+        for (size_t i = 0; i < _points.size(); ++i) {
+            color_averages[i] = vec3_to_RGB(point_totals[i].total / point_totals[i].n_cells);
         }
+        return color_averages;
+    }
 
-        // do the actual fill
-        into_image(img, color_averages);
+    const std::vector<vec_ull> &voronoi::points() const {
+        return _points;
     }
 
 

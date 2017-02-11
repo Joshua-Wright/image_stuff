@@ -17,7 +17,7 @@ int main(int argc, char const *argv[]) {
     image_RGB img_in = read_image(input);
     image_RGB img_out(img_in.x(), img_in.y());
 
-    // random points
+    // random _points
     std::vector<vec_ull> points(n);
     for (size_t i = 0; i < n; ++i) {
         points[i] = vec_ull{

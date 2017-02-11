@@ -38,6 +38,13 @@ namespace image_utils {
     typedef containers::vect<size_t, 2> vec_ull;
     typedef containers::vect<long, 2> vec_ll;
 
+    template<typename T, typename U>
+    T clamp(U value, T lower, T upper) {
+        if (value > upper) { return upper; }
+        if (value < lower) { return lower; }
+        return (T) value;
+    }
+
     struct grayscale {
         unsigned char g;
     };
@@ -53,6 +60,10 @@ namespace image_utils {
                    b == rhs.b;
         }
     };
+
+    vec3 RGB_to_vec3(const RGB c);
+
+    RGB vec3_to_RGB(const vec3 &v);
 
     struct RGBA : RGB {
         unsigned char a;

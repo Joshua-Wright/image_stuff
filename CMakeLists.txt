@@ -5,7 +5,6 @@ project(image_stuff)
 #set(CMAKE_C_COMPILER   "/usr/bin/clang")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
-# includes:
 include_directories(
         "src/libs/"
         "src/libs/util"
@@ -18,78 +17,62 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -fopenmp")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 
+file(GLOB_RECURSE IMAGE_LIB_SOURCES src/libs/*.cpp)
+file(GLOB_RECURSE IMAGE_LIB_HEADERS src/libs/*.h)
+add_library(image STATIC ${IMAGE_LIB_SOURCES})
 
-# find src/libs/ -type f | copy
-set(LIB_FILES
-        src/libs/types.h
-        src/libs/generators.h
-        src/libs/generators.cpp
-        src/libs/fractal/fractal_multithread.h
-        src/libs/expand_pixels.cpp
-        src/libs/fractal/fractal_multithread.cpp
-        src/libs/expand_pixels.h
-        src/libs/colormaps.cpp
-        src/libs/filters.cpp
-        src/libs/io.cpp
-        src/libs/io.h
-        src/libs/util/lodepng.cpp
-        src/libs/util/lodepng.h
-        src/libs/util/vect.h
-        src/libs/util/debug.h
-        src/libs/util/matrix.h
-        src/libs/util/arg_parser.h
-        src/libs/util/arg_parser.cpp
-        src/libs/util/cubic_interp.cpp
-        src/libs/util/cubic_interp.h
-        src/libs/colormaps.h
-        src/libs/filters.h
-        src/libs/fractal/fractal_singlethread.cpp
-        src/libs/fractal/fractal_singlethread.h
-        src/libs/fractal/fractal_common.h
-        src/libs/fractal/fractal_common.cpp
-        src/libs/util/linear_interp.h
-        src/libs/util/linear_interp.cpp
-        src/libs/fractal/fractal_animator.cpp src/libs/fractal/fractal_animator.h src/libs/fractal/fractal_animation_zoom.cpp src/libs/fractal/fractal_animation_zoom.h src/libs/fractal/downsampling_fractal_animation.cpp src/libs/fractal/downsampling_fractal_animation.h src/libs/voronoi/voronoi.cpp src/libs/voronoi/voronoi.h src/libs/image_difference.cpp src/libs/image_difference.h src/libs/voronoi/iterative_filter.cpp src/libs/voronoi/iterative_filter.h src/libs/types.cpp)
 
-add_executable(polar_grid ${LIB_FILES} src/renders/polar_grid.cpp)
-add_executable(plot_waves ${LIB_FILES} src/renders/plot_waves.cpp)
-add_executable(lissajous_dist ${LIB_FILES} src/renders/lissajous_dist.cpp)
-add_executable(rose_dist ${LIB_FILES} src/renders/rose_dist.cpp)
-add_executable(rose_dist_range ${LIB_FILES} src/renders/rose_dist_range.cpp)
+add_executable(colormap_demo            src/renders/colormap_demo.cpp)
+add_executable(expand_pixels            src/renders/expand_pixels.cpp)
+add_executable(fractal_animation        src/renders/fractal_animation.cpp)
+add_executable(gaussian_blur            src/renders/gaussian_blur.cpp)
+add_executable(lissajous_dist           src/renders/lissajous_dist.cpp)
+add_executable(mandelbrot               src/renders/mandelbrot.cpp)
+add_executable(plot_waves               src/renders/plot_waves.cpp)
+add_executable(polar_grid               src/renders/polar_grid.cpp)
+add_executable(rose_dist                src/renders/rose_dist.cpp)
+add_executable(rose_dist_range          src/renders/rose_dist_range.cpp)
+add_executable(voronoi_iterative        src/renders/voronoi_iterative.cpp)
+add_executable(voronoi_transform        src/renders/voronoi_transform.cpp)
+add_executable(zoom                     src/renders/zoom.cpp)
 
-add_executable(benchmark_types src/tests/benchmark_types.cpp)
-add_executable(benchmark_virtual ${LIB_FILES} src/tests/benchmark_virtual.cpp)
+target_link_libraries(expand_pixels       image)
+target_link_libraries(colormap_demo       image)
+target_link_libraries(fractal_animation   image)
+target_link_libraries(gaussian_blur       image)
+target_link_libraries(lissajous_dist      image)
+target_link_libraries(mandelbrot          image)
+target_link_libraries(plot_waves          image)
+target_link_libraries(polar_grid          image)
+target_link_libraries(rose_dist           image)
+target_link_libraries(rose_dist_range     image)
+target_link_libraries(voronoi_iterative   image)
+target_link_libraries(voronoi_transform   image)
+target_link_libraries(zoom                image)
 
-add_executable(find_fourier_max src/tests/find_fourier_max.cpp)
-add_executable(random_notes src/tmp_tests/random_notes_pcm.cpp)
 
-add_executable(fft_pcm ${LIB_FILES} src/tmp_tests/fft_pcm.cpp)
-add_executable(fft_upscale_image ${LIB_FILES} src/renders/fft_upscale_image.cpp)
-target_link_libraries(fft_pcm fftw3_omp fftw3 m)
-target_link_libraries(fft_upscale_image fftw3_omp fftw3 m)
-add_executable(expand_pixels ${LIB_FILES} src/renders/expand_pixels.cpp)
-add_executable(gaussian_blur ${LIB_FILES} src/renders/gaussian_blur.cpp)
-
-add_executable(voronoi_transform ${LIB_FILES} src/renders/voronoi_transform.cpp)
-add_executable(voronoi_iterative ${LIB_FILES} src/renders/voronoi_iterative.cpp)
-
-add_executable(mandelbrot ${LIB_FILES} src/renders/mandelbrot.cpp)
-add_executable(fractal_animation ${LIB_FILES} src/renders/fractal_animation.cpp)
-add_executable(zoom ${LIB_FILES} src/renders/zoom.cpp)
-
-add_executable(colormap_demo ${LIB_FILES} src/renders/colormap_demo.cpp)
-
-add_executable(fractal_cell_test ${LIB_FILES} src/tests/fractal_cell_test.cpp)
+add_executable(benchmark_types   src/tests/benchmark_types.cpp)
+add_executable(find_fourier_max  src/tests/find_fourier_max.cpp)
 
 
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-add_executable(gtest ${LIB_FILES} src/tests/unit_tests/all_tests.cpp src/tests/unit_tests/VoronoiTest.h)
+add_executable(gtest src/tests/unit_tests/all_tests.cpp)
+# unfortunately, this macro is not able to see into the macro that is used to
+# have parameterized tests in 
+GTEST_ADD_TESTS(gtest "" 
+	src/tests/unit_tests/all_tests.cpp
+	src/tests/unit_tests/FractalTest.h
+	src/tests/unit_tests/test_cubic_interp.h
+	src/tests/unit_tests/VoronoiTest.h
+	)
 target_link_libraries(gtest ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(gtest image)
+

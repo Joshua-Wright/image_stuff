@@ -1,13 +1,13 @@
 // (c) Copyright 2016 Josh Wright
-#include <string>
+#include "colormaps.h"
+#include "generators.h"
+#include "io.h"
+#include "util/arg_parser.h"
+#include "util/debug.h"
+#include <iomanip>
 #include <iostream>
 #include <map>
-#include <iomanip>
-#include "generators.h"
-#include "util/debug.h"
-#include "colormaps.h"
-#include "util/arg_parser.h"
-#include "io.h"
+#include <string>
 
 
 int main(int argc, char const *argv[]) {
@@ -37,23 +37,23 @@ int main(int argc, char const *argv[]) {
         config.find("-h") != config.end()) {
         /*help text*/
         std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
-        << std::endl;
+                  << std::endl;
         std::cout << std::endl;
-        int pw = 20; /*parameter width*/
+        int pw = 20;           /*parameter width*/
         int dw = 80 - pw - 10; /*description width*/
         // @formatter:off
-        std::cout << std::setw(pw) <<         "parameter:" << std::setw(dw) <<               "description:" << std::endl;
-        std::cout << std::setw(pw) <<             "folder" << std::setw(dw) <<              "output folder" << std::endl;
-        std::cout << std::setw(pw) <<           "n_frames" << std::setw(dw) <<           "number of frames" << std::endl;
-        std::cout << std::setw(pw) <<                  "x" << std::setw(dw) <<                "image width" << std::endl;
-        std::cout << std::setw(pw) <<                  "y" << std::setw(dw) <<               "image height" << std::endl;
-        std::cout << std::setw(pw) <<                  "n" << std::setw(dw) <<             "rose parameter" << std::endl;
-        std::cout << std::setw(pw) <<                  "d" << std::setw(dw) <<             "rose parameter" << std::endl;
-        std::cout << std::setw(pw) <<          "wave_size" << std::setw(dw) <<     "relative size of waves" << std::endl;
-        std::cout << std::setw(pw) <<          "wave_type" << std::setw(dw) <<              "type of waves" << std::endl;
-        std::cout << std::setw(pw) <<           "off_wave" << std::setw(dw) <<        "type of offset wave" << std::endl;
-        std::cout << std::setw(pw) <<        "base_offset" << std::setw(dw) <<       "added to offset wave" << std::endl;
-        std::cout << std::setw(pw) <<  "lookup_table_size" << std::setw(dw) <<  "size of lookup table size" << std::endl;
+        std::cout << std::setw(pw) << "parameter:" << std::setw(dw) << "description:" << std::endl;
+        std::cout << std::setw(pw) << "folder" << std::setw(dw) << "output folder" << std::endl;
+        std::cout << std::setw(pw) << "n_frames" << std::setw(dw) << "number of frames" << std::endl;
+        std::cout << std::setw(pw) << "x" << std::setw(dw) << "image width" << std::endl;
+        std::cout << std::setw(pw) << "y" << std::setw(dw) << "image height" << std::endl;
+        std::cout << std::setw(pw) << "n" << std::setw(dw) << "rose parameter" << std::endl;
+        std::cout << std::setw(pw) << "d" << std::setw(dw) << "rose parameter" << std::endl;
+        std::cout << std::setw(pw) << "wave_size" << std::setw(dw) << "relative size of waves" << std::endl;
+        std::cout << std::setw(pw) << "wave_type" << std::setw(dw) << "type of waves" << std::endl;
+        std::cout << std::setw(pw) << "off_wave" << std::setw(dw) << "type of offset wave" << std::endl;
+        std::cout << std::setw(pw) << "base_offset" << std::setw(dw) << "added to offset wave" << std::endl;
+        std::cout << std::setw(pw) << "lookup_table_size" << std::setw(dw) << "size of lookup table size" << std::endl;
         std::cout << std::setw(pw + dw) << "(given as 2^x)" << std::endl;
         // @formatter:on
         return 0;
@@ -81,7 +81,7 @@ int main(int argc, char const *argv[]) {
 
 
     /*TODO: parameterize colormap*/
-    colormap_basic_hot cmap;
+    colormap cmap;
 
 
     std::cout << "filling lookup table" << std::endl;
@@ -94,9 +94,7 @@ int main(int argc, char const *argv[]) {
 
         std::stringstream output;
 
-        output << output_folder <<
-        "out_frame_" << std::setfill('0') <<
-        std::setw(5) << i << ".png";
+        output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
 
         std::string out_filename = output.str();
         double offset = offset_wave(1.0 * i / n_frames) + 2 * i / n_frames;
@@ -105,15 +103,14 @@ int main(int argc, char const *argv[]) {
         image_fill_apply_wave_to_dist(grid_distances, grid_scaled, w,
                                       offset + base_offset);
 
-        color_write_image(grid_scaled, &cmap, out_filename, false);
+        color_write_image(grid_scaled, cmap, out_filename, false);
         std::cout << "rendered: " << out_filename << std::endl;
-
     }
 
     std::cout << "Done! Render using:" << std::endl;
     std::cout << "ffmpeg -framerate 60 -i "
-    << output_folder << "out_frame_%05d.png "
-    << output_folder << "output.mp4" << std::endl;
+              << output_folder << "out_frame_%05d.png "
+              << output_folder << "output.mp4" << std::endl;
 
     return 0;
 }

@@ -82,7 +82,7 @@ int main(int argc, char const *argv[]) {
     std::cout << "rendering image" << std::endl;
     image_fill_2d_wave(grid, &dist_lissajous1);
 
-    colormap_basic_hot colormap;
-    color_write_image(grid, &colormap, output);
+    colormap cmap = read_colormap_from_string("hot");
+    color_write_image(grid, cmap, output);
     return 0;
 }

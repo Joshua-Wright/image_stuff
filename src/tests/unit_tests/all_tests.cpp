@@ -1,10 +1,11 @@
 // (c) Copyright 2016 Josh Wright
 
-#include <gtest/gtest.h>
-#include "test_cubic_interp.h"
 #include "VoronoiTest.h"
-#include "fractal/fractal_singlethread.h"
 #include "fractal/fractal_multithread.h"
+#include "fractal/fractal_singlethread.h"
+#include "test_cubic_interp.h"
+#include "test_hsv.h"
+#include <gtest/gtest.h>
 
 // horrible macro magic to parametrize types on already value-parametrized tests
 #define FRACTAL_T fractal_singlethread

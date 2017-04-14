@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.6)
 project(image_stuff)
 
 # for using clang
 #set(CMAKE_C_COMPILER   "/usr/bin/clang")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
+add_subdirectory(cpp_containers_utilities)
+
 include_directories(
         "src/libs/"
         "src/libs/util"
+        cpp_containers_utilities
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -26,6 +29,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 file(GLOB_RECURSE IMAGE_LIB_SOURCES src/libs/*.cpp)
 file(GLOB_RECURSE IMAGE_LIB_HEADERS src/libs/*.h)
 add_library(image STATIC ${IMAGE_LIB_SOURCES})
+target_link_libraries(image arg_parser cubic_interp)
 
 
 add_executable(colormap_demo            src/renders/colormap_demo.cpp)
@@ -66,8 +70,8 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 add_executable(gtest src/tests/unit_tests/all_tests.cpp)
 # unfortunately, this macro is not able to see into the macro that is used to
-# have parameterized tests in 
-GTEST_ADD_TESTS(gtest "" 
+# have parameterized tests in
+GTEST_ADD_TESTS(gtest ""
 	src/tests/unit_tests/all_tests.cpp
 	src/tests/unit_tests/FractalTest.h
 	src/tests/unit_tests/test_cubic_interp.h

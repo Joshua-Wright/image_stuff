@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
     config["off_wave"] = "noop";
     config["base_offset"] = "0";
     config["lookup_table_size"] = "20";
-    containers::parse_args(config, argc, argv);
+    parse_args(config, argc, argv);
 
     if (argc == 1 ||
         config.find("--help") != config.end() ||

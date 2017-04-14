@@ -1,19 +1,19 @@
 // (c) Copyright 2016 Josh Wright
 
-#include <vector>
-#include <string>
+#include "colormaps.h"
+#include "fractal/fractal_multithread.h"
+#include "generators.h"
+#include "io.h"
+#include "util/arg_parser.h"
+#include "util/debug.h"
 #include <cmath>
-#include <iostream>
-#include <unordered_map>
+#include <fractal/fractal_singlethread.h>
 #include <functional>
 #include <iomanip>
-#include <fractal/fractal_singlethread.h>
-#include "util/arg_parser.h"
-#include "colormaps.h"
-#include "generators.h"
-#include "debug.h"
-#include "io.h"
-#include "fractal/fractal_multithread.h"
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 
 int main(int argc, char const *argv[]) {
@@ -28,20 +28,20 @@ int main(int argc, char const *argv[]) {
     config["folder"] = "fractal_frames";
     config["x"] = "500";
     config["y"] = "500";
-//    config["x"] = "1280";
-//    config["y"] = "720";
-//    config["x"] = "1920";
-//    config["y"] = "1080";
+    //    config["x"] = "1280";
+    //    config["y"] = "720";
+    //    config["x"] = "1920";
+    //    config["y"] = "1080";
     config["xa"] = "-2";
     config["xb"] = "2";
     config["ya"] = "-2";
     config["yb"] = "2";
     config["cr"] = "-0.7754659321544456";
     config["ci"] = "0.21015827865930042";
-//    config["n_frames"] = "400";
+    //    config["n_frames"] = "400";
     config["n_frames"] = "200";
     config["iter"] = "100";
-    containers::parse_args(config, argc, argv);
+    parse_args(config, argc, argv);
 
     /*TODO: help screen*/
 
@@ -69,8 +69,8 @@ int main(int argc, char const *argv[]) {
     fractal1.do_grid = false;
     fractal1.do_sine_transform = false;
 
-//    fractal1.set_zoom(vec2{2.2, 0.0}, 1.2);
-//    fractal1.polynomial = INV_C;
+    //    fractal1.set_zoom(vec2{2.2, 0.0}, 1.2);
+    //    fractal1.polynomial = INV_C;
 
     fractal1.set_zoom(vec2{0.0, 0.0}, 1);
     fractal1.polynomial = CUSTOM;
@@ -95,18 +95,18 @@ int main(int argc, char const *argv[]) {
         output << output_folder << "out_frame_" << std::setfill('0') << std::setw(5) << i << ".png";
         std::string out_filename = output.str();
 
-//        matrix<double> grid(0, 0);
+        //        matrix<double> grid(0, 0);
         if (grid.x() != grid1.x()) {
             grid = grid1;
         }
         std::copy(grid1.begin(), grid1.end(), grid.begin());
         grid = grid1;
-//        grid2 += t;
-//        sine_transform(grid, 1 + 0.3 * sinewave(t), t, true);
+        //        grid2 += t;
+        //        sine_transform(grid, 1 + 0.3 * sinewave(t), t, true);
         sine_transform(grid, 2, t, true);
 
         scale_grid(grid);
-//        color_write_image(grid, [t, cmap](double x1) { return cmap(x1, t); }, out_filename, false);
+        //        color_write_image(grid, [t, cmap](double x1) { return cmap(x1, t); }, out_filename, false);
         color_write_image(grid, cmap, out_filename, false);
 
         std::cout << "rendered: \t" << progress << "\t/" << n_frames << std::endl;

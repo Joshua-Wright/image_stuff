@@ -1,14 +1,14 @@
 // (c) Copyright 2016 Josh Wright
-#include <vector>
-#include <string>
-#include <iostream>
-#include <unordered_map>
-#include <functional>
-#include <iomanip>
-#include "util/arg_parser.h"
 #include "colormaps.h"
 #include "generators.h"
 #include "io.h"
+#include "util/arg_parser.h"
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
@@ -29,7 +29,7 @@ int main(int argc, char const *argv[]) {
     config["wdist"] = "sine";
     config["wtheta"] = "fourier_square:3";
 
-    containers::parse_args(config, argc, argv);
+    parse_args(config, argc, argv);
 
 
     if (argc == 1 ||
@@ -39,17 +39,17 @@ int main(int argc, char const *argv[]) {
         std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
                   << std::endl;
         std::cout << std::endl;
-        int pw = 20; /*parameter width*/
+        int pw = 20;           /*parameter width*/
         int dw = 80 - pw - 10; /*description width*/
         // @formatter:off
-        std::cout << std::setw(pw) <<         "parameter:" << std::setw(dw) <<               "description:" << std::endl;
-        std::cout << std::setw(pw) <<             "output" << std::setw(dw) <<            "output filename" << std::endl;
-        std::cout << std::setw(pw) <<                  "x" << std::setw(dw) <<                "image width" << std::endl;
-        std::cout << std::setw(pw) <<                  "y" << std::setw(dw) <<               "image height" << std::endl;
-        std::cout << std::setw(pw) <<              "xdist" << std::setw(dw) <<        "distance multiplier" << std::endl;
-        std::cout << std::setw(pw) <<             "xtheta" << std::setw(dw) <<           "theta multiplier" << std::endl;
-        std::cout << std::setw(pw) <<              "wdist" << std::setw(dw) <<              "distance wave" << std::endl;
-        std::cout << std::setw(pw) <<             "wtheta" << std::setw(dw) <<                 "theta wave" << std::endl;
+        std::cout << std::setw(pw) << "parameter:" << std::setw(dw) << "description:" << std::endl;
+        std::cout << std::setw(pw) << "output" << std::setw(dw) << "output filename" << std::endl;
+        std::cout << std::setw(pw) << "x" << std::setw(dw) << "image width" << std::endl;
+        std::cout << std::setw(pw) << "y" << std::setw(dw) << "image height" << std::endl;
+        std::cout << std::setw(pw) << "xdist" << std::setw(dw) << "distance multiplier" << std::endl;
+        std::cout << std::setw(pw) << "xtheta" << std::setw(dw) << "theta multiplier" << std::endl;
+        std::cout << std::setw(pw) << "wdist" << std::setw(dw) << "distance wave" << std::endl;
+        std::cout << std::setw(pw) << "wtheta" << std::setw(dw) << "theta wave" << std::endl;
         // @formatter:on
         return 0;
     }
@@ -72,7 +72,7 @@ int main(int argc, char const *argv[]) {
     image_fill_circle_grid(grid, mul_theta, mul_dist, wave_dist, wave_theta);
 
     /*write the image*/
-//    colormap *cmap = new colormap_basic_hot();
+    //    colormap *cmap = new colormap_basic_hot();
     colormap cmap = read_colormap_from_string("threecolor");
     color_write_image(grid, cmap, output);
 }

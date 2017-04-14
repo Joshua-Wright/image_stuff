@@ -5,5 +5,5 @@
 
 namespace image_utils {
 
-    matrix<containers::vect<double, 3>> gaussian_blur(const matrix<containers::vect<double, 3>> &in);
+matrix<vec3> gaussian_blur(const matrix<vec3> &in);
 }

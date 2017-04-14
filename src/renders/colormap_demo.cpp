@@ -1,28 +1,29 @@
 // (c) Copyright 2016 Josh Wright
-#include <vector>
-#include <string>
-#include <iostream>
-#include <io.h>
-#include "util/arg_parser.h"
 #include "colormaps.h"
+#include "util/arg_parser.h"
+#include <io.h>
+#include <iostream>
+#include <string>
+#include <vector>
 
 
 using std::vector;
 using std::string;
 
 vector<string> default_colormaps_str{
-        "hot",
-        "rainbow",
-        "gray",
-        "threecolor",
-        "sine",
-        "cubic_blue_yellow",
-        "3d-cosine",
+    "hot",
+    "rainbow",
+    "gray",
+    "threecolor",
+    "sine",
+    "cubic_blue_yellow",
+    "3d-cosine",
 };
 
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
+    using namespace util;
     arg_parser args(argc, argv);
 
     auto colorband_width = args.read<size_t>("colorband_width", 1024);

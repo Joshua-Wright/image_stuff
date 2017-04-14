@@ -1,14 +1,14 @@
 // (c) Copyright 2016 Josh Wright
-#include <iostream>
-#include <string>
-#include <map>
-#include <iomanip>
-#include <unordered_map>
-#include "generators.h"
-#include "util/debug.h"
 #include "colormaps.h"
+#include "generators.h"
 #include "io.h"
 #include "util/arg_parser.h"
+#include "util/debug.h"
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <string>
+#include <unordered_map>
 
 
 int main(int argc, char const *argv[]) {
@@ -28,7 +28,7 @@ int main(int argc, char const *argv[]) {
     config["wave_size"] = "16";
     config["wave_type"] = "sawtooth";
     config["lookup_table_size"] = "20";
-    containers::parse_args(config, argc, argv);
+    parse_args(config, argc, argv);
 
     if (argc == 1 ||
         config.find("--help") != config.end() ||
@@ -37,18 +37,18 @@ int main(int argc, char const *argv[]) {
         std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
                   << std::endl;
         std::cout << std::endl;
-        int pw = 20; /*parameter width*/
+        int pw = 20;           /*parameter width*/
         int dw = 80 - pw - 10; /*description width*/
         // @formatter:off
-        std::cout << std::setw(pw) <<         "parameter:" << std::setw(dw) <<               "description:" << std::endl;
-        std::cout << std::setw(pw) <<             "output" << std::setw(dw) <<            "output filename" << std::endl;
-        std::cout << std::setw(pw) <<                  "x" << std::setw(dw) <<                "image width" << std::endl;
-        std::cout << std::setw(pw) <<                  "y" << std::setw(dw) <<               "image height" << std::endl;
-        std::cout << std::setw(pw) <<                  "n" << std::setw(dw) <<             "rose parameter" << std::endl;
-        std::cout << std::setw(pw) <<                  "d" << std::setw(dw) <<             "rose parameter" << std::endl;
-        std::cout << std::setw(pw) <<          "wave_size" << std::setw(dw) <<     "relative size of waves" << std::endl;
-        std::cout << std::setw(pw) <<          "wave_type" << std::setw(dw) <<              "type of waves" << std::endl;
-        std::cout << std::setw(pw) <<  "lookup_table_size" << std::setw(dw) <<  "size of lookup table size" << std::endl;
+        std::cout << std::setw(pw) << "parameter:" << std::setw(dw) << "description:" << std::endl;
+        std::cout << std::setw(pw) << "output" << std::setw(dw) << "output filename" << std::endl;
+        std::cout << std::setw(pw) << "x" << std::setw(dw) << "image width" << std::endl;
+        std::cout << std::setw(pw) << "y" << std::setw(dw) << "image height" << std::endl;
+        std::cout << std::setw(pw) << "n" << std::setw(dw) << "rose parameter" << std::endl;
+        std::cout << std::setw(pw) << "d" << std::setw(dw) << "rose parameter" << std::endl;
+        std::cout << std::setw(pw) << "wave_size" << std::setw(dw) << "relative size of waves" << std::endl;
+        std::cout << std::setw(pw) << "wave_type" << std::setw(dw) << "type of waves" << std::endl;
+        std::cout << std::setw(pw) << "lookup_table_size" << std::setw(dw) << "size of lookup table size" << std::endl;
         std::cout << std::setw(pw + dw) << "(given as 2^x)" << std::endl;
         // @formatter:on
         return 0;
@@ -70,8 +70,8 @@ int main(int argc, char const *argv[]) {
 
 
     /*TODO: parameterize the colormap*/
-//    colormap_basic_hot map;
-//    color_write_image(grid, &map, output);
+    //    colormap_basic_hot map;
+    //    color_write_image(grid, &map, output);
 
     colormap cmap = read_colormap_from_string("threecolor");
 

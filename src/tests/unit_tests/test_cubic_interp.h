@@ -1,17 +1,17 @@
 // (c) Copyright 2016 Josh Wright
 #pragma once
 
+#include "util/cubic_interp.h"
 #include <gtest/gtest.h>
 #include <iostream>
-#include "cubic_interp.h"
+
 
 TEST(cubic, datapoints) {
     // TODO determine why final unused data point is needed
     cubic_interp interp(
-            -999, 999,
-            {0, 1, 2, 3, 4},
-            {0, 100, 200, 300, 400}
-    );
+        -999, 999,
+        {0, 1, 2, 3, 4},
+        {0, 100, 200, 300, 400});
 
     // exactly equal because it should return the real data point
     ASSERT_EQ(0, interp(0));
@@ -22,10 +22,9 @@ TEST(cubic, datapoints) {
 
 TEST(cubic, linear_interp) {
     cubic_interp interp(
-            -999, 999,
-            {0, 1, 2, 3},
-            {0, 100, 200, 300}
-    );
+        -999, 999,
+        {0, 1, 2, 3},
+        {0, 100, 200, 300});
 
     for (double x = 0.1; x < 2.9; x += 0.05) {
         ASSERT_DOUBLE_EQ(100 * x, interp(x)) << "linear interp " << x << " to " << 100 * x;
@@ -72,8 +71,7 @@ TEST(cubic, cubic) {
 
     for (double x = -0.9 * xmax; x < 0.9 * xmax; x += 0.1) {
         ASSERT_NEAR(poly(x), interp(x), max_error)
-                                    << "x = " << x << " -> "
-                                    << a << "*x^3 + " << b << "*x^2 + " << c << "*x + " << d <<
-                                    " = " << interp(x);
+            << "x = " << x << " -> "
+            << a << "*x^3 + " << b << "*x^2 + " << c << "*x + " << d << " = " << interp(x);
     }
 }

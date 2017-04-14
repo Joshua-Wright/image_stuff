@@ -1,9 +1,9 @@
 // (c) Copyright 2015 Josh Wright
-#include <iostream>
-#include <iomanip>
-#include "util/arg_parser.h"
-#include "io.h"
 #include "expand_pixels.h"
+#include "io.h"
+#include "util/arg_parser.h"
+#include <iomanip>
+#include <iostream>
 
 int main(int argc, char const *argv[]) {
     using namespace image_utils;
@@ -15,7 +15,7 @@ int main(int argc, char const *argv[]) {
     /*default values*/
     unordered_map<string, string> config;
     config["scale"] = "30";
-    containers::parse_args(config, argc, argv);
+    parse_args(config, argc, argv);
 
 
     if (argc == 1 ||
@@ -24,15 +24,15 @@ int main(int argc, char const *argv[]) {
         config.find("in") == config.end()) {
         /*help text*/
         std::cout << "Usage: " << argv[0] << " [parameter_name=definition ...]"
-        << std::endl;
+                  << std::endl;
         std::cout << std::endl;
-        int pw = 20; /*parameter width*/
+        int pw = 20;           /*parameter width*/
         int dw = 80 - pw - 10; /*description width*/
         // @formatter:off
-        std::cout << std::setw(pw) <<         "parameter:" << std::setw(dw) <<               "description:" << std::endl;
-        std::cout << std::setw(pw) <<                 "in" << std::setw(dw) <<             "input filename" << std::endl;
-        std::cout << std::setw(pw) <<                "out" << std::setw(dw) <<            "output filename" << std::endl;
-        std::cout << std::setw(pw) <<              "scale" << std::setw(dw) <<               "scale factor" << std::endl;
+        std::cout << std::setw(pw) << "parameter:" << std::setw(dw) << "description:" << std::endl;
+        std::cout << std::setw(pw) << "in" << std::setw(dw) << "input filename" << std::endl;
+        std::cout << std::setw(pw) << "out" << std::setw(dw) << "output filename" << std::endl;
+        std::cout << std::setw(pw) << "scale" << std::setw(dw) << "scale factor" << std::endl;
         // @formatter:on
         return 0;
     }

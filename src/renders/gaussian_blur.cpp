@@ -1,35 +1,34 @@
 // (c) Copyright 2015 Josh Wright
-
-#include "io.h"
 #include "filters.h"
+#include "io.h"
+#include "util/arg_parser.h"
+#include "util/struct_tuple.h"
 
-int main(int argc, char const *argv[]) {
+using std::string;
 
-    using namespace image_utils;
+struct CFG {
+  string in, out;
+  string kernel = "unsharp";
+};
 
-    const std::string in = "/home/j0sh/Dropbox/code/Cpp/image_stuff/build/input.png";
-    matrix<RGB> in_data = read_image(in);
-    matrix<vec3> in_double(in_data.x(), in_data.y());
-    std::transform(in_data.begin(), in_data.end(), in_double.begin(),
-                   [](const RGB &in) {
-                       vec3 out;
-                       out[0] = in.r;
-                       out[1] = in.g;
-                       out[2] = in.b;
-                       return out;
-                   });
+ADAPT_FIELDS(CFG, in, out, kernel)
 
-    matrix<vec3> out_double = gaussian_blur(in_double);
-    matrix<RGB> out_rgb(out_double.x(), out_double.y());
-    std::transform(out_double.begin(), out_double.end(), out_rgb.begin(),
-                   [](const vec3 &in) {
-                                      RGB out;
-                                      out.r = in[0];
-                                      out.g = in[1];
-                                      out.g = in[2];
-                                      return out;
-                   });
+int main(int argc, char const **argv) {
+  using namespace image_utils;
+  using namespace util;
+  help_printer(argc, argv,
+               {
+                   {"in", "input filename"}, {"out", "output filename"},
+               });
+  CFG cfg = parse_args<CFG>(argc, argv);
+  if (cfg.out == "") {
+    cfg.out = cfg.in + "blurred.png";
+  }
 
-    write_image(out_rgb, in + "blured.png");
-    return 0;
+  write_image(
+      // image_vec3_to_RGB(gaussian_blur(image_RGB_to_vec3(read_image(cfg.in)))),
+      image_vec3_to_RGB(convolve(image_RGB_to_vec3(read_image(cfg.in)),
+                                 kernels.at(cfg.kernel))),
+      cfg.out);
+  return 0;
 }

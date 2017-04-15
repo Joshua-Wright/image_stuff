@@ -1,57 +1,105 @@
-// (c) Copyright 2015 Josh Wright
-
+// (c) Copyright 2017 Josh Wright
 #include "filters.h"
-
+#include <numeric>
 
 namespace image_utils {
 
-void gaussian_helper(const matrix<vec3> &in,
-                     matrix<vec3> &out,
-                     const size_t &x, const size_t &y) {
-    const int wid = 5;
-    vec3 avg{0, 0, 0};
-    size_t count = 0;
-    for (int dx = -1 * wid; dx < wid; ++dx) {
-        for (int dy = -1 * wid; dy < wid; ++dy) {
-            /*if inside input matrix*/
-            //                if ((x + dx) < in.x() && (x + dx) >= 0 &&
-            //                    (y + dy) < in.y() && (y + dy) >= 0) {
-            //                    /*add into the weighted average*/
-            //                    if (dx != 0 && dy != 0) {
-            //                        avg += in(x + dx, y + dy) / (x * x + y * y);
-            //                    } else {
-            //                        avg += in(x + dx, y + dy) / 0.5;
-            //                    }
-            //                    ++count;
-            //                }
-            try {
-                avg += in(x + dx, y + dy) / (dx * dx + dy * dy + 1);
-                //                    if (dx != 0 && dy != 0) {
-                //                        avg += in(x + dx, y + dy) / (dx * dx + dy * dy);
-                //                    } else {
-                //                        avg += in(x + dx, y + dy) / 0.5;
-                //                    }
-                ++count;
-            } catch (...) {
-            }
-        }
-    }
-    //        out(x, y) = avg / count;
-    out(x, y) = avg;
-}
+matrix<vec3> convolve(const matrix<vec3> &in, const matrix<double> &kernel) {
+  matrix<vec3> out(in.x(), in.y());
+  size_t kx = kernel.x(), ky = kernel.y();
 
-matrix<util::vect<double, 3>> gaussian_blur(
-    const matrix<util::vect<double, 3>> &in) {
-
-    matrix<util::vect<double, 3>> out(in.x(), in.y());
+// double kernel_sum = std::accumulate(kernel.begin(), kernel.end(), 0.0);
 
 #pragma omp parallel for schedule(static) collapse(2)
-    for (size_t x = 0; x < in.x(); ++x) {
-        for (size_t y = 0; y < in.y(); ++y) {
-            gaussian_helper(in, out, x, y);
-        }
-    }
+  for (size_t i = 0; i < in.x(); ++i) {
+    for (size_t j = 0; j < in.y(); ++j) {
+      vec3 sum = {0, 0, 0};
+      // only sum the parts from the kernel that we use
+      double kernel_sum = 0;
 
-    return out;
+      for (size_t ki = 0; ki < kernel.x(); ++ki) {
+        for (size_t kj = 0; kj < kernel.y(); ++kj) {
+          vec_ull pos{i + ki - kx / 2, j + kj - ky / 2};
+          // unsigned-ness takes care of the <0 case for us
+          if (pos[0] < in.x() && pos[1] < in.y()) {
+            sum += in(pos)*kernel(ki, kj);
+            kernel_sum += kernel(ki, kj);
+          }
+        }
+      }
+      if (kernel_sum == 0) {
+        kernel_sum = 1;
+      }
+
+      out(i, j) = sum / kernel_sum;
+    }
+  }
+  return out;
 }
+
+matrix<double> kernel_gaussian({
+    // clang-format off
+{0.00000067, 0.00002292, 0.00019117, 0.00038771, 0.00019117, 0.00002292, 0.00000067},
+{0.00002292, 0.00078634, 0.00655965, 0.01330373, 0.00655965, 0.00078633, 0.00002292},
+{0.00019117, 0.00655965, 0.05472157, 0.11098164, 0.05472157, 0.00655965, 0.00019117},
+{0.00038771, 0.01330373, 0.11098164, 0.22508352, 0.11098164, 0.01330373, 0.00038771},
+{0.00019117, 0.00655965, 0.05472157, 0.11098164, 0.05472157, 0.00655965, 0.00019117},
+{0.00002292, 0.00078633, 0.00655965, 0.01330373, 0.00655965, 0.00078633, 0.00002292},
+{0.00000067, 0.00002292, 0.00019117, 0.00038771, 0.00019117, 0.00002292, 0.00000067},
+    // clang-format on
+});
+
+matrix<double> kernel_unsharp({
+    // clang-format off
+{1,  4,    6,  4, 1},
+{4, 16,   24, 16, 4},
+{6, 24, -476, 24, 6},
+{4, 16,   24, 16, 4},
+{1,  4,    6,  4, 1},
+    // clang-format on
+});
+
+matrix<double> kernel_edge_detect({
+    // clang-format off
+{-1,-1,-1},
+{-1, 8,-1},
+{-1,-1,-1},
+    // clang-format on
+});
+
+matrix<double> kernel_edge_detect_x2({
+    // clang-format off
+{-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1},
+{-1,-1, 8, 8,-1,-1},
+{-1,-1, 8, 8,-1,-1},
+{-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1},
+    // clang-format on
+});
+
+matrix<double> kernel_edge_detect_x4({
+    // clang-format off
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1, 8, 8, 8, 8,-1,-1,-1,-1},
+{-1,-1,-1,-1, 8, 8, 8, 8,-1,-1,-1,-1},
+{-1,-1,-1,-1, 8, 8, 8, 8,-1,-1,-1,-1},
+{-1,-1,-1,-1, 8, 8, 8, 8,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+    // clang-format on
+});
+
+std::unordered_map<std::string, matrix<double>> kernels{
+    {"gaussian", kernel_gaussian},
+    {"unsharp", kernel_unsharp},
+    {"edge_detect", kernel_edge_detect},
+    {"edge_detect_x2", kernel_edge_detect_x2},
+    {"edge_detect_x4", kernel_edge_detect_x4},
+};
 }

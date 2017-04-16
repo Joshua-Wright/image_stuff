@@ -58,12 +58,13 @@ int main(int argc, char const *argv[]) {
   arg_parser args(argc, argv);
   fractal_info cfg = parse_args<fractal_info>(argc, argv);
   // only support square images for now
-  cfg.y = cfg.x;
+  // cfg.y = cfg.x;
   std::string base_outfile = args.read<std::string>("output", "output");
   size_t n = args.read<size_t>("n", 2);
   cfg.zoom *= n;
-  auto bounds = calc_bounds(cfg.x, cfg.x, vec2{cfg.r, cfg.i}, cfg.zoom);
+  auto bounds = calc_bounds(cfg.x, cfg.y, vec2{cfg.r, cfg.i}, cfg.zoom);
   double width_at_zoom = (bounds[1] - bounds[0]) / 2;
+  double height_at_zoom = (bounds[3] - bounds[2]) / 2;
 
   int np = n / 2;
 
@@ -78,24 +79,23 @@ int main(int argc, char const *argv[]) {
         fractal_info cfg2 = cfg;
         if (n % 2 == 1) {
           cfg2.r += 2 * width_at_zoom * i;
-          cfg2.i += 2 * width_at_zoom * j;
+          cfg2.i += 2 * height_at_zoom * j;
         } else {
           cfg2.r += width_at_zoom * i + sgn(i) * (width_at_zoom) * (abs(i) - 1);
-          cfg2.i += width_at_zoom * j + sgn(j) * (width_at_zoom) * (abs(j) - 1);
+          cfg2.i +=
+              height_at_zoom * j + sgn(j) * (height_at_zoom) * (abs(j) - 1);
         }
 
         if (!render_exists(base_outfile, cfg2)) {
 
-          std::cout << "i=" << i << std::endl;
-          std::cout << "j=" << j << std::endl;
-          std::cout << json(cfg2) << std::endl;
+          std::cout << "i=" << i << "\t"
+                    << "j=" << j << "\t" << json(cfg2) << std::endl;
 
           fractal_singlethread fractal;
           fractal.read_config(cfg2);
           fractal.run();
 
           image_sanity_check(fractal.iterations, true);
-          scale_grid(fractal.iterations);
 
           color_write_image(fractal.iterations,
                             read_colormap_from_string(cfg2.color), outfile);
@@ -118,7 +118,7 @@ int main(int argc, char const *argv[]) {
     }
   }
   // tell montage not to put a border between the things
-  script << "-geometry " << cfg.x << "x" << cfg.x << "+0+0 ";
+  script << "-geometry " << cfg.x << "x" << cfg.y << "+0+0 ";
   script << base_outfile << ".png" << std::endl;
   std::cout << script.str();
   std::ofstream("combine_" + base_outfile + ".sh") << script.str();

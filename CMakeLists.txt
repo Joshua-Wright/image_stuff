@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 project(image_stuff)
 
 # for using clang
@@ -68,18 +68,19 @@ add_executable(benchmark_types   src/tests/benchmark_types.cpp)
 add_executable(find_fourier_max  src/tests/find_fourier_max.cpp)
 
 
-enable_testing()
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-add_executable(gtest src/tests/unit_tests/all_tests.cpp)
-# unfortunately, this macro is not able to see into the macro that is used to
-# have parameterized tests in
-GTEST_ADD_TESTS(gtest ""
-	src/tests/unit_tests/all_tests.cpp
-	src/tests/unit_tests/FractalTest.h
-	src/tests/unit_tests/test_cubic_interp.h
-	src/tests/unit_tests/VoronoiTest.h
-	)
-target_link_libraries(gtest ${GTEST_BOTH_LIBRARIES})
-target_link_libraries(gtest image)
+# TODO rewrite tests using Catch. gtest stopped building on my system for some reason
+# enable_testing()
+# find_package(GTest REQUIRED)
+# include_directories(${GTEST_INCLUDE_DIRS})
+# add_executable(gtest src/tests/unit_tests/all_tests.cpp)
+# # unfortunately, this macro is not able to see into the macro that is used to
+# # have parameterized tests in
+# GTEST_ADD_TESTS(gtest ""
+# 	src/tests/unit_tests/all_tests.cpp
+# 	src/tests/unit_tests/FractalTest.h
+# 	src/tests/unit_tests/test_cubic_interp.h
+# 	src/tests/unit_tests/VoronoiTest.h
+# 	)
+# target_link_libraries(gtest ${GTEST_BOTH_LIBRARIES})
+# target_link_libraries(gtest image)
 

@@ -1,11 +1,4 @@
 // (c) Copyright 2015 Josh Wright
-#include "colormaps.h"
-#include "fractal/fractal_info.h"
-#include "fractal/fractal_singlethread.h"
-#include "generators.h"
-#include "io.h"
-#include "util/arg_parser.h"
-#include "util/debug.h"
 #include <fstream>
 #include <functional>
 #include <iomanip>
@@ -13,6 +6,13 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "colormaps.h"
+#include "fractal/fractal_info.h"
+#include "fractal/fractal_singlethread.h"
+#include "generators.h"
+#include "io.h"
+#include "util/arg_parser.h"
+#include "util/debug.h"
 
 static inline int sgn(int i) {
   if (i > 0) {
@@ -24,8 +24,7 @@ static inline int sgn(int i) {
   }
 };
 
-static inline bool render_exists(const std::string &path,
-                                 const fractal_info &cfg) {
+static inline bool render_exists(const std::string &path, const fractal_info &cfg) {
   json expected = json(cfg);
   json actual;
   std::ifstream f(path + ".json");
@@ -38,7 +37,6 @@ static inline bool render_exists(const std::string &path,
 }
 
 int main(int argc, char const *argv[]) {
-
   using namespace image_utils;
   help_printer(argc, argv,
                {
@@ -62,7 +60,7 @@ int main(int argc, char const *argv[]) {
   std::string base_outfile = args.read<std::string>("output", "output");
   size_t n = args.read<size_t>("n", 2);
   cfg.zoom *= n;
-  auto bounds = calc_bounds(cfg.x, cfg.y, vec2{cfg.r, cfg.i}, cfg.zoom);
+  auto bounds = fractal_singlethread<>::calc_bounds(cfg.x, cfg.y, vec2{cfg.r, cfg.i}, cfg.zoom);
   double width_at_zoom = (bounds[1] - bounds[0]) / 2;
   double height_at_zoom = (bounds[3] - bounds[2]) / 2;
 
@@ -74,31 +72,28 @@ int main(int argc, char const *argv[]) {
       // TODO do not re-create images that are already made with the same
       // parameters
       if (!(n % 2 == 0 && (i == 0 || j == 0))) {
-        std::string outfile = base_outfile + "_" + std::to_string(i) + "_" +
-                              std::to_string(j) + ".png";
+        std::string outfile =
+            base_outfile + "_" + std::to_string(i) + "_" + std::to_string(j) + ".png";
         fractal_info cfg2 = cfg;
         if (n % 2 == 1) {
           cfg2.r += 2 * width_at_zoom * i;
           cfg2.i += 2 * height_at_zoom * j;
         } else {
           cfg2.r += width_at_zoom * i + sgn(i) * (width_at_zoom) * (abs(i) - 1);
-          cfg2.i +=
-              height_at_zoom * j + sgn(j) * (height_at_zoom) * (abs(j) - 1);
+          cfg2.i += height_at_zoom * j + sgn(j) * (height_at_zoom) * (abs(j) - 1);
         }
 
         if (!render_exists(base_outfile, cfg2)) {
-
           std::cout << "i=" << i << "\t"
                     << "j=" << j << "\t" << json(cfg2) << std::endl;
 
-          fractal_singlethread fractal;
+          fractal_singlethread<> fractal;
           fractal.read_config(cfg2);
           fractal.run();
 
           image_sanity_check(fractal.iterations, true);
 
-          color_write_image(fractal.iterations,
-                            read_colormap_from_string(cfg2.color), outfile);
+          color_write_image(fractal.iterations, read_colormap_from_string(cfg2.color), outfile);
           // write metadata file
           std::ofstream f(outfile + ".json");
           f << json(cfg2) << std::endl;

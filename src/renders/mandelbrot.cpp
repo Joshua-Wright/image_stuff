@@ -1,10 +1,4 @@
 // (c) Copyright 2015 Josh Wright
-#include "colormaps.h"
-#include "fractal/fractal_info.h"
-#include "fractal/fractal_multithread.h"
-#include "generators.h"
-#include "io.h"
-#include "util/arg_parser.h"
 #include <fstream>
 #include <functional>
 #include <iomanip>
@@ -12,9 +6,14 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "colormaps.h"
+#include "fractal/fractal_info.h"
+#include "fractal/fractal_multithread.h"
+#include "generators.h"
+#include "io.h"
+#include "util/arg_parser.h"
 
 int main(int argc, char const *argv[]) {
-
   using namespace image_utils;
   help_printer(argc, argv,
                {
@@ -32,7 +31,7 @@ int main(int argc, char const *argv[]) {
                3, 10);
   arg_parser args(argc, argv);
   fractal_info cfg = parse_args<fractal_info>(argc, argv);
-  fractal_multithread fractal;
+  fractal_multithread<> fractal;
   fractal.read_config(cfg);
 
   std::cout << json(cfg) << std::endl;
@@ -43,8 +42,7 @@ int main(int argc, char const *argv[]) {
   scale_grid(fractal.iterations);
 
   std::string outfile = args.read<std::string>("output", "output.png");
-  color_write_image(fractal.iterations, read_colormap_from_string(cfg.color),
-                    outfile);
+  color_write_image(fractal.iterations, read_colormap_from_string(cfg.color), outfile);
   // write metadata file
   std::ofstream f(outfile + ".json");
   f << json(cfg) << std::endl;

@@ -31,18 +31,19 @@ int main(int argc, char const *argv[]) {
                3, 10);
   arg_parser args(argc, argv);
   fractal_info cfg = parse_args<fractal_info>(argc, argv);
-  fractal_multithread<> fractal;
-  fractal.read_config(cfg);
+  // fractal_multithread<> fractal;
+  // fractal.read_config(cfg);
+  fractal_ref fractal = get_fractal(cfg);
 
   std::cout << json(cfg) << std::endl;
 
-  fractal.run();
+  fractal->run();
 
-  image_sanity_check(fractal.iterations, true);
-  scale_grid(fractal.iterations);
+  image_sanity_check(fractal->iterations, true);
+  scale_grid(fractal->iterations);
 
   std::string outfile = args.read<std::string>("output", "output.png");
-  color_write_image(fractal.iterations, read_colormap_from_string(cfg.color), outfile);
+  color_write_image(fractal->iterations, read_colormap_from_string(cfg.color), outfile);
   // write metadata file
   std::ofstream f(outfile + ".json");
   f << json(cfg) << std::endl;

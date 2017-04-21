@@ -188,8 +188,8 @@ class fractal_impl : public fractal {
       z = poly(z, c);
       if (norm(z) > cap) {
         if (smooth) {
-          // return double( numeric(i) - log(log(norm(z) + numeric(1)) + numeric(1)) + numeric(4.0));
-          return i - log2(log2(norm(z) + 1) + 1) + 4.0;
+          // explicitly down-casting here is deemed to be fine because we'll be returning a double anyway
+          return i - log2(log2(double(norm(z)) + 1) + 1) + 4.0;
         } else {
           return double(i);
         }

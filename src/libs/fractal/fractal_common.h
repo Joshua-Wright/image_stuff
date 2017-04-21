@@ -21,11 +21,11 @@ const double NOT_DEFINED = -1.0;
     }                                                                  \
   };
 
-FRACTAL_POLYNOMIAL(func_standard, pow(z, numeric(2)) + c)
-FRACTAL_POLYNOMIAL(func_cubic, pow(z, numeric(3)) + c)
-FRACTAL_POLYNOMIAL(func_quadratic_rational, pow(z, numeric(2)) + pow(c, 2) / (pow(c, 4) - numeric(0.25)))
-FRACTAL_POLYNOMIAL(func_inv_c, pow(z, numeric(2)) + numeric(1.0) / (c - numeric(1)))
-FRACTAL_POLYNOMIAL(func_inv_c_parabola, pow(z, numeric(2)) + numeric(1.0) / c + numeric(0.25))
+FRACTAL_POLYNOMIAL(func_standard, z * z + c)
+FRACTAL_POLYNOMIAL(func_cubic, z * z * z + c)
+FRACTAL_POLYNOMIAL(func_quadratic_rational, (z * z) + (c * c) / ((c*c*c*c) - numeric(0.25)))
+FRACTAL_POLYNOMIAL(func_inv_c, (z * z) + numeric(1.0) / (c - numeric(1)))
+FRACTAL_POLYNOMIAL(func_inv_c_parabola, (z * z) + numeric(1.0) / c + numeric(0.25))
 
 enum polynomial_t {
   STANDARD,

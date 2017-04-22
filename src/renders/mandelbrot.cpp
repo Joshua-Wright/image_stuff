@@ -8,7 +8,7 @@
 #include <vector>
 #include "colormaps.h"
 #include "fractal/fractal_info.h"
-#include "fractal/fractal_multithread.h"
+#include "fractal/fractal_common.h"
 #include "generators.h"
 #include "io.h"
 #include "util/arg_parser.h"

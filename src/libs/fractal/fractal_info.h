@@ -4,9 +4,10 @@
 struct fractal_info {
   size_t x = 500, y = 500;
   size_t iter = 256, bits = 64;
-  double r = 0, i = 0;
-  double cr = 0, ci = 0;
-  double zoom = 1;
+  // strings for representing values that may be arbitrary precision
+  std::string zoom = "1";
+  std::string r = "0", i = "0";
+  std::string cr = "0", ci = "0";
   double mul = 1;
   bool subsample = false;
   bool smooth = false;

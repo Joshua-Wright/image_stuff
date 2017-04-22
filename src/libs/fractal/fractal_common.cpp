@@ -1,9 +1,13 @@
 // (c) Copyright 2016 Josh Wright
-// #include <boost/multiprecision/cpp_bin_float.hpp>
+
 #include <boost/multiprecision/float128.hpp>
+#include <boost/multiprecision/gmp.hpp>
 using namespace boost::multiprecision;
+using namespace boost::math;
+using namespace boost::math::tools;
 
 #include "fractal_common.h"
+#include "fractal_impl.h"
 #include "generators.h"
 
 namespace image_utils {
@@ -39,6 +43,30 @@ void log_transform(matrix<double> &in, const double multiplier) {
   }
 }
 
+// maximum precision available numeric type
+typedef mpf_float precise_numeric;
+
+std::string precise_mul(const std::string &_a, const std::string &_b) {
+  precise_numeric a = numeric_from_string<precise_numeric>(_a);
+  precise_numeric b = numeric_from_string<precise_numeric>(_b);
+  std::stringstream ss;
+  ss << a * b;
+  return ss.str();
+}
+
+///////////////////////////////////////////////////////////////////
+
+void fractal::read_config(const fractal_info &cfg) {
+  iterations = matrix<double>(cfg.x, cfg.y, NOT_DEFINED);
+  grid_mask = matrix<bool>(cfg.x, cfg.y, 0);
+  subsample = cfg.subsample;
+  smooth = cfg.smooth;
+  do_grid = cfg.do_grid;
+  is_julia = cfg.is_julia;
+  max_iterations = cfg.iter;
+  mul = cfg.mul;
+}
+
 template <typename numeric>
 fractal_ref get_fractal_helper(const fractal_info &cfg) {
   using std::make_shared;
@@ -71,11 +99,9 @@ fractal_ref get_fractal(const fractal_info &cfg) {
       return get_fractal_helper<double>(cfg);
     case 128:
       return get_fractal_helper<float128>(cfg);
-    // currently causes an insane amount of template-related errors
-    // case 256:
-    //   return get_fractal_helper<cpp_bin_float<256>>(cfg);
     default:
-      throw std::invalid_argument("unsupported precision: " + std::to_string(cfg.bits));
+      mpf_float::default_precision(cfg.bits);
+      return get_fractal_helper<mpf_float>(cfg);
   }
 }
 

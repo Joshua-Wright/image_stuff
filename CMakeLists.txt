@@ -31,8 +31,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -ggdb")
 file(GLOB_RECURSE IMAGE_LIB_SOURCES src/libs/*.cpp)
 file(GLOB_RECURSE IMAGE_LIB_HEADERS src/libs/*.h)
 add_library(image STATIC ${IMAGE_LIB_SOURCES})
-#target_link_libraries(image arg_parser cubic_interp quadmath)
 target_link_libraries(image arg_parser cubic_interp)
+target_link_libraries(image quadmath gmp)
 
 
 add_executable(colormap_demo            src/renders/colormap_demo.cpp)

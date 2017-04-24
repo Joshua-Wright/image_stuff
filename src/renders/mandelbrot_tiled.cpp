@@ -38,18 +38,6 @@ std::string to_string(const mpf_float &n) {
   return ss.str();
 }
 
-static inline bool render_exists(const std::string &path, const fractal_info &cfg) {
-  json expected = json(cfg);
-  json actual;
-  std::ifstream f(path + ".json");
-  if (f.good()) {
-    f >> actual;
-    return expected.dump() == actual.dump();
-  } else {
-    return false;
-  }
-}
-
 int main(int argc, char const *argv[]) {
   using namespace image_utils;
   help_printer(argc, argv,
@@ -72,9 +60,10 @@ int main(int argc, char const *argv[]) {
   std::string base_outfile = args.read<std::string>("output", "output");
   size_t n = args.read<size_t>("n", 2);
   mpf_float zoom = numeric_from_string<mpf_float>(cfg.zoom) * n;
-  mpf_float r = numeric_from_string<mpf_float>(cfg.r);
-  mpf_float i = numeric_from_string<mpf_float>(cfg.i);
-  auto bounds = fractal_impl<mpf_float>::calc_bounds(cfg.x, cfg.y, vect<mpf_float, 2>{r, i}, zoom);
+  mpf_float cfg_r = numeric_from_string<mpf_float>(cfg.r);
+  mpf_float cfg_i = numeric_from_string<mpf_float>(cfg.i);
+  auto bounds =
+      fractal_impl<mpf_float>::calc_bounds(cfg.x, cfg.y, vect<mpf_float, 2>{cfg_r, cfg_i}, zoom);
   mpf_float width_at_zoom = (bounds[1] - bounds[0]) / 2;
   mpf_float height_at_zoom = (bounds[3] - bounds[2]) / 2;
 
@@ -83,20 +72,21 @@ int main(int argc, char const *argv[]) {
 #pragma omp parallel for schedule(static) collapse(2)
   for (int i = -np; i <= np; i++) {
     for (int j = -np; j <= np; j++) {
-      // do not re-create images that are already made with the same parameters
+      // for even n, skip rendering the middle cross section
       if (!(n % 2 == 0 && (i == 0 || j == 0))) {
         std::string outfile =
             base_outfile + "_" + std::to_string(i) + "_" + std::to_string(j) + ".png";
         fractal_info cfg2 = cfg;
         cfg2.zoom = to_string(zoom);
         if (n % 2 == 1) {
-          cfg2.r = to_string(r + 2 * width_at_zoom * i);
-          cfg2.i = to_string(i + 2 * height_at_zoom * j);
+          cfg2.r = to_string(cfg_r + 2 * width_at_zoom * i);
+          cfg2.i = to_string(cfg_i + 2 * height_at_zoom * j);
         } else {
-          cfg2.r = to_string(r + width_at_zoom * i + sgn(i) * (width_at_zoom) * (abs(i) - 1));
-          cfg2.i = to_string(i + height_at_zoom * j + sgn(j) * (height_at_zoom) * (abs(j) - 1));
+          cfg2.r = to_string(cfg_r + width_at_zoom * i + sgn(i) * (width_at_zoom) * (abs(i) - 1));
+          cfg2.i = to_string(cfg_i + height_at_zoom * j + sgn(j) * (height_at_zoom) * (abs(j) - 1));
         }
 
+        // do not re-create images that are already made with the same parameters
         if (!render_exists(base_outfile, cfg2)) {
           std::cout << "i=" << i << "\t"
                     << "j=" << j << "\t" << json(cfg2) << std::endl;

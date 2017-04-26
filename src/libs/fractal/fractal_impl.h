@@ -215,7 +215,7 @@ class fractal_impl : public fractal {
     }
 
     if (do_sine_transform) {
-      iterations = iterations;
+      // iterations = iterations;
       log_transform(iterations);
       sine_transform(iterations, mul);
     }

@@ -7,8 +7,9 @@
 #include <unordered_map>
 #include <vector>
 #include "colormaps.h"
-#include "fractal/fractal_info.h"
 #include "fractal/fractal_common.h"
+#include "fractal/fractal_avx.h"
+#include "fractal/fractal_info.h"
 #include "generators.h"
 #include "io.h"
 #include "util/arg_parser.h"
@@ -33,7 +34,12 @@ int main(int argc, char const *argv[]) {
   fractal_info cfg = parse_args<fractal_info>(argc, argv);
   // fractal_multithread<> fractal;
   // fractal.read_config(cfg);
-  fractal_ref fractal = get_fractal(cfg);
+  fractal_ref fractal;
+  if (args.read<int>("avx", 0) != 0 || args.read<int>("AVX", 0) != 0) {
+    fractal = get_fractal_avx_f32(cfg);
+  } else {
+    fractal = get_fractal(cfg);
+  }
 
   std::cout << json(cfg) << std::endl;
 

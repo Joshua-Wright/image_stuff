@@ -50,6 +50,8 @@ add_executable(rose_dist_range          src/renders/rose_dist_range.cpp)
 add_executable(voronoi_iterative        src/renders/voronoi_iterative.cpp)
 add_executable(voronoi_transform        src/renders/voronoi_transform.cpp)
 add_executable(zoom                     src/renders/zoom.cpp)
+add_executable(chaos_game               src/renders/chaos_game.cpp)
+add_executable(chaos_game2              src/renders/chaos_game2.cpp)
 
 target_link_libraries(expand_pixels       image)
 target_link_libraries(colormap_demo       image)
@@ -65,6 +67,8 @@ target_link_libraries(rose_dist_range     image)
 target_link_libraries(voronoi_iterative   image)
 target_link_libraries(voronoi_transform   image)
 target_link_libraries(zoom                image)
+target_link_libraries(chaos_game          image)
+target_link_libraries(chaos_game2         image)
 
 
 add_executable(benchmark_types   src/tests/benchmark_types.cpp)

@@ -13,45 +13,55 @@
 #include <vector>
 #include <io.h>
 
-
 using std::vector;
+using namespace image_utils;
 
-namespace {
-    static unsigned long xor_x = 123456789, xor_y = 362436069, xor_z = 521288629;
 
-    unsigned long xorshf96() {          //period 2^96-1
-        unsigned long t;
-        xor_x ^= xor_x << 16;
-        xor_x ^= xor_x >> 5;
-        xor_x ^= xor_x << 1;
 
-        t = xor_x;
-        xor_x = xor_y;
-        xor_y = xor_z;
-        xor_z = t ^ xor_x ^ xor_y;
 
-        return xor_z;
-    }
+struct chaos_global_state {
+    const vector<vec2> vertexes{
+            vec2{0, 0},
+            vec2{0, 1},
+            vec2{1, 0},
+            vec2{1, 1},
+    };
+};
 
-    double xorshf96_d() {
-        return xorshf96() * 1.0 / std::numeric_limits<unsigned long>::max();
+struct chaos_state {
+    using global_state_t = chaos_global_state;
+    vec2 point;
+
+    size_t n_child() {
+
     }
 };
 
 
 int main(int argc, char const *argv[]) {
-    using namespace image_utils;
     arg_parser args(argc, argv);
 
-    const vec2 vertexes[] = {
+//    const vec2 corners[] = {
+//            vec2{0, 0},
+//            vec2{0, 1},
+//            vec2{1, 0},
+//            vec2{1, 1},
+//    };
+//    const size_t n_vertexes = sizeof(corners) / sizeof(corners[0]);
+
+    const vector<vec2> vertexes{
             vec2{0, 0},
             vec2{0, 1},
             vec2{1, 0},
             vec2{1, 1},
-//            vec2{0.5, 1},
-//            vec2{0.5, 0},
     };
-    const size_t n_vertexes = sizeof(vertexes) / sizeof(vertexes[0]);
+    const size_t n_vertexes = vertexes.size();
+
+    vector<vector<vec2>> next_vertex_lookup(n_vertexes, vertexes);
+    for (size_t i = 0; i < n_vertexes; ++i) {
+        next_vertex_lookup[i].erase(next_vertex_lookup[i].begin() + i);
+    }
+
 
     const auto x = args.read<size_t>("x", 500);
     const auto y = args.read<size_t>("y", 500);
@@ -61,7 +71,7 @@ int main(int argc, char const *argv[]) {
 
     vector<vec2> points;
     vector<vec2> last_vertexes;
-    // start toward all 4 vertexes
+    // start toward all 4 corners
     for (auto v : vertexes) {
         auto point = vec2{0.5, 0.5};
         points.push_back(point + (v - point) / 2);
@@ -93,10 +103,10 @@ int main(int argc, char const *argv[]) {
             }
 
             for (size_t j = 0; j < (n_vertexes - 1); ++j) {
-                next_points[(n_vertexes-1) * i + j] = tmp_points[j];
+                next_points[(n_vertexes - 1) * i + j] = tmp_points[j];
             }
             for (size_t j = 0; j < (n_vertexes - 1); ++j) {
-                next_last_vertexes[(n_vertexes-1) * i + j] = tmp_last_vertexes[j];
+                next_last_vertexes[(n_vertexes - 1) * i + j] = tmp_last_vertexes[j];
             }
         }
         points = std::move(next_points);

@@ -12,9 +12,11 @@
 #include <unordered_map>
 #include <vector>
 #include <io.h>
+#include <filters.h>
 
 
 using std::vector;
+using namespace image_utils;
 
 namespace {
     static unsigned long xor_x = 123456789, xor_y = 362436069, xor_z = 521288629;
@@ -38,21 +40,97 @@ namespace {
     }
 };
 
+const vec2 corners[] = {
+        vec2{0, 0},
+        vec2{0, 1},
+        vec2{1, 1},
+        vec2{1, 0},
+};
+const size_t n_corners = sizeof(corners) / sizeof(corners[0]);
+
+vec2 chaos_square(size_t iter) {
+    size_t last_vertex_idx = xorshf96() % n_corners;
+    vec2 point{xorshf96_d(), xorshf96_d()};
+    for (size_t j = 0; j < iter; ++j) {
+
+        // pick a new vertex
+        size_t new_vertex_idx = xorshf96() % n_corners;
+        while (new_vertex_idx == last_vertex_idx) {
+            new_vertex_idx = xorshf96() % n_corners;
+        }
+        last_vertex_idx = new_vertex_idx;
+
+        // move halfway toward new vertex
+        point = point + (corners[new_vertex_idx] - point) / 2;
+    }
+    return point;
+}
+
+vec2 chaos_diagonal(size_t iter) {
+    size_t last_vertex_idx = xorshf96() % n_corners;
+    vec2 point{xorshf96_d(), xorshf96_d()};
+    for (size_t j = 0; j < iter; ++j) {
+
+        // pick a new vertex
+        size_t new_vertex_idx = xorshf96() % n_corners;
+        while (((last_vertex_idx + 1) % n_corners) == new_vertex_idx) {
+            new_vertex_idx = xorshf96() % n_corners;
+        }
+        last_vertex_idx = new_vertex_idx;
+
+        // move halfway toward new corner
+        point = point + (corners[new_vertex_idx] - point) / 2;
+    }
+    return point;
+}
+
+vec2 chaos_T(size_t iter) {
+    size_t last_vertex_idx = xorshf96() % n_corners;
+    vec2 point{xorshf96_d(), xorshf96_d()};
+    for (size_t j = 0; j < iter; ++j) {
+
+        // pick a new vertex
+        size_t new_vertex_idx = xorshf96() % n_corners;
+        while (((last_vertex_idx + 2) % n_corners) == new_vertex_idx) {
+            new_vertex_idx = xorshf96() % n_corners;
+        }
+        last_vertex_idx = new_vertex_idx;
+
+        // move halfway toward new corner
+        point = point + (corners[new_vertex_idx] - point) / 2;
+    }
+    return point;
+}
+
+vec2 chaos_flower(size_t iter) {
+    // FIXME
+    size_t last_vertex_idx = xorshf96() % n_corners;
+    size_t last_vertex_idx2 = xorshf96() % n_corners;
+    vec2 point{xorshf96_d(), xorshf96_d()};
+    for (size_t j = 0; j < iter; ++j) {
+
+        // pick a new vertex
+        size_t new_vertex_idx = xorshf96() % n_corners;
+//        while (((last_vertex_idx2 + 1) % n_corners) == new_vertex_idx ||
+//               ((last_vertex_idx2 + 3) % n_corners) == new_vertex_idx ||
+//               ((last_vertex_idx + 1) % n_corners) == new_vertex_idx ||
+//               ((last_vertex_idx + 3) % n_corners) == new_vertex_idx) {
+        while (((last_vertex_idx + 1) % n_corners) == new_vertex_idx ||
+               ((last_vertex_idx2 + 3) % n_corners) == new_vertex_idx ) {
+            new_vertex_idx = xorshf96() % n_corners;
+        }
+        last_vertex_idx2 = last_vertex_idx;
+        last_vertex_idx = new_vertex_idx;
+
+        // move halfway toward new corner
+        point = point + (corners[new_vertex_idx] - point) / 2;
+    }
+    return point;
+}
 
 int main(int argc, char const *argv[]) {
-    using namespace image_utils;
     arg_parser args(argc, argv);
 
-    const vec2 vertexes[] = {
-            vec2{0, 0},
-            vec2{0, 1},
-            vec2{1, 0},
-            vec2{1, 1},
-//            vec2{0.5, 1},
-//            vec2{0.5, 0},
-    };
-
-//    const auto N = args.read<size_t>("N", 500);
     const auto x = args.read<size_t>("x", 500);
     const auto y = args.read<size_t>("y", 500);
     const auto N = x * y;
@@ -61,44 +139,19 @@ int main(int argc, char const *argv[]) {
     vector<vec2> last_vertexes(N);
     image_RGB grid(x, y, RGB{255, 255, 255});
 
-    // generate points
-//#pragma omp parallel for private(xor_x, xor_y, xor_z)
-//    for (size_t i = 0; i < N; ++i) {
-//        last_vertexes[i] = vertexes[xorshf96() % sizeof(vertexes) / sizeof(vertexes[0])];
-//        points[i][0] = xorshf96_d();
-//        points[i][1] = xorshf96_d();
-//    }
-
 #pragma omp parallel for
     for (size_t i = 0; i < N; i++) {
-        points[i] = vec2{grid.z_to_x(i)*1.0/x, grid.z_to_y(i)*1.0/y};
+        points[i] = vec2{grid.z_to_x(i) * 1.0 / x, grid.z_to_y(i) * 1.0 / y};
     }
 
     // iterate points
     auto iter = args.read<size_t>("iter", 500);
 #pragma omp parallel for private(xor_x, xor_y, xor_z)
     for (size_t i = 0; i < N; ++i) {
-        vec2 last_vertex = vertexes[xorshf96() % sizeof(vertexes) / sizeof(vertexes[0])];
-        vec2 point = points[i];
-        for (size_t j = 0; j < iter; ++j) {
-
-            // pick a new vertex
-            vec2 new_vertex = vertexes[xorshf96() % sizeof(vertexes) / sizeof(vertexes[0])];
-            while (new_vertex == last_vertex) {
-//            while (new_vertex == last_vertexes[(i + 1) % 4]) {
-                new_vertex = vertexes[xorshf96() % sizeof(vertexes) / sizeof(vertexes[0])];
-            }
-//            vec2 new_vertex{
-//                    last_vertex[0] == 1 ? 0 : 1,
-//                    last_vertex[1] == 1 ? 0 : 1,
-//            };
-            last_vertex = new_vertex;
-
-            // move halfway toward new vertex
-//            points[i] = points[i] + (new_vertex - points[i]) / 2;
-            point = point + (new_vertex - point) / 2;
-        }
-        points[i] = point;
+        points[i] = chaos_square(iter);
+//        points[i] = chaos_T(iter);
+//        points[i] = chaos_flower(iter);
+//        points[i] = chaos_diagonal(iter);
     }
 
 
@@ -113,4 +166,5 @@ int main(int argc, char const *argv[]) {
 
     std::string outfile = args.read<std::string>("output", "output.png");
     write_image(grid, outfile);
+//    write_image(square_to_widescreen(grid), outfile);
 }

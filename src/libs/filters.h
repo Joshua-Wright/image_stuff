@@ -18,4 +18,6 @@ extern std::unordered_map<std::string, matrix<double>> kernels;
 
 void color_connected_components(image_RGB &image, const RGB &to_replace, const std::vector<RGB> &replacements);
 
+image_RGB square_to_widescreen(const image_RGB &image);
+
 }

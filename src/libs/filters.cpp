@@ -103,8 +103,10 @@ namespace image_utils {
             {"edge_detect_x4", kernel_edge_detect_x4},
     };
 
-    void bfs_set_color(image_RGB &image, const vec_ull &start, const RGB &to_replace, const RGB &replacements) {
+    void bfs_set_color(image_RGB &image, const vec_ull &start, const RGB &to_replace, const RGB &replacement) {
         std::vector<vec_ull> to_visit(1, start);
+        image(start) = replacement;
+
         while (!to_visit.empty()) {
 
             std::vector<vec_ull> to_visit_next;
@@ -113,15 +115,65 @@ namespace image_utils {
 
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
-                        
-                    }
+                        vec_ll newpos = pos + vec_ull{i, j};
 
+                        if (newpos[0] < image.x() &&
+                            newpos[1] < image.y() &&
+                            image(newpos) == to_replace) {
+
+                            to_visit_next.push_back(newpos);
+                            image(newpos) = replacement;
+                        }
+                    }
+                }
+            }
+
+            to_visit = std::move(to_visit_next);
+        }
+    }
+
+    void color_connected_components(image_RGB &image, const RGB &to_replace, const std::vector<RGB> &replacements) {
+        size_t next_replacement = 0;
+
+        for (size_t i = 0; i < image.x(); i++) {
+            for (size_t j = 0; j < image.y(); j++) {
+                vec_ull pos{i, j};
+
+                if (image(pos) == to_replace) {
+//                    bfs_set_color(image, pos, to_replace, replacements[next_replacement]);
+                    bfs_set_color(image, pos, to_replace, replacements[rand() % replacements.size()]);
+
+                    ++next_replacement;
+                    if (next_replacement == replacements.size()) {
+                        next_replacement = 0;
+                    }
                 }
             }
         }
     }
 
-    void color_connected_components(image_RGB &image, const RGB &to_replace, const std::vector<RGB> &replacements) {
+    image_RGB square_to_widescreen(const image_RGB &image) {
+        size_t new_width = image.x() * 16 / 9;
+        image_RGB wide_image(new_width, image.y());
 
+        size_t xb = new_width / 2 - image.x() / 2;
+        size_t xc = xb + image.x();
+
+        for (size_t i = 0; i < wide_image.x(); ++i) {
+            for (size_t j = 0; j < wide_image.y(); ++j) {
+
+                size_t i_;
+                if (i < xb) {
+                    i_ = image.x() - (xb - i );
+                } else if (i < xb + image.x()) {
+                    i_ = i - xb;
+                } else {
+                    i_ = i - xc;
+                }
+
+                wide_image(i, j) = image(i_, j);
+            }
+        }
+        return wide_image;
     }
 }

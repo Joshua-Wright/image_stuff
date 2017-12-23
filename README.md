@@ -2,6 +2,7 @@
 Various for-fun image renders. Most are based on mathematical equations, fractals, or identities.
 
 [Gallery of examples](http://imgur.com/a/W2gFT/all) (warning: very large .gifs!)
+[IAT fractals](https://imgur.com/a/UsjPS)
 
 ## Includes:
 * parametric rose wave distance
